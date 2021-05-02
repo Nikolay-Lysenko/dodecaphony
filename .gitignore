@@ -127,3 +127,27 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Other editors
+*~
+.idea/
+.save
+
+# Binaries
+*.db
+*.sqlite3
+
+# Logs
+nohup.out
+
+# TeX
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.out
+*.pdf
+*.gz
+
+# Project data
+outputs/
