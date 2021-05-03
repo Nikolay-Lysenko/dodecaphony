@@ -1,3 +1,8 @@
+[![Build Status](https://github.com/Nikolay-Lysenko/dodecaphony/actions/workflows/main.yml/badge.svg)](https://github.com/Nikolay-Lysenko/dodecaphony/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/Nikolay-Lysenko/dodecaphony/branch/master/graph/badge.svg)](https://codecov.io/gh/Nikolay-Lysenko/dodecaphony)
+[![Maintainability](https://api.codeclimate.com/v1/badges/b83bc51361ac046bc7eb/maintainability)](https://codeclimate.com/github/Nikolay-Lysenko/dodecaphony/maintainability)
+[![PyPI version](https://badge.fury.io/py/dodecaphony.svg)](https://badge.fury.io/py/dodecaphony)
+
 # Dodecaphony
 
 ## Overview

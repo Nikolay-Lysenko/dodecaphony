@@ -1,4 +1,4 @@
-name: Run Unit Tests and Measure Coverage
+name: build
 
 on:
   push:
