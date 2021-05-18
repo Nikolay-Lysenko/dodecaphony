@@ -10,7 +10,7 @@ import math
 from typing import Any, Callable
 
 from .fragment import Fragment
-from .utils import N_SEMITONES_PER_OCTAVE
+from .music_theory import N_SEMITONES_PER_OCTAVE
 
 
 SCORING_SETS_REGISTRY_TYPE = dict[str, list[tuple[Callable[..., float], float, dict[str, Any]]]]
@@ -218,7 +218,7 @@ def evaluate_smoothness_of_voice_leading(
     :param fragment:
         a fragment to be evaluated
     :param penalty_deduction_per_line:
-        amount of leaps average penalty that is deducted for each melodic line
+        amount of averaged leaps penalty that is deducted for each melodic line
     :param n_semitones_to_penalty:
         mapping from size of melodic interval in semitones to penalty for it
     :return:

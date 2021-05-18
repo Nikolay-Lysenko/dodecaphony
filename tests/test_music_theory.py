@@ -1,5 +1,5 @@
 """
-Test `dodecaphony.utils` module.
+Test `dodecaphony.music_theory` module.
 
 Author: Nikolay Lysenko
 """
@@ -7,7 +7,7 @@ Author: Nikolay Lysenko
 
 import pytest
 
-from dodecaphony.utils import (
+from dodecaphony.music_theory import (
     get_smallest_intervals_between_pitch_classes,
     invert_tone_row,
     revert_tone_row,

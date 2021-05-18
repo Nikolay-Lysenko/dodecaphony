@@ -12,7 +12,7 @@ from typing import Optional
 
 from sinethesizer.utils.music_theory import get_note_to_position_mapping
 
-from .utils import (
+from .music_theory import (
     N_SEMITONES_PER_OCTAVE,
     TONE_ROW_LEN,
     get_smallest_intervals_between_pitch_classes,

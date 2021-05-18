@@ -16,7 +16,7 @@ import random
 from typing import Any, Callable
 
 from .fragment import Fragment, SUPPORTED_DURATIONS, override_calculated_attributes
-from .utils import TONE_ROW_LEN, invert_tone_row, revert_tone_row, transpose_tone_row
+from .music_theory import TONE_ROW_LEN, invert_tone_row, revert_tone_row, transpose_tone_row
 
 
 TRANSFORMATIONS_REGISTRY_TYPE = dict[str, tuple[Callable, list[Any]]]
