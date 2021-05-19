@@ -202,6 +202,8 @@ def evaluate_harmony_dynamic(
     def find_sonority_type() -> str:
         """Find type of current sonority."""
         for ad_hoc_position in ad_hoc_positions:
+            if ad_hoc_position['time'] < 0:
+                ad_hoc_position['time'] += fragment.n_beats
             if sonority_start <= ad_hoc_position['time'] < sonority_end:
                 return ad_hoc_position['name']
         for regular_position in regular_positions:

@@ -462,6 +462,83 @@ def test_evaluate_consistency_of_rhythm_with_meter(
             # `expected`
             -0.1766666667
         ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [
+                        [
+                            Event(line_index=0, start_time=0.0, duration=1.0),
+                            Event(line_index=0, start_time=1.0, duration=1.0),
+                            Event(line_index=0, start_time=2.0, duration=1.0),
+                            Event(line_index=0, start_time=3.0, duration=1.0),
+                        ],
+                        [
+                            Event(line_index=1, start_time=0.0, duration=1.0),
+                            Event(line_index=1, start_time=1.0, duration=1.0),
+                            Event(line_index=1, start_time=2.0, duration=1.0),
+                            Event(line_index=1, start_time=3.0, duration=0.5),
+                            Event(line_index=1, start_time=3.5, duration=0.5),
+                        ],
+                        [
+                            Event(line_index=2, start_time=0.0, duration=1.0),
+                            Event(line_index=2, start_time=1.0, duration=1.0),
+                            Event(line_index=2, start_time=2.0, duration=1.0),
+                            Event(line_index=2, start_time=3.0, duration=0.5),
+                            Event(line_index=2, start_time=3.5, duration=0.5),
+                        ],
+                    ]
+                ],
+                sonic_content=[
+                    [
+                        'B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F',
+                        'pause', 'pause'
+                    ]
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=4,
+                line_ids=[1, 2, 3],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_tone_row_instances_by_group=[1]
+            ),
+            # `regular_positions`
+            [
+                {'name': 'downbeat', 'denominator': 4, 'remainder': 0},
+                {'name': 'middle', 'denominator': 4, 'remainder': 2},
+            ],
+            # `ad_hoc_positions`
+            [
+                {'name': '2nd_beat', 'time': 1.0},
+                {'name': 'ending', 'time': -0.01},
+            ],
+            # `ranges`
+            {
+                'downbeat': [0.75, 1.0],
+                'middle': [0.5, 0.9],
+                '2nd_beat': [0.8, 1.0],
+                'ending': [0.0, 0.1],
+                'default': [0.1, 0.9],
+            },
+            # `n_semitones_to_stability`
+            {
+                0: 1.0,
+                1: 0.2,
+                2: 0.2,
+                3: 0.7,
+                4: 0.8,
+                5: 0.5,
+                6: 0.0,
+                7: 0.9,
+                8: 0.6,
+                9: 0.6,
+                10: 0.2,
+                11: 0.2,
+            },
+            # `expected`
+            -0.3366666667
+        ),
     ]
 )
 def test_evaluate_harmony_dynamic(
