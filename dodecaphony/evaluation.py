@@ -101,6 +101,43 @@ def evaluate_cadence_duration(
     return score
 
 
+def evaluate_climax_explicity(
+        fragment: Fragment,
+        height_penalties: dict[int, float],
+        duplication_penalty: float
+) -> float:
+    """
+    Evaluate goal-orientedness of melodic lines by explicity of their climax points.
+
+    :param fragment:
+        a fragment to be evaluated
+    :param height_penalties:
+        mapping from interval size (in semitones) between average pitch of a line and climax of
+        this line to penalty for such interval; values for missing keys are forward-propagated
+    :param duplication_penalty:
+        penalty for each non-first occurrence of line's highest pitch within this line
+    :return:
+        summed over melodic lines penalty for not so high climax points and for duplications
+        of climax points within the same line
+    """
+    score = 0
+    for melodic_line in fragment.melodic_lines:
+        pitches = [event.position_in_semitones for event in melodic_line]
+        pitches = [x for x in pitches if x is not None]
+
+        climax_pitch = max(pitches)
+        average_pitch = sum(pitches) / len(pitches)
+        interval_size = climax_pitch - average_pitch
+        raw_height_penalties = [v for k, v in height_penalties.items() if k >= interval_size]
+        height_penalty = max(raw_height_penalties) if raw_height_penalties else 0
+        score -= height_penalty
+
+        n_duplications = len([x for x in pitches if x == climax_pitch]) - 1
+        score -= duplication_penalty * n_duplications
+    score /= len(fragment.melodic_lines)
+    return score
+
+
 def evaluate_consistency_of_rhythm_with_meter(
         fragment: Fragment, consistent_patterns: list[list[float]]
 ) -> float:
@@ -249,6 +286,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
         'absence_of_doubled_pitch_classes': evaluate_absence_of_doubled_pitch_classes,
         'absence_of_voice_crossing': evaluate_absence_of_voice_crossing,
         'cadence_duration': evaluate_cadence_duration,
+        'climax_explicity': evaluate_climax_explicity,
         'consistency_of_rhythm_with_meter': evaluate_consistency_of_rhythm_with_meter,
         'harmony_dynamic': evaluate_harmony_dynamic,
         'smoothness_of_voice_leading': evaluate_smoothness_of_voice_leading,
