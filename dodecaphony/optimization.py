@@ -131,10 +131,11 @@ def optimize_with_local_search(
         current_best_score = best_new_records[0]['score']
         incumbent_solutions = [record['fragment'] for record in best_new_records]
 
-        if current_best_score <= best_score:
-            n_transformations_per_trial += n_transformations_increment
-            n_transformations_per_trial = min(n_transformations_per_trial, max_n_transformations_per_trial)
+        if current_best_score > best_score:
+            n_transformations_per_trial = default_n_transformations_per_trial
         else:
+            n_transformations_per_trial += n_transformations_increment
+        if n_transformations_per_trial > max_n_transformations_per_trial:
             n_transformations_per_trial = default_n_transformations_per_trial
 
         records = sorted(records + new_records, key=lambda x: -x['score'])[:beam_width]
