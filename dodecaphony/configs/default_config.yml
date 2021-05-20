@@ -2,16 +2,16 @@ fragment:
   tone_row: [B, A#, G, C#, D#, C, D, A, F#, E, G#, F]
   groups:
     - n_melodic_lines: 1
-      n_tone_row_instances: 5
+      n_tone_row_instances: 1
     - n_melodic_lines: 3
-      n_tone_row_instances: 12
+      n_tone_row_instances: 4
   meter_numerator: 4
   meter_denominator: 4
-  n_measures: 25
+  n_measures: 4
   line_ids: [1, 2, 3, 4]
   upper_line_highest_note: E6
   upper_line_lowest_note: E4
-  pauses_fraction: 0.2
+  pauses_fraction: 0.0
 
 scoring_sets:
   - name: default
@@ -25,6 +25,19 @@ scoring_sets:
         max_duration: 4.0
         last_sonority_weight: 0.9
         last_notes_weight: 0.1
+      - name: climax_explicity
+        weight: 1.0
+        height_penalties:
+          2: 1.0
+          3: 0.8
+          4: 0.6
+          5: 0.5
+          6: 0.4
+          7: 0.3
+          8: 0.2
+          9: 0.1
+          10: 0.0
+        duplication_penalty: 0.5
       - name: consistency_of_rhythm_with_meter
         weight: 1.0
         consistent_patterns:
@@ -117,7 +130,7 @@ scoring_sets:
           - name: beginning
             time: 0
           - name: ending
-            time: 99.9  # It equals to `n_measures * meter_numerator - epsilon`.
+            time: -0.01
         ranges:
           downbeat: [0.75, 1.0]
           middle: [0.5, 0.9]
@@ -162,9 +175,9 @@ evaluation:
 optimization:
   n_iterations: 100
   n_trials_per_iteration: 1000
-  default_n_transformations_per_trial: 3
+  default_n_transformations_per_trial: 2
   n_transformations_increment: 1
-  max_n_transformations_per_trial: 10
+  max_n_transformations_per_trial: 5
   beam_width: 5
   transformation_probabilities:
     duration_change: 0.7
