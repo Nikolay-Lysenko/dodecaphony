@@ -5,7 +5,7 @@ Author: Nikolay Lysenko
 """
 
 
-from copy import deepcopy
+import copy
 from typing import Union
 
 from .evaluation import SCORING_SETS_REGISTRY_TYPE, evaluate
@@ -50,7 +50,18 @@ def generate_new_records(
     new_records = []
     for incumbent_solution in incumbent_solutions:
         for trial_id in range(n_trials_per_iteration):
-            candidate = deepcopy(incumbent_solution)
+            candidate = Fragment(
+                [copy.copy(x) for x in incumbent_solution.temporal_content],
+                [copy.copy(x) for x in incumbent_solution.sonic_content],
+                incumbent_solution.meter_numerator,
+                incumbent_solution.meter_denominator,
+                incumbent_solution.n_beats,
+                incumbent_solution.line_ids,
+                incumbent_solution.upper_line_highest_position,
+                incumbent_solution.upper_line_lowest_position,
+                incumbent_solution.n_melodic_lines_by_group,
+                incumbent_solution.n_tone_row_instances_by_group
+            )
             candidate = transform(
                 candidate,
                 n_transformations_per_trial,

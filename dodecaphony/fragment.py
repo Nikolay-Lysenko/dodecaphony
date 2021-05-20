@@ -5,6 +5,7 @@ Author: Nikolay Lysenko
 """
 
 
+import itertools
 import math
 import random
 from dataclasses import dataclass
@@ -66,7 +67,7 @@ class FragmentParams:
 @dataclass
 class Fragment:
     """A fragment of a musical piece."""
-    temporal_content: list[list[list[Event]]]
+    temporal_content: list[list[float]]
     sonic_content: list[list[str]]
     meter_numerator: int
     meter_denominator: int
@@ -74,6 +75,7 @@ class Fragment:
     line_ids: list[int]
     upper_line_highest_position: int
     upper_line_lowest_position: int
+    n_melodic_lines_by_group: list[int]
     n_tone_row_instances_by_group: list[int]
     melodic_lines: Optional[list[list[Event]]] = None
     sonorities: Optional[list[list[Event]]] = None
@@ -127,20 +129,18 @@ def split_time_span(n_measures: int, n_events: int, meter_numerator: float) -> l
     return durations
 
 
-def find_initial_durations(params: FragmentParams) -> list[list[list[float]]]:
+def create_initial_temporal_content(params: FragmentParams) -> list[list[float]]:
     """
     Split time span of each melodic line into durations of individual events.
 
     :param params:
         parameters of a fragment to be created
     :return:
-        lists of event durations (in reference beats) for each melodic line from each group of
-        melodic lines sharing the same series (in terms of vertical distribution of series pitches)
+        lists of event durations (in reference beats) for each melodic line
     """
     meter_numerator = float(params.meter_numerator)
     results = []
     for group_params in params.groups:
-        nested_results = []
         n_sound_events = group_params['n_tone_row_instances'] * TONE_ROW_LEN
         n_events = int(round(n_sound_events / (1 - params.pauses_fraction)))
         n_lines = group_params['n_melodic_lines']
@@ -151,36 +151,8 @@ def find_initial_durations(params: FragmentParams) -> list[list[list[float]]]:
             line_index += 1
         for current_n_events in n_events_per_line:
             durations = split_time_span(params.n_measures, current_n_events, meter_numerator)
-            nested_results.append(durations)
-        results.append(nested_results)
+            results.append(durations)
     return results
-
-
-def find_initial_temporal_content(params: FragmentParams) -> list[list[list[Event]]]:
-    """
-    Find initial value of data structure that keeps track of event durations.
-
-    :param params:
-        parameters of a fragment to be created
-    :return:
-        list where for each group of melodic lines sharing the same series for each melodic line
-        there are events representing temporal (loosely speaking, rhythmic) structure of the line
-    """
-    line_index = 0
-    temporal_content = []
-    groups_durations = find_initial_durations(params)
-    for group_durations in groups_durations:
-        group_content = []
-        for line_durations in group_durations:
-            start_time = 0
-            line_content = []
-            for duration in line_durations:
-                line_content.append(Event(line_index, start_time, duration))
-                start_time += duration
-            group_content.append(line_content)
-            line_index += 1
-        temporal_content.append(group_content)
-    return temporal_content
 
 
 def replicate_tone_row(tone_row: list[str], n_instances: int) -> list[str]:
@@ -206,9 +178,9 @@ def replicate_tone_row(tone_row: list[str], n_instances: int) -> list[str]:
     return pitch_classes
 
 
-def find_initial_sonic_content(params: FragmentParams) -> list[list[str]]:
+def create_initial_sonic_content(params: FragmentParams) -> list[list[str]]:
     """
-    Find initial value of data structure that keeps track of pitch classes.
+    Create initial data structure that keeps track of pitch classes.
 
     :param params:
         parameters of a fragment to be created
@@ -233,6 +205,35 @@ def find_initial_sonic_content(params: FragmentParams) -> list[list[str]]:
     return sonic_content
 
 
+def create_grouped_rhythm_only_lines(fragment: Fragment) -> list[list[list[Event]]]:
+    """
+    Create rhythm-only lines grouped by sharing of the same series.
+
+    :param fragment:
+        fragment with non-empty temporal content and sonic content
+    :return:
+        list where for each group of melodic lines sharing the same series for each melodic line
+        there are events representing temporal (loosely speaking, rhythmic) structure of the line,
+        but keeping no information about pitches
+    """
+    line_index = 0
+    rhythm_only_lines = []
+    end_indices = list(itertools.accumulate(fragment.n_melodic_lines_by_group))
+    start_indices = [0] + end_indices[:-1]
+    for start_index, end_index in zip(start_indices, end_indices):
+        group_of_lines = []
+        for line_durations in fragment.temporal_content[start_index:end_index]:
+            start_time = 0
+            line = []
+            for duration in line_durations:
+                line.append(Event(line_index, start_time, duration))
+                start_time += duration
+            group_of_lines.append(line)
+            line_index += 1
+        rhythm_only_lines.append(group_of_lines)
+    return rhythm_only_lines
+
+
 def distribute_pitch_classes(fragment: Fragment) -> list[list[Event]]:
     """
     Distribute pitch classes across melodic lines.
@@ -244,12 +245,13 @@ def distribute_pitch_classes(fragment: Fragment) -> list[list[Event]]:
         these lines are derived from temporal content and sonic content of the fragment
     """
     melodic_lines = [[] for _ in fragment.line_ids]
-    zipped = zip(fragment.temporal_content, fragment.sonic_content)
-    for group_temporal_content, group_sonic_content in zipped:
+    grouped_rhythm_only_lines = create_grouped_rhythm_only_lines(fragment)
+    zipped = zip(grouped_rhythm_only_lines, fragment.sonic_content)
+    for group_of_rhythm_only_lines, group_sonic_content in zipped:
         timeline = [
             event
-            for line_temporal_content in group_temporal_content
-            for event in line_temporal_content
+            for rhythm_only_line in group_of_rhythm_only_lines
+            for event in rhythm_only_line
         ]
         timeline = sorted(timeline, key=lambda event: (event.start_time, event.line_index))
         for event, pitch_class in zip(timeline, group_sonic_content):
@@ -426,14 +428,15 @@ def initialize_fragment(params: FragmentParams) -> Fragment:
     """
     validate(params)
     fragment = Fragment(
-        find_initial_temporal_content(params),
-        find_initial_sonic_content(params),
+        create_initial_temporal_content(params),
+        create_initial_sonic_content(params),
         params.meter_numerator,
         params.meter_denominator,
         params.n_measures * params.meter_numerator,
         params.line_ids,
         NOTE_TO_POSITION_MAPPING[params.upper_line_highest_note],
         NOTE_TO_POSITION_MAPPING[params.upper_line_lowest_note],
+        [group['n_melodic_lines'] for group in params.groups],
         [group['n_tone_row_instances'] for group in params.groups]
     )
     fragment = override_calculated_attributes(fragment)

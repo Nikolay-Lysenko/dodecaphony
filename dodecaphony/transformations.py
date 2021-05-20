@@ -46,7 +46,7 @@ def get_duration_changes() -> dict[tuple[float, float], list[tuple[float, float]
 
 def draw_random_indices(n_tone_row_instances_by_group: list[int]) -> tuple[int, int]:
     """
-    Draw index of melodic line and index of series from it.
+    Draw index of melodic lines group and index of tone row instance from it.
 
     :param n_tone_row_instances_by_group:
         list where number of tone row instances in the group is stored for each group of
@@ -139,20 +139,13 @@ def apply_duration_change(
     :return:
         modified fragment
     """
-    n_groups = len(fragment.n_tone_row_instances_by_group)
-    group_index = random.choices(range(n_groups), fragment.n_tone_row_instances_by_group, k=1)[0]
-    line = random.choice(fragment.temporal_content[group_index])
-    events_indices = random.sample(range(len(line)), 2)
-    key = tuple(sorted(line[event_index].duration for event_index in events_indices))
+    line_durations = random.choice(fragment.temporal_content)
+    events_indices = random.sample(range(len(line_durations)), 2)
+    key = tuple(sorted(line_durations[event_index] for event_index in events_indices))
     all_durations = duration_changes[key]
     durations = random.choice(all_durations)
     for event_index, duration in zip(events_indices, durations):
-        line[event_index].duration = duration
-    start_index, end_index = sorted(events_indices)
-    current_time = line[start_index].start_time
-    for event in line[start_index:end_index+1]:
-        event.start_time = current_time
-        current_time += event.duration
+        line_durations[event_index] = duration
     return fragment
 
 
