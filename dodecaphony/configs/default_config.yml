@@ -186,6 +186,8 @@ optimization:
     reversion: 0.075
     transposition: 0.075
   max_transposition_in_semitones: 3
+  paralleling_params:
+    n_processes: null
 
 rendering:
   dir: outputs
