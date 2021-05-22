@@ -8,7 +8,7 @@ Author: Nikolay Lysenko
 import pretty_midi
 import pytest
 
-from dodecaphony.fragment import Event, Fragment, override_calculated_attributes
+from dodecaphony.fragment import Fragment, override_calculated_attributes
 from dodecaphony.rendering import (
     create_lilypond_file_from_fragment,
     create_midi_from_fragment,

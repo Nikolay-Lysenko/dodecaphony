@@ -20,7 +20,7 @@ from dodecaphony.evaluation import (
     evaluate_smoothness_of_voice_leading,
     parse_scoring_sets_registry,
 )
-from dodecaphony.fragment import Event, Fragment, override_calculated_attributes
+from dodecaphony.fragment import Fragment, override_calculated_attributes
 
 
 @pytest.mark.parametrize(
