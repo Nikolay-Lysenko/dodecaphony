@@ -103,13 +103,12 @@ def create_tasks(
         paralleling_params: dict[str, Any]
 ) -> list[list[Task]]:
     """
-    Distribute incumbent solutions and trials between processes.
+    Distribute incumbent solutions and trials to improve them between processes.
 
     :param incumbent_solutions:
         fragments such that their neighborhoods should be searched
     :param n_trials_per_iteration:
         number of transformed fragments to generate and evaluate per each incumbent solution
-        at each iteration
     :param paralleling_params:
         settings of parallel running of trials
     :return:
@@ -192,7 +191,7 @@ def optimize_with_local_search(
     """
     incumbent_solutions = [fragment]
     records = []
-    best_score = -1e9
+    previous_best_score = -1e9
     n_transformations_per_trial = default_n_transformations_per_trial
     transformation_names = list(transformation_probabilities.keys())
     transformation_probabilities = list(transformation_probabilities.values())
@@ -219,7 +218,7 @@ def optimize_with_local_search(
         current_best_score = best_new_records[0].score
         incumbent_solutions = [record.fragment for record in best_new_records]
 
-        if current_best_score > best_score:
+        if current_best_score > previous_best_score:
             n_transformations_per_trial = default_n_transformations_per_trial
         else:
             n_transformations_per_trial += n_transformations_increment
@@ -227,10 +226,11 @@ def optimize_with_local_search(
             n_transformations_per_trial = default_n_transformations_per_trial
 
         records = sorted(records + new_records, key=lambda x: -x.score)[:beam_width]
-        best_score = records[0].score
+        global_best_score = records[0].score
+        previous_best_score = current_best_score
         print(
             f'Iteration #{iteration_id:>3}: '
-            f'best_score = {best_score:.5f}, '
+            f'global_best_score = {global_best_score:.5f}, '
             f'current_best_score = {current_best_score:.5f}'
         )
     result = [record.fragment for record in records]
