@@ -10,9 +10,59 @@ from typing import Any
 import pytest
 
 from dodecaphony.evaluation import parse_scoring_sets_registry
-from dodecaphony.fragment import Event, Fragment
-from dodecaphony.optimization import optimize_with_local_search
+from dodecaphony.fragment import Fragment
+from dodecaphony.optimization import Task, create_tasks, optimize_with_local_search
 from dodecaphony.transformations import create_transformations_registry
+
+
+@pytest.mark.parametrize(
+    "incumbent_solutions, n_trials_per_iteration, paralleling_params, expected",
+    [
+        (
+            # `incumbent_solutions`
+            [1, 2, 3, 4, 5],
+            # `n_trials_per_iteration`
+            1000,
+            # `paralleling_params`
+            {'n_processes': 8},
+            # `expected`
+            [
+                [Task(1, 625)],
+                [Task(1, 375), Task(2, 250)],
+                [Task(2, 625)],
+                [Task(2, 125), Task(3, 500)],
+                [Task(3, 500), Task(4, 125)],
+                [Task(4, 625)],
+                [Task(4, 250), Task(5, 375)],
+                [Task(5, 625)],
+            ]
+        ),
+        (
+            # `incumbent_solutions`
+            [1, 2, 3, 4, 5],
+            # `n_trials_per_iteration`
+            1000,
+            # `paralleling_params`
+            {'n_processes': 6},
+            # `expected`
+            [
+                [Task(1, 834)],
+                [Task(1, 166), Task(2, 668)],
+                [Task(2, 332), Task(3, 502)],
+                [Task(3, 498), Task(4, 336)],
+                [Task(4, 664), Task(5, 170)],
+                [Task(5, 830)],
+            ]
+        ),
+    ]
+)
+def test_create_tasks(
+        incumbent_solutions: list[int], n_trials_per_iteration: int,
+        paralleling_params: dict[str, Any], expected: list[list[Task]]
+) -> None:
+    """Test `create_tasks` function."""
+    result = create_tasks(incumbent_solutions, n_trials_per_iteration, paralleling_params)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
