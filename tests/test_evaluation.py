@@ -30,39 +30,8 @@ from dodecaphony.fragment import Event, Fragment, override_calculated_attributes
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=1.0),
-                            Event(line_index=1, start_time=5.0, duration=1.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause'],
@@ -74,6 +43,7 @@ from dodecaphony.fragment import Event, Fragment, override_calculated_attributes
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `expected`
@@ -96,39 +66,8 @@ def test_evaluate_absence_of_doubled_pitch_classes(fragment: Fragment, expected:
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=1.0),
-                            Event(line_index=1, start_time=5.0, duration=1.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F', 'pause'],
@@ -140,6 +79,7 @@ def test_evaluate_absence_of_doubled_pitch_classes(fragment: Fragment, expected:
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `expected`
@@ -161,38 +101,8 @@ def test_evaluate_absence_of_voice_crossing(fragment: Fragment, expected: float)
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=2.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=1.0),
-                            Event(line_index=1, start_time=5.0, duration=1.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F'],
@@ -204,6 +114,7 @@ def test_evaluate_absence_of_voice_crossing(fragment: Fragment, expected: float)
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `max_duration`
@@ -236,39 +147,8 @@ def test_evaluate_cadence_duration(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=4.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=1.0),
-                            Event(line_index=1, start_time=9.0, duration=1.0),
-                            Event(line_index=1, start_time=10.0, duration=1.0),
-                            Event(line_index=1, start_time=11.0, duration=1.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [2.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F', 'pause'],
@@ -280,6 +160,7 @@ def test_evaluate_cadence_duration(
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `height_penalties`
@@ -318,39 +199,8 @@ def test_evaluate_climax_explicity(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=4.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=1.0),
-                            Event(line_index=1, start_time=9.0, duration=1.0),
-                            Event(line_index=1, start_time=10.0, duration=1.0),
-                            Event(line_index=1, start_time=11.0, duration=1.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [2.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F', 'pause'],
@@ -362,6 +212,7 @@ def test_evaluate_climax_explicity(
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `consistent_patterns`
@@ -391,28 +242,9 @@ def test_evaluate_consistency_of_rhythm_with_meter(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=1.0),
-                            Event(line_index=1, start_time=1.0, duration=1.0),
-                            Event(line_index=1, start_time=2.0, duration=1.0),
-                            Event(line_index=1, start_time=3.0, duration=0.5),
-                            Event(line_index=1, start_time=3.5, duration=0.5),
-                        ],
-                        [
-                            Event(line_index=2, start_time=0.0, duration=1.0),
-                            Event(line_index=2, start_time=1.0, duration=1.0),
-                            Event(line_index=2, start_time=2.0, duration=1.0),
-                            Event(line_index=2, start_time=3.0, duration=0.5),
-                            Event(line_index=2, start_time=3.5, duration=0.5),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
                 ],
                 sonic_content=[
                     [
@@ -426,6 +258,7 @@ def test_evaluate_consistency_of_rhythm_with_meter(
                 line_ids=[1, 2, 3],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
                 n_tone_row_instances_by_group=[1]
             ),
             # `regular_positions`
@@ -466,28 +299,9 @@ def test_evaluate_consistency_of_rhythm_with_meter(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=1.0),
-                            Event(line_index=1, start_time=1.0, duration=1.0),
-                            Event(line_index=1, start_time=2.0, duration=1.0),
-                            Event(line_index=1, start_time=3.0, duration=0.5),
-                            Event(line_index=1, start_time=3.5, duration=0.5),
-                        ],
-                        [
-                            Event(line_index=2, start_time=0.0, duration=1.0),
-                            Event(line_index=2, start_time=1.0, duration=1.0),
-                            Event(line_index=2, start_time=2.0, duration=1.0),
-                            Event(line_index=2, start_time=3.0, duration=0.5),
-                            Event(line_index=2, start_time=3.5, duration=0.5),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
                 ],
                 sonic_content=[
                     [
@@ -501,6 +315,7 @@ def test_evaluate_consistency_of_rhythm_with_meter(
                 line_ids=[1, 2, 3],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
                 n_tone_row_instances_by_group=[1]
             ),
             # `regular_positions`
@@ -561,28 +376,9 @@ def test_evaluate_harmony_dynamic(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=1.0),
-                            Event(line_index=1, start_time=1.0, duration=1.0),
-                            Event(line_index=1, start_time=2.0, duration=1.0),
-                            Event(line_index=1, start_time=3.0, duration=0.5),
-                            Event(line_index=1, start_time=3.5, duration=0.5),
-                        ],
-                        [
-                            Event(line_index=2, start_time=0.0, duration=1.0),
-                            Event(line_index=2, start_time=1.0, duration=1.0),
-                            Event(line_index=2, start_time=2.0, duration=1.0),
-                            Event(line_index=2, start_time=3.0, duration=0.5),
-                            Event(line_index=2, start_time=3.5, duration=0.5),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
                 ],
                 sonic_content=[
                     [
@@ -596,6 +392,7 @@ def test_evaluate_harmony_dynamic(
                 line_ids=[1, 2, 3],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
                 n_tone_row_instances_by_group=[1]
             ),
             # `penalty_deduction_per_line`
@@ -640,28 +437,9 @@ def test_evaluate_smoothness_of_voice_leading(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=1.0),
-                            Event(line_index=1, start_time=1.0, duration=1.0),
-                            Event(line_index=1, start_time=2.0, duration=1.0),
-                            Event(line_index=1, start_time=3.0, duration=0.5),
-                            Event(line_index=1, start_time=3.5, duration=0.5),
-                        ],
-                        [
-                            Event(line_index=2, start_time=0.0, duration=1.0),
-                            Event(line_index=2, start_time=1.0, duration=1.0),
-                            Event(line_index=2, start_time=2.0, duration=1.0),
-                            Event(line_index=2, start_time=3.0, duration=0.5),
-                            Event(line_index=2, start_time=3.5, duration=0.5),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
                 ],
                 sonic_content=[
                     [
@@ -675,6 +453,7 @@ def test_evaluate_smoothness_of_voice_leading(
                 line_ids=[1, 2, 3],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
                 n_tone_row_instances_by_group=[1]
             ),
             # `params`

@@ -25,39 +25,8 @@ from dodecaphony.rendering import (
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=4.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=1.0),
-                            Event(line_index=1, start_time=9.0, duration=1.0),
-                            Event(line_index=1, start_time=10.0, duration=1.0),
-                            Event(line_index=1, start_time=11.0, duration=1.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [2.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'pause', 'F'],
@@ -69,6 +38,7 @@ from dodecaphony.rendering import (
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `expected`
@@ -113,38 +83,8 @@ def test_create_lilypond_file_from_fragment(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=2.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=1.0),
-                            Event(line_index=1, start_time=5.0, duration=1.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
@@ -156,6 +96,7 @@ def test_create_lilypond_file_from_fragment(
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `note_number`
@@ -171,38 +112,8 @@ def test_create_lilypond_file_from_fragment(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=2.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=1.0),
-                            Event(line_index=1, start_time=5.0, duration=1.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A#', 'G', 'C#', 'D#', 'pause', 'D', 'A', 'F#', 'E', 'G#', 'F'],
@@ -214,6 +125,7 @@ def test_create_lilypond_file_from_fragment(
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `note_number`
@@ -259,38 +171,8 @@ def test_create_midi_from_fragment(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=2.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=1.0),
-                            Event(line_index=1, start_time=5.0, duration=1.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
@@ -302,6 +184,7 @@ def test_create_midi_from_fragment(
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `expected`
@@ -337,38 +220,8 @@ def test_create_midi_from_fragment(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=2.0),
-                        ],
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=1.0),
-                            Event(line_index=1, start_time=5.0, duration=1.0),
-                            Event(line_index=1, start_time=6.0, duration=1.0),
-                            Event(line_index=1, start_time=7.0, duration=1.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=1.0),
-                            Event(line_index=1, start_time=13.0, duration=1.0),
-                            Event(line_index=1, start_time=14.0, duration=1.0),
-                            Event(line_index=1, start_time=15.0, duration=1.0),
-                        ],
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
@@ -380,6 +233,7 @@ def test_create_midi_from_fragment(
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[1, 1]
             ),
             # `expected`

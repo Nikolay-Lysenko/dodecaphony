@@ -24,51 +24,8 @@ from dodecaphony.transformations import create_transformations_registry
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=1.0),
-                            Event(line_index=0, start_time=5.0, duration=1.0),
-                            Event(line_index=0, start_time=6.0, duration=1.0),
-                            Event(line_index=0, start_time=7.0, duration=1.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=0.5),
-                            Event(line_index=0, start_time=11.5, duration=0.5),
-                            Event(line_index=0, start_time=12.0, duration=1.0),
-                            Event(line_index=0, start_time=13.0, duration=1.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                            Event(line_index=0, start_time=16.0, duration=1.0),
-                            Event(line_index=0, start_time=17.0, duration=1.0),
-                            Event(line_index=0, start_time=18.0, duration=1.0),
-                            Event(line_index=0, start_time=19.0, duration=1.0),
-                            Event(line_index=0, start_time=20.0, duration=1.0),
-                            Event(line_index=0, start_time=21.0, duration=1.0),
-                            Event(line_index=0, start_time=22.0, duration=1.0),
-                            Event(line_index=0, start_time=23.0, duration=1.0),
-                        ]
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=2.0),
-                            Event(line_index=1, start_time=6.0, duration=2.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=2.0),
-                            Event(line_index=1, start_time=14.0, duration=2.0),
-                            Event(line_index=1, start_time=16.0, duration=2.0),
-                            Event(line_index=1, start_time=18.0, duration=2.0),
-                            Event(line_index=1, start_time=20.0, duration=2.0),
-                            Event(line_index=1, start_time=22.0, duration=2.0),
-                        ]
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                 ],
                 sonic_content=[
                     [
@@ -85,6 +42,7 @@ from dodecaphony.transformations import create_transformations_registry
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[2, 1]
             ),
             # `n_iterations`

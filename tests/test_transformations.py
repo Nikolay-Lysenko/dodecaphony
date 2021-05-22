@@ -27,17 +27,8 @@ from dodecaphony.transformations import (
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=1.0),
-                            Event(line_index=1, start_time=3.0, duration=1.0),
-                        ]
-                    ]
+                    [2.0, 2.0],
+                    [2.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     ['A', 'B', 'C', 'D', 'E']
@@ -48,126 +39,46 @@ from dodecaphony.transformations import (
                 line_ids=[1, 2],
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
+                n_melodic_lines_by_group=[2],
                 n_tone_row_instances_by_group=[1]
             ),
             # `expected_options`
             [
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=1.0),
-                            Event(line_index=1, start_time=3.0, duration=1.0),
-                        ]
-                    ]
+                    [2.0, 2.0],
+                    [2.0, 1.0, 1.0],
                 ],
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=3.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=1.0),
-                            Event(line_index=1, start_time=3.0, duration=1.0),
-                        ]
-                    ]
+                    [1.0, 3.0],
+                    [2.0, 1.0, 1.0],
                 ],
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=3.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=1.0),
-                            Event(line_index=1, start_time=3.0, duration=1.0),
-                        ]
-                    ]
+                    [3.0, 1.0],
+                    [2.0, 1.0, 1.0],
                 ],
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=1.0),
-                            Event(line_index=1, start_time=1.0, duration=2.0),
-                            Event(line_index=1, start_time=3.0, duration=1.0),
-                        ]
-                    ]
+                    [2.0, 2.0],
+                    [1.0, 2.0, 1.0],
                 ],
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=1.0),
-                            Event(line_index=1, start_time=1.0, duration=1.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                        ]
-                    ]
+                    [2.0, 2.0],
+                    [1.0, 1.0, 2.0],
                 ],
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=1.5),
-                            Event(line_index=1, start_time=1.5, duration=1.5),
-                            Event(line_index=1, start_time=3.0, duration=1.0),
-                        ]
-                    ]
+                    [2.0, 2.0],
+                    [1.5, 1.5, 1.0],
                 ],
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=1.5),
-                            Event(line_index=1, start_time=1.5, duration=1.0),
-                            Event(line_index=1, start_time=2.5, duration=1.5),
-                        ]
-                    ]
+                    [2.0, 2.0],
+                    [1.5, 1.0, 1.5],
                 ],
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=0.5),
-                            Event(line_index=1, start_time=2.5, duration=1.5),
-                        ]
-                    ]
+                    [2.0, 2.0],
+                    [2.0, 0.5, 1.5],
                 ],
                 [
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                        ],
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=1.5),
-                            Event(line_index=1, start_time=3.5, duration=0.5),
-                        ]
-                    ]
+                    [2.0, 2.0],
+                    [2.0, 1.5, 0.5],
                 ],
             ]
         )
@@ -188,51 +99,8 @@ def test_apply_duration_change(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=1.0),
-                            Event(line_index=0, start_time=5.0, duration=1.0),
-                            Event(line_index=0, start_time=6.0, duration=1.0),
-                            Event(line_index=0, start_time=7.0, duration=1.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=0.5),
-                            Event(line_index=0, start_time=11.5, duration=0.5),
-                            Event(line_index=0, start_time=12.0, duration=1.0),
-                            Event(line_index=0, start_time=13.0, duration=1.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                            Event(line_index=0, start_time=16.0, duration=1.0),
-                            Event(line_index=0, start_time=17.0, duration=1.0),
-                            Event(line_index=0, start_time=18.0, duration=1.0),
-                            Event(line_index=0, start_time=19.0, duration=1.0),
-                            Event(line_index=0, start_time=20.0, duration=1.0),
-                            Event(line_index=0, start_time=21.0, duration=1.0),
-                            Event(line_index=0, start_time=22.0, duration=1.0),
-                            Event(line_index=0, start_time=23.0, duration=1.0),
-                        ]
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=2.0),
-                            Event(line_index=1, start_time=6.0, duration=2.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=2.0),
-                            Event(line_index=1, start_time=14.0, duration=2.0),
-                            Event(line_index=1, start_time=16.0, duration=2.0),
-                            Event(line_index=1, start_time=18.0, duration=2.0),
-                            Event(line_index=1, start_time=20.0, duration=2.0),
-                            Event(line_index=1, start_time=22.0, duration=2.0),
-                        ]
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                 ],
                 sonic_content=[
                     [
@@ -249,6 +117,7 @@ def test_apply_duration_change(
                 line_ids=[1, 2],
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[2, 1]
             ),
             # `expected_options`
@@ -297,35 +166,7 @@ def test_apply_inversion(fragment: Fragment, expected_options: list[list[list[st
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=1.0),
-                            Event(line_index=0, start_time=5.0, duration=1.0),
-                            Event(line_index=0, start_time=6.0, duration=1.0),
-                            Event(line_index=0, start_time=7.0, duration=1.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=0.5),
-                            Event(line_index=0, start_time=11.5, duration=0.5),
-                            Event(line_index=0, start_time=12.0, duration=1.0),
-                            Event(line_index=0, start_time=13.0, duration=1.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                            Event(line_index=0, start_time=16.0, duration=1.0),
-                            Event(line_index=0, start_time=17.0, duration=1.0),
-                            Event(line_index=0, start_time=18.0, duration=1.0),
-                            Event(line_index=0, start_time=19.0, duration=1.0),
-                            Event(line_index=0, start_time=20.0, duration=1.0),
-                            Event(line_index=0, start_time=21.0, duration=1.0),
-                            Event(line_index=0, start_time=22.0, duration=1.0),
-                            Event(line_index=0, start_time=23.0, duration=1.0),
-                        ]
-                    ],
+                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 ],
                 sonic_content=[
                     [
@@ -339,6 +180,7 @@ def test_apply_inversion(fragment: Fragment, expected_options: list[list[list[st
                 line_ids=[1],
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
+                n_melodic_lines_by_group=[1],
                 n_tone_row_instances_by_group=[2]
             ),
             # `expected_options`
@@ -367,22 +209,7 @@ def test_apply_inversion(fragment: Fragment, expected_options: list[list[list[st
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=2.0),
-                            Event(line_index=0, start_time=2.0, duration=2.0),
-                            Event(line_index=0, start_time=4.0, duration=2.0),
-                            Event(line_index=0, start_time=6.0, duration=2.0),
-                            Event(line_index=0, start_time=8.0, duration=2.0),
-                            Event(line_index=0, start_time=10.0, duration=2.0),
-                            Event(line_index=0, start_time=12.0, duration=2.0),
-                            Event(line_index=0, start_time=14.0, duration=2.0),
-                            Event(line_index=0, start_time=16.0, duration=2.0),
-                            Event(line_index=0, start_time=18.0, duration=2.0),
-                            Event(line_index=0, start_time=20.0, duration=2.0),
-                            Event(line_index=0, start_time=22.0, duration=2.0),
-                        ]
-                    ]
+                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                 ],
                 sonic_content=[
                     ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
@@ -393,6 +220,7 @@ def test_apply_inversion(fragment: Fragment, expected_options: list[list[list[st
                 line_ids=[1],
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
+                n_melodic_lines_by_group=[1],
                 n_tone_row_instances_by_group=[1]
             ),
             # `expected_options`
@@ -417,51 +245,8 @@ def test_apply_pause_swap(fragment: Fragment, expected_options: list[list[list[s
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=1.0),
-                            Event(line_index=0, start_time=5.0, duration=1.0),
-                            Event(line_index=0, start_time=6.0, duration=1.0),
-                            Event(line_index=0, start_time=7.0, duration=1.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=0.5),
-                            Event(line_index=0, start_time=11.5, duration=0.5),
-                            Event(line_index=0, start_time=12.0, duration=1.0),
-                            Event(line_index=0, start_time=13.0, duration=1.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                            Event(line_index=0, start_time=16.0, duration=1.0),
-                            Event(line_index=0, start_time=17.0, duration=1.0),
-                            Event(line_index=0, start_time=18.0, duration=1.0),
-                            Event(line_index=0, start_time=19.0, duration=1.0),
-                            Event(line_index=0, start_time=20.0, duration=1.0),
-                            Event(line_index=0, start_time=21.0, duration=1.0),
-                            Event(line_index=0, start_time=22.0, duration=1.0),
-                            Event(line_index=0, start_time=23.0, duration=1.0),
-                        ]
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=2.0),
-                            Event(line_index=1, start_time=6.0, duration=2.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=2.0),
-                            Event(line_index=1, start_time=14.0, duration=2.0),
-                            Event(line_index=1, start_time=16.0, duration=2.0),
-                            Event(line_index=1, start_time=18.0, duration=2.0),
-                            Event(line_index=1, start_time=20.0, duration=2.0),
-                            Event(line_index=1, start_time=22.0, duration=2.0),
-                        ]
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                 ],
                 sonic_content=[
                     [
@@ -478,6 +263,7 @@ def test_apply_pause_swap(fragment: Fragment, expected_options: list[list[list[s
                 line_ids=[1, 2],
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[2, 1]
             ),
             # `expected_options`
@@ -526,51 +312,8 @@ def test_apply_reversion(fragment: Fragment, expected_options: list[list[list[st
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=1.0),
-                            Event(line_index=0, start_time=5.0, duration=1.0),
-                            Event(line_index=0, start_time=6.0, duration=1.0),
-                            Event(line_index=0, start_time=7.0, duration=1.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=0.5),
-                            Event(line_index=0, start_time=11.5, duration=0.5),
-                            Event(line_index=0, start_time=12.0, duration=1.0),
-                            Event(line_index=0, start_time=13.0, duration=1.0),
-                            Event(line_index=0, start_time=14.0, duration=1.0),
-                            Event(line_index=0, start_time=15.0, duration=1.0),
-                            Event(line_index=0, start_time=16.0, duration=1.0),
-                            Event(line_index=0, start_time=17.0, duration=1.0),
-                            Event(line_index=0, start_time=18.0, duration=1.0),
-                            Event(line_index=0, start_time=19.0, duration=1.0),
-                            Event(line_index=0, start_time=20.0, duration=1.0),
-                            Event(line_index=0, start_time=21.0, duration=1.0),
-                            Event(line_index=0, start_time=22.0, duration=1.0),
-                            Event(line_index=0, start_time=23.0, duration=1.0),
-                        ]
-                    ],
-                    [
-                        [
-                            Event(line_index=1, start_time=0.0, duration=2.0),
-                            Event(line_index=1, start_time=2.0, duration=2.0),
-                            Event(line_index=1, start_time=4.0, duration=2.0),
-                            Event(line_index=1, start_time=6.0, duration=2.0),
-                            Event(line_index=1, start_time=8.0, duration=2.0),
-                            Event(line_index=1, start_time=10.0, duration=2.0),
-                            Event(line_index=1, start_time=12.0, duration=2.0),
-                            Event(line_index=1, start_time=14.0, duration=2.0),
-                            Event(line_index=1, start_time=16.0, duration=2.0),
-                            Event(line_index=1, start_time=18.0, duration=2.0),
-                            Event(line_index=1, start_time=20.0, duration=2.0),
-                            Event(line_index=1, start_time=22.0, duration=2.0),
-                        ]
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
                 ],
                 sonic_content=[
                     [
@@ -587,6 +330,7 @@ def test_apply_reversion(fragment: Fragment, expected_options: list[list[list[st
                 line_ids=[1, 2],
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
+                n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[2, 1]
             ),
             # `max_transposition`
@@ -686,22 +430,7 @@ def test_get_duration_changes(key: tuple[float, float], value: list[tuple[float,
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [
-                        [
-                            Event(line_index=0, start_time=0.0, duration=1.0),
-                            Event(line_index=0, start_time=1.0, duration=1.0),
-                            Event(line_index=0, start_time=2.0, duration=1.0),
-                            Event(line_index=0, start_time=3.0, duration=1.0),
-                            Event(line_index=0, start_time=4.0, duration=1.0),
-                            Event(line_index=0, start_time=5.0, duration=1.0),
-                            Event(line_index=0, start_time=6.0, duration=1.0),
-                            Event(line_index=0, start_time=7.0, duration=1.0),
-                            Event(line_index=0, start_time=8.0, duration=1.0),
-                            Event(line_index=0, start_time=9.0, duration=1.0),
-                            Event(line_index=0, start_time=10.0, duration=1.0),
-                            Event(line_index=0, start_time=11.0, duration=1.0),
-                        ]
-                    ]
+                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
                 ],
                 sonic_content=[
                     ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
@@ -712,6 +441,7 @@ def test_get_duration_changes(key: tuple[float, float], value: list[tuple[float,
                 line_ids=[1],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1],
                 n_tone_row_instances_by_group=[1]
             ),
             # `n_transformations`
