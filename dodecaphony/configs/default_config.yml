@@ -167,6 +167,22 @@ scoring_sets:
           10: 0.8
           11: 0.9
           12: 1.0
+      - name: stackability
+        weight: 1.0
+        n_semitones_to_penalty:
+          0: 0.0
+          1: 0.0
+          2: 0.0
+          3: 0.0
+          4: 0.0
+          5: 0.0
+          6: 0.0
+          7: 0.2
+          8: 0.4
+          9: 0.6
+          10: 0.8
+          11: 0.9
+          12: 1.0
 
 evaluation:
   scoring_sets:

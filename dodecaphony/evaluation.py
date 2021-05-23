@@ -277,6 +277,35 @@ def evaluate_smoothness_of_voice_leading(
     return score
 
 
+def evaluate_stackability(fragment: Fragment, n_semitones_to_penalty: dict[int, float]) -> float:
+    """
+    Evaluate seamlessness of repeating a fragment after itself.
+
+    Two copies of a fragment may be stacked together in ostinato or in a period consisting of
+    two phrases each of which is the fragment.
+
+    :param fragment:
+        a fragment to be evaluated
+    :param n_semitones_to_penalty:
+        mapping from size of melodic interval (in semitones) between last and first events
+        of a melodic line to penalty for it
+    :return:
+        average over melodic lines penalty
+    """
+    score = 0
+    for line in fragment.melodic_lines:
+        first_event = line[0]
+        if first_event.pitch_class == 'pause':
+            continue
+        last_event = line[-1]
+        if last_event.pitch_class == 'pause':
+            continue
+        interval = abs(first_event.position_in_semitones - last_event.position_in_semitones)
+        score -= n_semitones_to_penalty.get(interval, 1.0)
+    score /= len(fragment.melodic_lines)
+    return score
+
+
 def get_scoring_functions_registry() -> dict[str, Callable]:
     """
     Get mapping from names to corresponding scoring functions.
@@ -292,6 +321,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
         'consistency_of_rhythm_with_meter': evaluate_consistency_of_rhythm_with_meter,
         'harmony_dynamic': evaluate_harmony_dynamic,
         'smoothness_of_voice_leading': evaluate_smoothness_of_voice_leading,
+        'stackability': evaluate_stackability,
     }
     return registry
 

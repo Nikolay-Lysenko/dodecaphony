@@ -18,6 +18,7 @@ from dodecaphony.evaluation import (
     evaluate_consistency_of_rhythm_with_meter,
     evaluate_harmony_dynamic,
     evaluate_smoothness_of_voice_leading,
+    evaluate_stackability,
     parse_scoring_sets_registry,
 )
 from dodecaphony.fragment import Fragment, override_calculated_attributes
@@ -428,6 +429,62 @@ def test_evaluate_smoothness_of_voice_leading(
         fragment, penalty_deduction_per_line, n_semitones_to_penalty
     )
     assert round(result, 10) == round(expected, 10)
+
+
+@pytest.mark.parametrize(
+    "fragment, n_semitones_to_penalty, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [1.0, 1.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
+                    [1.0, 1.0, 1.0, 0.5, 0.5],
+                ],
+                sonic_content=[
+                    [
+                        'pause', 'B', 'A', 'G', 'C#', 'D#', 'C',
+                        'D', 'A#', 'F#', 'E', 'G#', 'F', 'pause'
+                    ]
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=4,
+                line_ids=[1, 2, 3],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
+                n_tone_row_instances_by_group=[1]
+            ),
+            # `n_semitones_to_penalty`
+            {
+                0: 0.2,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+                5: 0.3,
+                6: 0.4,
+                7: 0.5,
+                8: 0.6,
+                9: 0.7,
+                10: 0.8,
+                11: 0.9,
+                12: 1.0,
+            },
+            # `expected`
+            -2 / 15
+        ),
+    ]
+)
+def test_stackability(
+        fragment: Fragment, n_semitones_to_penalty: dict[int, float], expected: float
+) -> None:
+    """Test `evaluate_stackability` function."""
+    fragment = override_calculated_attributes(fragment)
+    result = evaluate_stackability(fragment, n_semitones_to_penalty)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
