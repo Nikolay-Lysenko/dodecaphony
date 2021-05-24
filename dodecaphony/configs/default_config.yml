@@ -210,7 +210,7 @@ rendering:
   common:
     beat_in_seconds: 0.5
     opening_silence_in_seconds: 1.0
-    trailing_silence_in_seconds: 2.0
+    trailing_silence_in_seconds: 1.0
   midi:
     instruments:
       1: 0
