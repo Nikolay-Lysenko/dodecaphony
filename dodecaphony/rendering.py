@@ -63,7 +63,7 @@ def create_midi_from_fragment(
     numeration_shift = pretty_midi.note_name_to_number('A0')
     pretty_midi_instruments = []
     for line_id, melodic_line in zip(fragment.line_ids, fragment.melodic_lines):
-        pretty_midi_instrument = pretty_midi.Instrument(instruments[line_id])
+        pretty_midi_instrument = pretty_midi.Instrument(instruments[line_id], name=str(line_id))
         for event in melodic_line:
             if event.pitch_class in ['pause', 'skip']:
                 continue
