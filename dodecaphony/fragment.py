@@ -9,7 +9,7 @@ import itertools
 import math
 import random
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 from sinethesizer.utils.music_theory import get_note_to_position_mapping
 
@@ -62,6 +62,8 @@ class FragmentParams:
     upper_line_highest_note: str
     upper_line_lowest_note: str
     pauses_fraction: float
+    temporal_content: Optional[dict[int, dict[str, Any]]] = None
+    sonic_content: Optional[dict[int, dict[str, Any]]] = None
 
 
 @dataclass
@@ -77,13 +79,39 @@ class Fragment:
     upper_line_lowest_position: int
     n_melodic_lines_by_group: list[int]
     n_tone_row_instances_by_group: list[int]
+    mutable_temporal_content_indices: list[int]
+    mutable_sonic_content_indices: list[int]
     melodic_lines: Optional[list[list[Event]]] = None
     sonorities: Optional[list[list[Event]]] = None
 
 
+def validate_initialized_content(params: FragmentParams) -> None:
+    """
+    Validate parameters related to initialized parts of temporal content and sonic content.
+
+    :param params:
+        parameters of a fragment to be created
+    :return:
+        None
+    """
+    if params.temporal_content is not None:
+        total_duration_in_beats = params.n_measures * params.meter_numerator
+        for line_index, line_params in params.temporal_content.items():
+            duration_in_beats = sum(line_params['durations'])
+            if duration_in_beats != total_duration_in_beats:
+                raise ValueError("A line has duration that is not equal to that of the fragment.")
+    if params.sonic_content is not None:  # pragma: no branch
+        for group_index, group_params in params.sonic_content.items():
+            n_sound_events = len([x for x in group_params['pitch_classes'] if x != 'pause'])
+            n_tone_row_instances = n_sound_events / TONE_ROW_LEN
+            declared_n_instances = params.groups[group_index]['n_tone_row_instances']
+            if n_tone_row_instances != declared_n_instances:
+                raise ValueError("A group has wrong number of tone row instances.")
+
+
 def validate(params: FragmentParams) -> None:
     """
-    Validate parameters.
+    Validate all parameters.
 
     :param params:
         parameters of a fragment to be created
@@ -97,6 +125,7 @@ def validate(params: FragmentParams) -> None:
         raise ValueError("IDs of melodic lines must be unique.")
     if float(params.meter_numerator) not in SUPPORTED_DURATIONS:
         raise ValueError(f"Meter numerator = {params.meter_numerator} is not supported.")
+    validate_initialized_content(params)
 
 
 def split_time_span(n_measures: int, n_events: int, meter_numerator: float) -> list[float]:
@@ -129,6 +158,60 @@ def split_time_span(n_measures: int, n_events: int, meter_numerator: float) -> l
     return durations
 
 
+def calculate_number_of_undefined_events(
+        group_index: int,
+        temporal_content: list[list[float]],
+        sonic_content: dict[int, dict[str, Any]],
+        line_indices: list[int],
+        n_tone_row_instances: int,
+        pauses_fraction: float
+) -> int:
+    """
+    Calculate total number of undefined events in a group of melodic lines sharing the same series.
+
+    :param group_index:
+        index of a group of melodic lines
+    :param temporal_content:
+        partially filled list of lists of event durations (in reference beats)
+        for each melodic line
+    :param sonic_content:
+        mapping from group index to user-defined sequence of its pitch classes (including pauses)
+    :param line_indices:
+        indices of melodic lines forming the group
+    :param n_tone_row_instances:
+        number of tone row instances in the group
+    :param pauses_fraction:
+        fraction of pauses amongst all events from the group
+    :return:
+        total number of events in the group that are not initially defined by a user
+    """
+    if group_index in sonic_content:
+        return len(sonic_content[group_index]['pitch_classes'])
+    n_sound_events = n_tone_row_instances * TONE_ROW_LEN
+    n_events = int(round(n_sound_events / (1 - pauses_fraction)))
+    n_events -= sum(len(temporal_content[line_index]) for line_index in line_indices)
+    return n_events
+
+
+def distribute_events_between_lines(n_events: int, n_lines: int) -> list[int]:
+    """
+    Distribute evenly the specified number of events between the specified number of lines.
+
+    :param n_events:
+        number of events
+    :param n_lines:
+        number of lines
+    :return:
+        list of numbers of events in a particular line
+    """
+    results = [n_events // n_lines for _ in range(n_lines)]
+    i = 0
+    while sum(results) < n_events:
+        results[i] += 1
+        i += 1
+    return results
+
+
 def create_initial_temporal_content(params: FragmentParams) -> list[list[float]]:
     """
     Split time span of each melodic line into durations of individual events.
@@ -138,21 +221,31 @@ def create_initial_temporal_content(params: FragmentParams) -> list[list[float]]
     :return:
         lists of event durations (in reference beats) for each melodic line
     """
+    temporal_content = [
+        params.temporal_content.get(line_index, {}).get('durations', [])
+        for line_index, line_id in enumerate(params.line_ids)
+    ]
     meter_numerator = float(params.meter_numerator)
-    results = []
-    for group_params in params.groups:
-        n_sound_events = group_params['n_tone_row_instances'] * TONE_ROW_LEN
-        n_events = int(round(n_sound_events / (1 - params.pauses_fraction)))
+    group_lines_start_index = 0
+    for group_index, group_params in enumerate(params.groups):
         n_lines = group_params['n_melodic_lines']
-        n_events_per_line = [n_events // n_lines for _ in range(n_lines)]
-        line_index = 0
-        while sum(n_events_per_line) < n_events:
-            n_events_per_line[line_index] += 1
-            line_index += 1
-        for current_n_events in n_events_per_line:
-            durations = split_time_span(params.n_measures, current_n_events, meter_numerator)
-            results.append(durations)
-    return results
+        line_indices = list(range(group_lines_start_index, group_lines_start_index + n_lines))
+        n_undefined_events = calculate_number_of_undefined_events(
+            group_index,
+            temporal_content,
+            params.sonic_content,
+            line_indices,
+            group_params['n_tone_row_instances'],
+            params.pauses_fraction
+        )
+        indices_of_undefined_lines = [x for x in line_indices if x not in params.temporal_content]
+        n_undefined_lines = len(indices_of_undefined_lines)
+        n_events_per_line = distribute_events_between_lines(n_undefined_events, n_undefined_lines)
+        for line_index, n_events in zip(indices_of_undefined_lines, n_events_per_line):
+            durations = split_time_span(params.n_measures, n_events, meter_numerator)
+            temporal_content[line_index] = durations
+        group_lines_start_index += n_lines
+    return temporal_content
 
 
 def replicate_tone_row(tone_row: list[str], n_instances: int) -> list[str]:
@@ -178,30 +271,46 @@ def replicate_tone_row(tone_row: list[str], n_instances: int) -> list[str]:
     return pitch_classes
 
 
-def create_initial_sonic_content(params: FragmentParams) -> list[list[str]]:
+def create_initial_sonic_content(
+        params: FragmentParams, temporal_content: list[list[float]]
+) -> list[list[str]]:
     """
     Create initial data structure that keeps track of pitch classes.
 
     :param params:
         parameters of a fragment to be created
+    :param temporal_content:
+        lists of event durations (in reference beats) for each melodic line
     :return:
         list where for each group of melodic lines sharing the same series sonic content
         of the series is stored (i.e., there is a sequence consisting of pitch classes and pauses)
     """
     sonic_content = []
-    for group_params in params.groups:
-        group_content = []
+    group_lines_start_index = 0
+    for group_index, group_params in enumerate(params.groups):
+        n_lines = group_params['n_melodic_lines']
+        if group_index in params.sonic_content:
+            sonic_content.append(params.sonic_content[group_index]['pitch_classes'])
+            group_lines_start_index += n_lines
+            continue
+
+        n_events = 0
+        durations = temporal_content[group_lines_start_index:(group_lines_start_index + n_lines)]
+        for line_durations in durations:
+            n_events += len(line_durations)
         n_sound_events = group_params['n_tone_row_instances'] * TONE_ROW_LEN
-        n_events = int(round(n_sound_events / (1 - params.pauses_fraction)))
         n_pauses = n_events - n_sound_events
+        if n_pauses < 0:
+            raise ValueError("User-defined temporal content has not enough events.")
+
         pauses_indices = random.sample(range(n_events), n_pauses)
         series = replicate_tone_row(params.tone_row, group_params['n_tone_row_instances'])
+        group_sonic_content = []
         for index in range(n_events):
-            if index in pauses_indices:
-                group_content.append('pause')
-            else:
-                group_content.append(series.pop(0))
-        sonic_content.append(group_content)
+            group_sonic_content.append('pause' if index in pauses_indices else series.pop(0))
+        sonic_content.append(group_sonic_content)
+
+        group_lines_start_index += n_lines
     return sonic_content
 
 
@@ -210,7 +319,7 @@ def create_grouped_rhythm_only_lines(fragment: Fragment) -> list[list[list[Event
     Create rhythm-only lines grouped by sharing of the same series.
 
     :param fragment:
-        fragment with non-empty temporal content and sonic content
+        fragment with non-empty temporal content
     :return:
         list where for each group of melodic lines sharing the same series for each melodic line
         there are events representing temporal (loosely speaking, rhythmic) structure of the line,
@@ -417,6 +526,38 @@ def override_calculated_attributes(fragment: Fragment) -> Fragment:
     return fragment
 
 
+def find_mutable_temporal_content_indices(params: FragmentParams) -> list[int]:
+    """
+    Find indices of melodic lines such that their temporal content can be modified.
+
+    :param params:
+        parameters of a fragment to be created
+    :return:
+        indices of melodic lines such that their temporal content can be modified
+    """
+    results = []
+    for line_index, line_id in enumerate(params.line_ids):
+        if not params.temporal_content.get(line_index, {}).get('immutable', False):
+            results.append(line_index)
+    return results
+
+
+def find_mutable_sonic_content_indices(params: FragmentParams) -> list[int]:
+    """
+    Find indices of groups such that their sonic content can be modified.
+
+    :param params:
+        parameters of a fragment to be created
+    :return:
+        indices of groups such that their sonic content can be modified
+    """
+    results = []
+    for group_index, group_params in enumerate(params.groups):
+        if not params.sonic_content.get(group_index, {}).get('immutable', False):
+            results.append(group_index)
+    return results
+
+
 def initialize_fragment(params: FragmentParams) -> Fragment:
     """
     Create fragment by its parameters.
@@ -426,10 +567,14 @@ def initialize_fragment(params: FragmentParams) -> Fragment:
     :return:
         fragment
     """
+    params.temporal_content = params.temporal_content or {}
+    params.sonic_content = params.sonic_content or {}
     validate(params)
+    temporal_content = create_initial_temporal_content(params)
+    sonic_content = create_initial_sonic_content(params, temporal_content)
     fragment = Fragment(
-        create_initial_temporal_content(params),
-        create_initial_sonic_content(params),
+        temporal_content,
+        sonic_content,
         params.meter_numerator,
         params.meter_denominator,
         params.n_measures * params.meter_numerator,
@@ -437,7 +582,9 @@ def initialize_fragment(params: FragmentParams) -> Fragment:
         NOTE_TO_POSITION_MAPPING[params.upper_line_highest_note],
         NOTE_TO_POSITION_MAPPING[params.upper_line_lowest_note],
         [group['n_melodic_lines'] for group in params.groups],
-        [group['n_tone_row_instances'] for group in params.groups]
+        [group['n_tone_row_instances'] for group in params.groups],
+        find_mutable_temporal_content_indices(params),
+        find_mutable_sonic_content_indices(params),
     )
     fragment = override_calculated_attributes(fragment)
     return fragment

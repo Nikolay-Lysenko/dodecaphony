@@ -44,17 +44,21 @@ def get_duration_changes() -> dict[tuple[float, float], list[tuple[float, float]
     return result
 
 
-def draw_random_indices(n_tone_row_instances_by_group: list[int]) -> tuple[int, int]:
+def draw_random_indices(
+        mutable_sonic_content_indices: list[int], n_tone_row_instances_by_group: list[int]
+) -> tuple[int, int]:
     """
     Draw index of melodic lines group and index of tone row instance from it.
 
+    :param mutable_sonic_content_indices:
+        indices of groups such that their sonic content can be transformed
     :param n_tone_row_instances_by_group:
         list where number of tone row instances in the group is stored for each group of
         melodic lines sharing the same series (in terms of vertical distribution of series pitches)
     :return:
         index of group and index of tone row instance from it
     """
-    group_index = random.choice(range(len(n_tone_row_instances_by_group)))
+    group_index = random.choice(mutable_sonic_content_indices)
     n_instances = n_tone_row_instances_by_group[group_index]
     instance_index = random.randrange(0, n_instances)
     return group_index, instance_index
@@ -139,7 +143,8 @@ def apply_duration_change(
     :return:
         modified fragment
     """
-    line_durations = random.choice(fragment.temporal_content)
+    line_index = random.choice(fragment.mutable_temporal_content_indices)
+    line_durations = fragment.temporal_content[line_index]
     events_indices = random.sample(range(len(line_durations)), 2)
     key = tuple(sorted(line_durations[event_index] for event_index in events_indices))
     all_durations = duration_changes[key]
@@ -181,7 +186,9 @@ def apply_inversion(fragment: Fragment) -> Fragment:
     :return:
         modified fragment
     """
-    group_index, instance_index = draw_random_indices(fragment.n_tone_row_instances_by_group)
+    group_index, instance_index = draw_random_indices(
+        fragment.mutable_sonic_content_indices, fragment.n_tone_row_instances_by_group
+    )
     tone_row_instance = find_instance_by_indices(fragment, group_index, instance_index)
     tone_row_instance = invert_tone_row(tone_row_instance)
     fragment = replace_instance(fragment, group_index, instance_index, tone_row_instance)
@@ -197,7 +204,9 @@ def apply_reversion(fragment: Fragment) -> Fragment:
     :return:
         modified fragment
     """
-    group_index, instance_index = draw_random_indices(fragment.n_tone_row_instances_by_group)
+    group_index, instance_index = draw_random_indices(
+        fragment.mutable_sonic_content_indices, fragment.n_tone_row_instances_by_group
+    )
     tone_row_instance = find_instance_by_indices(fragment, group_index, instance_index)
     tone_row_instance = revert_tone_row(tone_row_instance)
     fragment = replace_instance(fragment, group_index, instance_index, tone_row_instance)
@@ -215,7 +224,9 @@ def apply_transposition(fragment: Fragment, max_transposition: int) -> Fragment:
     :return:
         modified fragment
     """
-    group_index, instance_index = draw_random_indices(fragment.n_tone_row_instances_by_group)
+    group_index, instance_index = draw_random_indices(
+        fragment.mutable_sonic_content_indices, fragment.n_tone_row_instances_by_group
+    )
     tone_row_instance = find_instance_by_indices(fragment, group_index, instance_index)
     shift = random.randint(-max_transposition, max_transposition)
     tone_row_instance = transpose_tone_row(tone_row_instance, shift)

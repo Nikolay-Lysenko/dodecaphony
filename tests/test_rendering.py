@@ -39,7 +39,9 @@ from dodecaphony.rendering import (
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `expected`
             (
@@ -97,7 +99,9 @@ def test_create_lilypond_file_from_fragment(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `note_number`
             5,
@@ -126,7 +130,9 @@ def test_create_lilypond_file_from_fragment(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `note_number`
             5,
@@ -185,7 +191,9 @@ def test_create_midi_from_fragment(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `expected`
             (
@@ -234,7 +242,9 @@ def test_create_midi_from_fragment(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `expected`
             (

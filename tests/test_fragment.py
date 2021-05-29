@@ -17,6 +17,8 @@ from dodecaphony.fragment import (
     create_initial_sonic_content,
     create_initial_temporal_content,
     distribute_pitch_classes,
+    find_mutable_sonic_content_indices,
+    find_mutable_temporal_content_indices,
     find_sonorities,
     initialize_fragment,
     set_pitches_of_lower_lines,
@@ -27,13 +29,14 @@ from dodecaphony.fragment import (
 
 
 @pytest.mark.parametrize(
-    "params, expected_n_pauses_by_group",
+    "params, temporal_content, expected_n_pauses_by_group",
     [
         (
+            # `params`
             FragmentParams(
                 tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
                 groups=[
-                    {'n_melodic_lines': 1, 'n_tone_row_instances': 100},
+                    {'n_melodic_lines': 1, 'n_tone_row_instances': 1},
                 ],
                 meter_numerator=4,
                 meter_denominator=4,
@@ -41,17 +44,52 @@ from dodecaphony.fragment import (
                 line_ids=[1],
                 upper_line_highest_note='E6',
                 upper_line_lowest_note='E4',
-                pauses_fraction=0.1
+                pauses_fraction=0.1,
+                temporal_content={},
+                sonic_content={}
             ),
-            [133]
+            # `temporal_content`
+            [[1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]],
+            # `expected_n_pauses_by_group`
+            [1]
+        ),
+        (
+            # `params`
+            FragmentParams(
+                tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+                groups=[
+                    {'n_melodic_lines': 1, 'n_tone_row_instances': 1},
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_measures=2,
+                line_ids=[1],
+                upper_line_highest_note='E6',
+                upper_line_lowest_note='E4',
+                pauses_fraction=0.1,
+                temporal_content={},
+                sonic_content={
+                    0: {
+                        'pitch_classes': [
+                            'pause', 'B', 'A#', 'G', 'C#', 'D#', 'C',
+                            'D', 'A', 'F#', 'E', 'G#', 'F', 'pause'
+                        ]
+                    }
+                }
+            ),
+            # `temporal_content`
+            [[1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]],
+            # `expected_n_pauses_by_group`
+            [2]
         ),
     ]
 )
 def test_create_initial_sonic_content(
-        params: FragmentParams, expected_n_pauses_by_group: list[int]
+        params: FragmentParams, temporal_content: list[list[float]],
+        expected_n_pauses_by_group: list[int]
 ) -> None:
     """Test `create_initial_sonic_content` function."""
-    sonic_content = create_initial_sonic_content(params)
+    sonic_content = create_initial_sonic_content(params, temporal_content)
     assert len(sonic_content) == len(params.groups)
     zipped = zip(sonic_content, expected_n_pauses_by_group)
     for i, (line_content, expected_n_pauses) in enumerate(zipped):
@@ -65,6 +103,7 @@ def test_create_initial_sonic_content(
     "params, expected_n_events_by_line",
     [
         (
+            # `params`
             FragmentParams(
                 tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
                 groups=[
@@ -77,9 +116,60 @@ def test_create_initial_sonic_content(
                 line_ids=[1, 2, 3, 4],
                 upper_line_highest_note='E6',
                 upper_line_lowest_note='E4',
-                pauses_fraction=0.1
+                pauses_fraction=0.1,
+                temporal_content={},
+                sonic_content={}
             ),
+            # `expected_n_events_by_line`
             [13, 27, 27, 26]
+        ),
+        (
+            # `params`
+            FragmentParams(
+                tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+                groups=[
+                    {'n_melodic_lines': 1, 'n_tone_row_instances': 1},
+                    {'n_melodic_lines': 3, 'n_tone_row_instances': 6},
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_measures=8,
+                line_ids=[1, 2, 3, 4],
+                upper_line_highest_note='E6',
+                upper_line_lowest_note='E4',
+                pauses_fraction=0.1,
+                temporal_content={1: {'durations': [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]}},
+                sonic_content={}
+            ),
+            # `expected_n_events_by_line`
+            [13, 8, 36, 36]
+        ),
+        (
+            # `params`
+            FragmentParams(
+                tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+                groups=[
+                    {'n_melodic_lines': 1, 'n_tone_row_instances': 1},
+                    {'n_melodic_lines': 3, 'n_tone_row_instances': 6},
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_measures=8,
+                line_ids=[1, 2, 3, 4],
+                upper_line_highest_note='E6',
+                upper_line_lowest_note='E4',
+                pauses_fraction=0.1,
+                temporal_content={},
+                sonic_content={
+                    0: {
+                        'pitch_classes': [
+                            'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                        ]
+                    }
+                }
+            ),
+            # `expected_n_events_by_line`
+            [12, 27, 27, 26]
         ),
     ]
 )
@@ -115,7 +205,9 @@ def test_create_initial_temporal_content(
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
                 n_melodic_lines_by_group=[1, 2],
-                n_tone_row_instances_by_group=[0, 0]
+                n_tone_row_instances_by_group=[0, 0],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `expected`
             [
@@ -137,6 +229,83 @@ def test_create_initial_temporal_content(
 def test_distribute_pitch_classes(fragment: Fragment, expected: list[list[Event]]) -> None:
     """Test `distribute_pitch_classes` function."""
     result = distribute_pitch_classes(fragment)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "params, expected",
+    [
+        (
+            # `params`
+            FragmentParams(
+                tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+                groups=[
+                    {'n_melodic_lines': 1, 'n_tone_row_instances': 1},
+                    {'n_melodic_lines': 3, 'n_tone_row_instances': 6},
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_measures=8,
+                line_ids=[1, 2, 3, 4],
+                upper_line_highest_note='E6',
+                upper_line_lowest_note='E4',
+                pauses_fraction=0.1,
+                temporal_content={},
+                sonic_content={
+                    0: {
+                        'pitch_classes': [
+                            'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                        ],
+                        'immutable': True
+                    }
+                }
+            ),
+            # `expected`
+            [1]
+        ),
+    ]
+)
+def test_find_mutable_sonic_content_indices(params: FragmentParams, expected: list[int]) -> None:
+    """Test `find_mutable_sonic_content_indices` function."""
+    result = find_mutable_sonic_content_indices(params)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "params, expected",
+    [
+        (
+            # `params`
+            FragmentParams(
+                tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+                groups=[
+                    {'n_melodic_lines': 1, 'n_tone_row_instances': 1},
+                    {'n_melodic_lines': 3, 'n_tone_row_instances': 6},
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_measures=8,
+                line_ids=[1, 2, 3, 4],
+                upper_line_highest_note='E6',
+                upper_line_lowest_note='E4',
+                pauses_fraction=0.1,
+                temporal_content={
+                    1: {
+                        'durations': [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0],
+                        'immutable': True
+                    }
+                }
+            ),
+            # `expected`
+            [0, 2, 3]
+        ),
+    ]
+)
+def test_find_mutable_temporal_content_indices(
+        params: FragmentParams, expected: list[int]
+) -> None:
+    """Test `find_mutable_temporal_content_indices` function."""
+    result = find_mutable_temporal_content_indices(params)
     assert result == expected
 
 
@@ -236,7 +405,9 @@ def test_initialize_fragment(params: FragmentParams) -> None:
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[0, 0]
+                n_tone_row_instances_by_group=[0, 0],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `max_interval`
             16,
@@ -297,7 +468,9 @@ def test_initialize_fragment(params: FragmentParams) -> None:
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1, 1],
-                n_tone_row_instances_by_group=[0, 0, 0]
+                n_tone_row_instances_by_group=[0, 0, 0],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0, 1, 2],
             ),
             # `max_interval`
             16,
@@ -366,7 +539,9 @@ def test_initialize_fragment(params: FragmentParams) -> None:
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1, 1],
-                n_tone_row_instances_by_group=[0, 0, 0]
+                n_tone_row_instances_by_group=[0, 0, 0],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0, 1, 2],
             ),
             # `max_interval`
             16,
@@ -460,6 +635,8 @@ def test_set_pitches_of_lower_lines(
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[0, 0],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
                 melodic_lines=[
                     [
                         Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='C'),
@@ -510,6 +687,8 @@ def test_set_pitches_of_lower_lines(
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[0, 0],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
                 melodic_lines=[
                     [
                         Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='pause'),
@@ -560,6 +739,8 @@ def test_set_pitches_of_lower_lines(
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
                 n_tone_row_instances_by_group=[0, 0],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
                 melodic_lines=[
                     [
                         Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='C'),
@@ -674,6 +855,47 @@ def test_split_time_span_with_invalid_arguments(
                 pauses_fraction=0.0
             ),
             "Meter numerator = 5 is not supported."
+        ),
+        (
+            FragmentParams(
+                tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+                groups=[{'n_melodic_lines': 2, 'n_tone_row_instances': 2}],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_measures=8,
+                line_ids=[1, 2],
+                upper_line_highest_note='E6',
+                upper_line_lowest_note='E4',
+                pauses_fraction=0.0,
+                temporal_content={
+                    0: {'durations': [1.0 for _ in range(40)]},
+                    1: {'durations': [1.0]},
+                }
+            ),
+            "A line has duration that is not equal to that of the fragment."
+        ),
+        (
+            FragmentParams(
+                tone_row=['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+                groups=[{'n_melodic_lines': 2, 'n_tone_row_instances': 2}],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_measures=8,
+                line_ids=[1, 2],
+                upper_line_highest_note='E6',
+                upper_line_lowest_note='E4',
+                pauses_fraction=0.0,
+                sonic_content={
+                    0: {
+                        'pitch_classes': [
+                            'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F',
+                            'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F',
+                            'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F',
+                        ]
+                    },
+                }
+            ),
+            "A group has wrong number of tone row instances."
         ),
     ]
 )

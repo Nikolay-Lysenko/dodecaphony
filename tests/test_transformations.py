@@ -40,7 +40,9 @@ from dodecaphony.transformations import (
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
                 n_melodic_lines_by_group=[2],
-                n_tone_row_instances_by_group=[1]
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0],
             ),
             # `expected_options`
             [
@@ -118,7 +120,9 @@ def test_apply_duration_change(
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[2, 1]
+                n_tone_row_instances_by_group=[2, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `expected_options`
             [
@@ -181,7 +185,9 @@ def test_apply_inversion(fragment: Fragment, expected_options: list[list[list[st
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
                 n_melodic_lines_by_group=[1],
-                n_tone_row_instances_by_group=[2]
+                n_tone_row_instances_by_group=[2],
+                mutable_temporal_content_indices=[0],
+                mutable_sonic_content_indices=[0],
             ),
             # `expected_options`
             [
@@ -221,7 +227,9 @@ def test_apply_inversion(fragment: Fragment, expected_options: list[list[list[st
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
                 n_melodic_lines_by_group=[1],
-                n_tone_row_instances_by_group=[1]
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0],
+                mutable_sonic_content_indices=[0],
             ),
             # `expected_options`
             [
@@ -264,7 +272,9 @@ def test_apply_pause_swap(fragment: Fragment, expected_options: list[list[list[s
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[2, 1]
+                n_tone_row_instances_by_group=[2, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `expected_options`
             [
@@ -331,7 +341,9 @@ def test_apply_reversion(fragment: Fragment, expected_options: list[list[list[st
                 upper_line_highest_position=88,
                 upper_line_lowest_position=1,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[2, 1]
+                n_tone_row_instances_by_group=[2, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `max_transposition`
             1,
@@ -442,7 +454,9 @@ def test_get_duration_changes(key: tuple[float, float], value: list[tuple[float,
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1],
-                n_tone_row_instances_by_group=[1]
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0],
+                mutable_sonic_content_indices=[0],
             ),
             # `n_transformations`
             1,

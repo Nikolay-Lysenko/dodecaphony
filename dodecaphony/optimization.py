@@ -82,7 +82,9 @@ def generate_new_records(
                 incumbent_solution.upper_line_highest_position,
                 incumbent_solution.upper_line_lowest_position,
                 incumbent_solution.n_melodic_lines_by_group,
-                incumbent_solution.n_tone_row_instances_by_group
+                incumbent_solution.n_tone_row_instances_by_group,
+                incumbent_solution.mutable_temporal_content_indices,
+                incumbent_solution.mutable_sonic_content_indices
             )
             candidate = transform(
                 candidate,

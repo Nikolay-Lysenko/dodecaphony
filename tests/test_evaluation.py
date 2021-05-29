@@ -45,7 +45,9 @@ from dodecaphony.fragment import Fragment, override_calculated_attributes
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `expected`
             -0.125
@@ -81,7 +83,9 @@ def test_evaluate_absence_of_doubled_pitch_classes(fragment: Fragment, expected:
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `expected`
             -0.0625
@@ -116,7 +120,9 @@ def test_evaluate_absence_of_voice_crossing(fragment: Fragment, expected: float)
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `max_duration`
             4,
@@ -162,7 +168,9 @@ def test_evaluate_cadence_duration(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `height_penalties`
             {
@@ -214,7 +222,9 @@ def test_evaluate_climax_explicity(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1]
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
             ),
             # `consistent_patterns`
             [
@@ -260,7 +270,9 @@ def test_evaluate_consistency_of_rhythm_with_meter(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[3],
-                n_tone_row_instances_by_group=[1]
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
             ),
             # `regular_positions`
             [
@@ -317,7 +329,9 @@ def test_evaluate_consistency_of_rhythm_with_meter(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[3],
-                n_tone_row_instances_by_group=[1]
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
             ),
             # `regular_positions`
             [
@@ -394,7 +408,9 @@ def test_evaluate_harmony_dynamic(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[3],
-                n_tone_row_instances_by_group=[1]
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
             ),
             # `penalty_deduction_per_line`
             0.2,
@@ -455,7 +471,9 @@ def test_evaluate_smoothness_of_voice_leading(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[3],
-                n_tone_row_instances_by_group=[1]
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
             ),
             # `n_semitones_to_penalty`
             {
@@ -511,7 +529,9 @@ def test_stackability(
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
                 n_melodic_lines_by_group=[3],
-                n_tone_row_instances_by_group=[1]
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
             ),
             # `params`
             [
