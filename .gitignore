@@ -150,4 +150,5 @@ nohup.out
 *.gz
 
 # Project data
+configs/
 outputs/
