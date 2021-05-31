@@ -5,8 +5,11 @@ Author: Nikolay Lysenko
 """
 
 
+from typing import Any
+
 import pretty_midi
 import pytest
+import yaml
 
 from dodecaphony.fragment import Fragment, override_calculated_attributes
 from dodecaphony.rendering import (
@@ -15,6 +18,7 @@ from dodecaphony.rendering import (
     create_sinethesizer_instruments,
     create_tsv_events_from_fragment,
     create_wav_from_tsv_events,
+    create_yaml_from_fragment,
 )
 
 
@@ -324,3 +328,52 @@ def test_create_wav_from_tsv_events(
         instruments_registry,
         trailing_silence_in_seconds
     )
+
+
+@pytest.mark.parametrize(
+    "fragment, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+                    ['pause', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'],
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
+            ),
+            # `expected`
+            {
+                "temporal_content": {
+                    0: {'durations': [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]},
+                    1: {'durations': [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0]},
+                },
+                'sonic_content': {
+                    0: {'pitch_classes': ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']},
+                    1: {'pitch_classes': ['pause', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B']},
+                }
+            }
+        ),
+    ]
+)
+def test_create_yaml_from_fragment(
+        path_to_tmp_file: str, fragment: Fragment, expected: dict[str, Any]
+) -> None:
+    """Test `create_yaml_from_fragment` function."""
+    create_yaml_from_fragment(fragment, path_to_tmp_file)
+    with open(path_to_tmp_file) as in_file:
+        result = yaml.load(in_file, Loader=yaml.FullLoader)
+    assert result == expected

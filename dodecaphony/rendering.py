@@ -14,6 +14,7 @@ from pkg_resources import resource_filename
 from typing import Any
 
 import pretty_midi
+import yaml
 from sinethesizer.io import (
     convert_events_to_timeline,
     convert_tsv_to_events,
@@ -218,6 +219,30 @@ def create_wav_from_tsv_events(
     events = convert_tsv_to_events(events_path, settings)
     timeline = convert_events_to_timeline(events, settings)
     write_timeline_to_wav(output_path, timeline, settings['frame_rate'])
+
+
+def create_yaml_from_fragment(fragment: Fragment, yaml_path: str) -> None:
+    """
+    Create YAML file that can be used for setting temporal and sonic content in a runtime config.
+
+    :param fragment:
+        musical fragment
+    :param yaml_path:
+        path to a file where result is going to be saved
+    :return:
+        None
+    """
+    temporal_content = {
+        i: {'durations': durations}
+        for i, durations in enumerate(fragment.temporal_content)
+    }
+    sonic_content = {
+        i: {'pitch_classes': pitch_classes}
+        for i, pitch_classes in enumerate(fragment.sonic_content)
+    }
+    result = {'temporal_content': temporal_content, 'sonic_content': sonic_content}
+    with open(yaml_path, 'w') as out_file:
+        yaml.dump(result, out_file)
 
 
 def make_lilypond_template(
@@ -523,6 +548,9 @@ def render(fragment: Fragment, rendering_params: dict[str, Any]) -> None:  # pra
     n_melodic_lines = len(fragment.melodic_lines)
     instruments_registry = create_sinethesizer_instruments(n_melodic_lines)
     create_wav_from_tsv_events(events_path, wav_path, instruments_registry, trailing_silence_in_sec)
+
+    yaml_path = os.path.join(nested_dir, 'content.yml')
+    create_yaml_from_fragment(fragment, yaml_path)
 
     lilypond_path = os.path.join(nested_dir, 'sheet_music.ly')
     create_lilypond_file_from_fragment(fragment, lilypond_path)

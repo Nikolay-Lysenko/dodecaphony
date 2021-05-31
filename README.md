@@ -13,7 +13,8 @@ Each run of the tool results in creation of a directory that contains:
 * MIDI file;
 * WAV file;
 * Events file in [sinethesizer](https://github.com/Nikolay-Lysenko/sinethesizer) TSV format;
-* PDF file with sheet music and its Lilypond source.
+* PDF file with sheet music and its Lilypond source;
+* YAML file that can be copied to a config for a derivative fragment.
 
 ## Installation
 
