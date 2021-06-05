@@ -84,6 +84,14 @@ class Fragment:
     melodic_lines: Optional[list[list[Event]]] = None
     sonorities: Optional[list[list[Event]]] = None
 
+    def __eq__(self, other: Any):
+        if not isinstance(other, Fragment):
+            return NotImplemented
+        return (
+            self.temporal_content == other.temporal_content
+            and self.sonic_content == other.sonic_content
+        )
+
 
 def validate_initialized_content(params: FragmentParams) -> None:
     """

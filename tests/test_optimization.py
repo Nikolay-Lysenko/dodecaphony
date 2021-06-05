@@ -11,7 +11,9 @@ import pytest
 
 from dodecaphony.evaluation import parse_scoring_sets_registry
 from dodecaphony.fragment import Fragment
-from dodecaphony.optimization import Task, create_tasks, optimize_with_local_search
+from dodecaphony.optimization import (
+    Record, Task, create_tasks, optimize_with_local_search, select_distinct_best_records
+)
 from dodecaphony.transformations import create_transformations_registry
 
 
@@ -166,3 +168,18 @@ def test_optimize_with_local_search(
         n_transformations_increment, max_n_transformations_per_trial, beam_width,
         transformations_registry, transformation_probabilities, scoring_sets, scoring_sets_registry
     )
+
+
+@pytest.mark.parametrize(
+    "records, n_records, expected",
+    [
+        ([], 5, []),
+        ([Record('a', 0), Record('b', -1), Record('a', 0)], 2, [Record('a', 0), Record('b', -1)]),
+    ]
+)
+def test_select_distinct_best_records(
+        records: list[Record], n_records: int, expected: list[Record]
+) -> None:
+    """Test `select_distinct_best_records` function."""
+    result = select_distinct_best_records(records, n_records)
+    assert result == expected

@@ -31,6 +31,26 @@ class Task:
     n_trials: int
 
 
+def select_distinct_best_records(records: list[Record], n_records: int) -> list[Record]:
+    """
+    Select records related to highest scores (without duplicates).
+
+    :param records:
+        original records
+    :param n_records:
+        number of unique records to select
+    :return:
+        best records
+    """
+    results = []
+    for record in sorted(records, key=lambda x: -x.score):
+        if record not in results:
+            results.append(record)
+        if len(results) == n_records:
+            break
+    return results
+
+
 def generate_new_records(
         tasks: list[Task],
         n_records_to_return: int,
@@ -94,8 +114,9 @@ def generate_new_records(
                 transformation_probabilities
             )
             score = evaluate(candidate, scoring_sets, scoring_sets_registry)
+            score = round(score, 10)  # Prevent overflow during records comparison.
             new_records.append(Record(candidate, score))
-    new_records = sorted(new_records, key=lambda x: -x.score)[:n_records_to_return]
+    new_records = select_distinct_best_records(new_records, n_records_to_return)
     return new_records
 
 
@@ -216,7 +237,7 @@ def optimize_with_local_search(
         ]
         nested_new_records = starmap_in_parallel(generate_new_records, args, paralleling_params)
         new_records = [record for records in nested_new_records for record in records]
-        best_new_records = sorted(new_records, key=lambda x: -x.score)[:beam_width]
+        best_new_records = select_distinct_best_records(new_records, beam_width)
         current_best_score = best_new_records[0].score
         incumbent_solutions = [record.fragment for record in best_new_records]
 
@@ -227,7 +248,7 @@ def optimize_with_local_search(
         if n_transformations_per_trial > max_n_transformations_per_trial:
             n_transformations_per_trial = default_n_transformations_per_trial
 
-        records = sorted(records + new_records, key=lambda x: -x.score)[:beam_width]
+        records = select_distinct_best_records(records + new_records, beam_width)
         global_best_score = records[0].score
         previous_best_score = current_best_score
         print(

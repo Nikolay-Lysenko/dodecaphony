@@ -21,6 +21,7 @@ from dodecaphony.fragment import (
     find_mutable_temporal_content_indices,
     find_sonorities,
     initialize_fragment,
+    override_calculated_attributes,
     set_pitches_of_lower_lines,
     set_pitches_of_upper_line,
     split_time_span,
@@ -903,3 +904,56 @@ def test_validate(params: FragmentParams, match: str) -> None:
     """Test `validate` function."""
     with pytest.raises(ValueError, match=match):
         validate(params)
+
+
+@pytest.mark.parametrize(
+    "first_temporal_content, second_temporal_content, first_sonic_content, second_sonic_content, "
+    "expected",
+    [
+        (
+            [[1.0 for _ in range(12)]],
+            [[1.0 for _ in range(12)]],
+            [['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']],
+            [['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']],
+            True
+        ),
+    ]
+)
+def test_equality_of_fragments(
+        first_temporal_content: list[list[float]], second_temporal_content: list[list[float]],
+        first_sonic_content: list[list[str]], second_sonic_content: list[list[str]],
+        expected: bool
+) -> None:
+    """Test `__eq__` method of `Fragment` class."""
+    first_fragment = Fragment(
+        first_temporal_content,
+        first_sonic_content,
+        meter_numerator=4,
+        meter_denominator=4,
+        n_beats=12,
+        line_ids=[1],
+        upper_line_highest_position=88,
+        upper_line_lowest_position=0,
+        n_melodic_lines_by_group=[1],
+        n_tone_row_instances_by_group=[1],
+        mutable_temporal_content_indices=[0],
+        mutable_sonic_content_indices=[0]
+    )
+    first_fragment = override_calculated_attributes(first_fragment)
+    second_fragment = Fragment(
+        second_temporal_content,
+        second_sonic_content,
+        meter_numerator=4,
+        meter_denominator=4,
+        n_beats=12,
+        line_ids=[1],
+        upper_line_highest_position=88,
+        upper_line_lowest_position=0,
+        n_melodic_lines_by_group=[1],
+        n_tone_row_instances_by_group=[1],
+        mutable_temporal_content_indices=[0],
+        mutable_sonic_content_indices=[0]
+    )
+    second_fragment = override_calculated_attributes(second_fragment)
+    result = first_fragment == second_fragment
+    assert result == expected
