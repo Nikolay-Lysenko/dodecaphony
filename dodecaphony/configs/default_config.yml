@@ -18,6 +18,8 @@ scoring_sets:
     scoring_functions:
       - name: absence_of_doubled_pitch_classes
         weight: 1.0
+      - name: absence_of_simultaneous_skips
+        weight: 1.0
       - name: absence_of_voice_crossing
         weight: 1.0
       - name: cadence_duration

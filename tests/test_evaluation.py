@@ -12,6 +12,7 @@ import pytest
 from dodecaphony.evaluation import (
     evaluate,
     evaluate_absence_of_doubled_pitch_classes,
+    evaluate_absence_of_simultaneous_skips,
     evaluate_absence_of_voice_crossing,
     evaluate_cadence_duration,
     evaluate_climax_explicity,
@@ -59,6 +60,51 @@ def test_evaluate_absence_of_doubled_pitch_classes(fragment: Fragment, expected:
     """Test `evaluate_absence_of_doubled_pitch_classes` function."""
     fragment = override_calculated_attributes(fragment)
     result = evaluate_absence_of_doubled_pitch_classes(fragment)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "fragment, min_skip_in_semitones, max_skips_share, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause'],
+                    ['B', 'C', 'D#', 'A', 'G', 'A#', 'G#', 'C#', 'E', 'F#', 'D', 'F'],
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
+            ),
+            # `min_skip_in_semitones`
+            7,
+            # `max_skips_share`
+            0.1,
+            # `expected`
+            -2 / 15
+        ),
+    ]
+)
+def test_evaluate_absence_of_simultaneous_skips(
+        fragment: Fragment, min_skip_in_semitones: int, max_skips_share: float, expected: float
+) -> None:
+    """Test `evaluate_absence_of_simultaneous_skips` function."""
+    fragment = override_calculated_attributes(fragment)
+    result = evaluate_absence_of_simultaneous_skips(
+        fragment, min_skip_in_semitones, max_skips_share
+    )
     assert result == expected
 
 

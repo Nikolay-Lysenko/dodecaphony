@@ -42,6 +42,38 @@ def evaluate_absence_of_doubled_pitch_classes(fragment: Fragment) -> float:
     return score
 
 
+def evaluate_absence_of_simultaneous_skips(
+        fragment: Fragment, min_skip_in_semitones: int = 5, max_skips_share: float = 0.65
+) -> float:
+    """
+    Evaluate absence of simultaneous large enough skips.
+
+    :param fragment:
+        a fragment to be evaluated
+    :param min_skip_in_semitones:
+        minimum size (in semitones) of a melodic interval to be considered a large enough skip
+    :param max_skips_share:
+        maximum share of melodic lines with skips between adjacent sonorities not to be penalized
+        for this pair of sonorities
+    :return:
+        minus one multiplied by fraction of sonorities with enough number of simultaneous skips
+    """
+    score = 0
+    for first_sonority, second_sonority in zip(fragment.sonorities, fragment.sonorities[1:]):
+        n_melodic_intervals = 0
+        n_skips = 0
+        for first, second in zip(first_sonority, second_sonority):
+            if first.pitch_class == 'pause' or second.pitch_class == 'pause':
+                continue
+            n_melodic_intervals += 1
+            interval_size = abs(first.position_in_semitones - second.position_in_semitones)
+            n_skips += int(interval_size >= min_skip_in_semitones)
+        if n_skips / n_melodic_intervals >= max_skips_share:
+            score -= 1
+    score /= len(fragment.sonorities) - 1
+    return score
+
+
 def evaluate_absence_of_voice_crossing(fragment: Fragment) -> float:
     """
     Evaluate absence of voice crossing.
@@ -315,6 +347,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
     """
     registry = {
         'absence_of_doubled_pitch_classes': evaluate_absence_of_doubled_pitch_classes,
+        'absence_of_simultaneous_skips': evaluate_absence_of_simultaneous_skips,
         'absence_of_voice_crossing': evaluate_absence_of_voice_crossing,
         'cadence_duration': evaluate_cadence_duration,
         'climax_explicity': evaluate_climax_explicity,
