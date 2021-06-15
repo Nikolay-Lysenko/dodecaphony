@@ -194,9 +194,10 @@ def calculate_number_of_undefined_events(
         total number of events in the group that are not initially defined by a user
     """
     if group_index in sonic_content:
-        return len(sonic_content[group_index]['pitch_classes'])
-    n_sound_events = n_tone_row_instances * TONE_ROW_LEN
-    n_events = int(round(n_sound_events / (1 - pauses_fraction)))
+        n_events = len(sonic_content[group_index]['pitch_classes'])
+    else:
+        n_sound_events = n_tone_row_instances * TONE_ROW_LEN
+        n_events = int(round(n_sound_events / (1 - pauses_fraction)))
     n_events -= sum(len(temporal_content[line_index]) for line_index in line_indices)
     return n_events
 

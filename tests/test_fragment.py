@@ -6,6 +6,7 @@ Author: Nikolay Lysenko
 
 
 from collections import Counter
+from typing import Any
 
 import pytest
 
@@ -14,6 +15,7 @@ from dodecaphony.fragment import (
     Fragment,
     FragmentParams,
     SUPPORTED_DURATIONS,
+    calculate_number_of_undefined_events,
     create_initial_sonic_content,
     create_initial_temporal_content,
     distribute_pitch_classes,
@@ -27,6 +29,49 @@ from dodecaphony.fragment import (
     split_time_span,
     validate,
 )
+
+
+@pytest.mark.parametrize(
+    "group_index, temporal_content, sonic_content, line_indices, n_tone_row_instances, "
+    "pauses_fraction, expected",
+    [
+        (
+            # `group_index`
+            0,
+            # `temporal_content`
+            [[], [1.0 for _ in range(12)]],
+            # `sonic_content`
+            {
+                0: {
+                    'pitch_classes': [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F',
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F',
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F',
+                    ]
+                }
+            },
+            # `line_indices`
+            [0, 1],
+            # `n_tone_row_instances`
+            3,
+            # `pauses_fraction`
+            0.0,
+            # `expected`
+            24
+        ),
+    ]
+)
+def test_calculate_number_of_undefined_events(
+        group_index: int, temporal_content: list[list[float]],
+        sonic_content: dict[int, dict[str, Any]], line_indices: list[int],
+        n_tone_row_instances: int, pauses_fraction: float, expected: float
+) -> None:
+    """Test `calculate_number_of_undefined_events` function."""
+    result = calculate_number_of_undefined_events(
+        group_index, temporal_content, sonic_content, line_indices, n_tone_row_instances,
+        pauses_fraction
+    )
+    assert result == expected
 
 
 @pytest.mark.parametrize(
