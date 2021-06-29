@@ -68,7 +68,7 @@ def evaluate_absence_of_simultaneous_skips(
             n_melodic_intervals += 1
             interval_size = abs(first.position_in_semitones - second.position_in_semitones)
             n_skips += int(interval_size >= min_skip_in_semitones)
-        if n_skips / n_melodic_intervals >= max_skips_share:
+        if n_melodic_intervals > 0 and n_skips / n_melodic_intervals >= max_skips_share:
             score -= 1
     score /= len(fragment.sonorities) - 1
     return score
