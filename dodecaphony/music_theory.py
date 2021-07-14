@@ -6,6 +6,7 @@ Author: Nikolay Lysenko
 
 
 import itertools
+from enum import Enum
 
 
 N_SEMITONES_PER_OCTAVE = 12
@@ -15,6 +16,44 @@ PITCH_CLASS_TO_POSITION = {
     'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
 }
 POSITION_TO_PITCH_CLASS = {v: k for k, v in PITCH_CLASS_TO_POSITION.items()}
+
+
+class IntervalTypes(Enum):
+    """Enumeration of interval types."""
+    PERFECT_CONSONANCE = 1
+    IMPERFECT_CONSONANCE = 2
+    DISSONANCE = 3
+    NOT_AN_INTERVAL = 4
+
+
+N_SEMITONES_TO_INTERVAL_TYPE_WITH_CONSONANT_P4 = {
+    0: IntervalTypes.PERFECT_CONSONANCE,
+    1: IntervalTypes.DISSONANCE,
+    2: IntervalTypes.DISSONANCE,
+    3: IntervalTypes.IMPERFECT_CONSONANCE,
+    4: IntervalTypes.IMPERFECT_CONSONANCE,
+    5: IntervalTypes.IMPERFECT_CONSONANCE,
+    6: IntervalTypes.DISSONANCE,
+    7: IntervalTypes.PERFECT_CONSONANCE,
+    8: IntervalTypes.IMPERFECT_CONSONANCE,
+    9: IntervalTypes.IMPERFECT_CONSONANCE,
+    10: IntervalTypes.DISSONANCE,
+    11: IntervalTypes.DISSONANCE,
+}
+N_SEMITONES_TO_INTERVAL_TYPE_WITH_DISSONANT_P4 = {
+    0: IntervalTypes.PERFECT_CONSONANCE,
+    1: IntervalTypes.DISSONANCE,
+    2: IntervalTypes.DISSONANCE,
+    3: IntervalTypes.IMPERFECT_CONSONANCE,
+    4: IntervalTypes.IMPERFECT_CONSONANCE,
+    5: IntervalTypes.DISSONANCE,
+    6: IntervalTypes.DISSONANCE,
+    7: IntervalTypes.PERFECT_CONSONANCE,
+    8: IntervalTypes.IMPERFECT_CONSONANCE,
+    9: IntervalTypes.IMPERFECT_CONSONANCE,
+    10: IntervalTypes.DISSONANCE,
+    11: IntervalTypes.DISSONANCE,
+}
 
 
 def get_smallest_intervals_between_pitch_classes() -> dict[tuple[str, str], int]:
@@ -37,6 +76,28 @@ def get_smallest_intervals_between_pitch_classes() -> dict[tuple[str, str], int]
         value = (destination_position - starting_position + shift) % N_SEMITONES_PER_OCTAVE - shift
         result[(starting_pitch_class, destination_pitch_class)] = value
     return result
+
+
+def get_type_of_interval(
+        n_semitones: int,
+        is_perfect_fourth_consonant: bool = True
+) -> IntervalTypes:
+    """
+    Get type of a harmonic interval.
+
+    :param n_semitones:
+        interval size in semitones
+    :param is_perfect_fourth_consonant:
+        indicator whether perfect fourth is a consonant interval
+    :return:
+        type of interval
+    """
+    if is_perfect_fourth_consonant:
+        n_semitones_to_consonance = N_SEMITONES_TO_INTERVAL_TYPE_WITH_CONSONANT_P4
+    else:
+        n_semitones_to_consonance = N_SEMITONES_TO_INTERVAL_TYPE_WITH_DISSONANT_P4
+    n_semitones %= len(n_semitones_to_consonance)
+    return n_semitones_to_consonance[n_semitones]
 
 
 def validate_tone_row(tone_row: list[str]) -> None:

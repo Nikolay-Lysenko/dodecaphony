@@ -9,8 +9,8 @@ import itertools
 import math
 from typing import Any, Callable
 
-from .fragment import Fragment
-from .music_theory import N_SEMITONES_PER_OCTAVE
+from .fragment import Event, Fragment
+from .music_theory import IntervalTypes, N_SEMITONES_PER_OCTAVE, get_type_of_interval
 
 
 SCORING_SETS_REGISTRY_TYPE = dict[str, list[tuple[Callable[..., float], float, dict[str, Any]]]]
@@ -208,6 +208,114 @@ def evaluate_consistency_of_rhythm_with_meter(
     return score
 
 
+def find_indices_of_dissonating_events(
+        sonority: list[Event], meter_numerator: int
+) -> tuple[set[int], set[int]]:
+    """
+    Find indices of dissonating (i.e., dependent, non-free in terms of strict counterpoint) events.
+
+    :param sonority:
+        simultaneously sounding events
+    :param meter_numerator:
+        numerator in meter signature, i.e., number of reference beats per measure
+    :return:
+        indices of passing tones or neighbor dissonances and indices of suspended dissonances
+    """
+    passing_tones_and_neighbors = set()
+    suspensions = set()
+    sonority_start_time = max(event.start_time for event in sonority)
+    enumerated = list(enumerate(sonority))
+    pairs = itertools.combinations(enumerated, 2)
+    for (first_index, first_event), (second_index, second_event) in pairs:
+        if first_event.pitch_class == 'pause' or second_event.pitch_class == 'pause':
+            continue
+        n_semitones = first_event.position_in_semitones - second_event.position_in_semitones
+        is_perfect_fourth_consonant = second_index != len(sonority)
+        interval_type = get_type_of_interval(n_semitones, is_perfect_fourth_consonant)
+        if interval_type != IntervalTypes.DISSONANCE:
+            continue
+        first_event_continues = first_event.start_time < sonority_start_time
+        second_event_continues = second_event.start_time < sonority_start_time
+        if first_event_continues and second_event_continues:
+            continue
+        first_event_starts_on_downbeat = first_event.start_time % meter_numerator == 0
+        second_event_starts_on_downbeat = second_event.start_time % meter_numerator == 0
+        if first_event_continues and second_event_starts_on_downbeat:
+            suspensions.add(first_index)
+            continue
+        if second_event_continues and first_event_starts_on_downbeat:
+            suspensions.add(second_index)
+            continue
+        if not first_event_continues:
+            passing_tones_and_neighbors.add(first_index)
+        if not second_event_continues:
+            passing_tones_and_neighbors.add(second_index)
+    return passing_tones_and_neighbors, suspensions
+
+
+def evaluate_dissonances_preparation_and_resolution(
+        fragment: Fragment,
+        n_semitones_to_pt_and_ngh_preparation_penalty: dict[int, float],
+        n_semitones_to_pt_and_ngh_resolution_penalty: dict[int, float],
+        n_semitones_to_suspension_resolution_penalty: dict[int, float]
+) -> float:
+    """
+    Evaluate smoothness of dissonances preparation and resolution.
+
+    :param fragment:
+        a fragment to be evaluated
+    :param n_semitones_to_pt_and_ngh_preparation_penalty:
+        mapping from melodic interval size in semitones to a penalty for moving by this interval
+        to a dissonance considered to be an analogue of passing tone or neighbor dissonance
+    :param n_semitones_to_pt_and_ngh_resolution_penalty:
+        mapping from melodic interval size in semitones to a penalty for moving by this interval
+        from a dissonance considered to be an analogue of passing tone or neighbor dissonance
+    :param n_semitones_to_suspension_resolution_penalty:
+        mapping from melodic interval size in semitones to a penalty for moving by this interval
+        from a dissonance considered to be an analogue of suspended dissonance
+    :return:
+        average over all vertical intervals penalty for their preparation and resolution
+    """
+    score = 0
+    event_indices = [0 for _ in fragment.melodic_lines]
+    for sonority in fragment.sonorities[1:]:
+        zipped = zip(sonority, fragment.melodic_lines, event_indices)
+        for line_index, (event, melodic_line, event_index) in enumerate(zipped):
+            if event != melodic_line[event_index]:
+                event_indices[line_index] += 1
+        pt_and_ngh_line_indices, suspension_line_indices = find_indices_of_dissonating_events(
+            sonority, fragment.meter_numerator
+        )
+        for line_index in pt_and_ngh_line_indices:
+            event_index = event_indices[line_index]
+            melodic_line = fragment.melodic_lines[line_index]
+            event = melodic_line[event_index]
+            if event_index > 0:
+                previous_event = melodic_line[event_index - 1]
+                if previous_event.pitch_class != 'pause':
+                    n_semitones = event.position_in_semitones - previous_event.position_in_semitones
+                    score -= n_semitones_to_pt_and_ngh_preparation_penalty.get(n_semitones, 1.0)
+            if event_index < len(melodic_line) - 1:
+                next_event = melodic_line[event_index + 1]
+                if next_event.pitch_class != 'pause':
+                    n_semitones = next_event.position_in_semitones - event.position_in_semitones
+                    score -= n_semitones_to_pt_and_ngh_resolution_penalty.get(n_semitones, 1.0)
+        for line_index in suspension_line_indices:
+            event_index = event_indices[line_index]
+            melodic_line = fragment.melodic_lines[line_index]
+            event = melodic_line[event_index]
+            if event_index < len(melodic_line) - 1:
+                next_event = melodic_line[event_index + 1]
+                if next_event.pitch_class != 'pause':
+                    n_semitones = next_event.position_in_semitones - event.position_in_semitones
+                    score -= n_semitones_to_suspension_resolution_penalty.get(n_semitones, 1.0)
+
+    total_n_events = sum(len(melodic_line) for melodic_line in fragment.melodic_lines)
+    n_first_events = len(fragment.melodic_lines)
+    score /= total_n_events - n_first_events
+    return score
+
+
 def evaluate_harmony_dynamic(
         fragment: Fragment, regular_positions: list[dict[str, Any]],
         ad_hoc_positions: list[dict[str, Any]], ranges: dict[str, tuple[float, float]],
@@ -352,6 +460,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
         'cadence_duration': evaluate_cadence_duration,
         'climax_explicity': evaluate_climax_explicity,
         'consistency_of_rhythm_with_meter': evaluate_consistency_of_rhythm_with_meter,
+        'dissonances_preparation_and_resolution': evaluate_dissonances_preparation_and_resolution,
         'harmony_dynamic': evaluate_harmony_dynamic,
         'smoothness_of_voice_leading': evaluate_smoothness_of_voice_leading,
         'stackability': evaluate_stackability,
