@@ -315,6 +315,71 @@ def evaluate_dissonances_preparation_and_resolution(
     return score
 
 
+def compute_harmonic_stability_of_sonority(
+        sonority: list[Event], n_semitones_to_stability: dict[int, float]
+) -> float:
+    """
+    Compute stability of sonority as average stability of intervals forming it.
+
+    :param sonority:
+        simultaneously sounding events
+    :param n_semitones_to_stability:
+        mapping from interval size in semitones to its harmonic stability
+    :return:
+        average stability of intervals forming the sonority
+    """
+    stability = 0
+    sound_events = [event for event in sonority if event.pitch_class != 'pause']
+    if len(sound_events) <= 1:
+        return 1.0
+    for first, second in itertools.combinations(sound_events, 2):
+        interval_in_semitones = abs(first.position_in_semitones - second.position_in_semitones)
+        interval_in_semitones %= N_SEMITONES_PER_OCTAVE
+        stability += n_semitones_to_stability[interval_in_semitones]
+    n_pairs = len(sound_events) * (len(sound_events) - 1) / 2
+    stability /= n_pairs
+    return stability
+
+
+def find_sonority_type(
+        sonority_start: float, sonority_end: float, regular_positions: list[dict[str, Any]],
+        ad_hoc_positions: list[dict[str, Any]], n_beats: int
+) -> str:
+    """
+    Find type of sonority based on its position in time.
+
+    :param sonority_start:
+        start time of sonority (in reference beats)
+    :param sonority_end:
+        end time of sonority (in reference beats)
+    :param regular_positions:
+        parameters of regular positions (for example, downbeats or relatively strong beats)
+    :param ad_hoc_positions:
+        parameters of ad hoc positions which appear just once (for example, the beginning of
+        the fragment or the 11th reference beat)
+    :param n_beats:
+        total duration of a fragment (in reference beats)
+    :return:
+        type of sonority based on its position in time
+    """
+    for ad_hoc_position in ad_hoc_positions:
+        if ad_hoc_position['time'] < 0:
+            ad_hoc_position['time'] += n_beats
+        if sonority_start <= ad_hoc_position['time'] < sonority_end:
+            return ad_hoc_position['name']
+    for regular_position in regular_positions:
+        denominator = regular_position['denominator']
+        ratio = math.ceil(sonority_start) // denominator
+        processed_start = sonority_start - ratio * denominator
+        processed_end = sonority_end - ratio * denominator
+        current_time = regular_position['remainder']
+        while current_time < processed_end:
+            if current_time >= processed_start:
+                return regular_position['name']
+            current_time += denominator
+    return 'default'
+
+
 def evaluate_harmony_dynamic(
         fragment: Fragment, regular_positions: list[dict[str, Any]],
         ad_hoc_positions: list[dict[str, Any]], ranges: dict[str, tuple[float, float]],
@@ -337,46 +402,16 @@ def evaluate_harmony_dynamic(
     :return:
         average over all sonorities deviation of harmonic stability from its ranges
     """
-
-    def find_sonority_type() -> str:
-        """Find type of current sonority."""
-        for ad_hoc_position in ad_hoc_positions:
-            if ad_hoc_position['time'] < 0:
-                ad_hoc_position['time'] += fragment.n_beats
-            if sonority_start <= ad_hoc_position['time'] < sonority_end:
-                return ad_hoc_position['name']
-        for regular_position in regular_positions:
-            denominator = regular_position['denominator']
-            ratio = math.ceil(sonority_start) // denominator
-            processed_start = sonority_start - ratio * denominator
-            processed_end = sonority_end - ratio * denominator
-            current_time = regular_position['remainder']
-            while current_time < processed_end:
-                if current_time >= processed_start:
-                    return regular_position['name']
-                current_time += denominator
-        return 'default'
-
-    def compute_harmonic_stability_of_sonority() -> float:
-        """Compute stability of sonority as average stability of intervals forming it."""
-        stability = 0
-        sound_events = [event for event in sonority if event.pitch_class != 'pause']
-        if len(sound_events) <= 1:
-            return 1.0
-        for first, second in itertools.combinations(sound_events, 2):
-            interval_in_semitones = abs(first.position_in_semitones - second.position_in_semitones)
-            interval_in_semitones %= N_SEMITONES_PER_OCTAVE
-            stability += n_semitones_to_stability[interval_in_semitones]
-        n_pairs = len(sound_events) * (len(sound_events) - 1) / 2
-        stability /= n_pairs
-        return stability
-
     score = 0
     for sonority in fragment.sonorities:
         sonority_start = max(event.start_time for event in sonority)
         sonority_end = min(event.start_time + event.duration for event in sonority)
-        stability_of_current_sonority = compute_harmonic_stability_of_sonority()
-        sonority_type = find_sonority_type()
+        stability_of_current_sonority = compute_harmonic_stability_of_sonority(
+            sonority, n_semitones_to_stability
+        )
+        sonority_type = find_sonority_type(
+            sonority_start, sonority_end, regular_positions, ad_hoc_positions, fragment.n_beats
+        )
         min_allowed_value = ranges[sonority_type][0]
         score += min(stability_of_current_sonority - min_allowed_value, 0)
         max_allowed_value = ranges[sonority_type][1]
