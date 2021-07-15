@@ -7,7 +7,7 @@ Author: Nikolay Lysenko
 
 import itertools
 import math
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from .fragment import Event, Fragment
 from .music_theory import IntervalTypes, N_SEMITONES_PER_OCTAVE, get_type_of_interval
@@ -252,6 +252,34 @@ def find_indices_of_dissonating_events(
     return passing_tones_and_neighbors, suspensions
 
 
+def find_melodic_interval(
+        event: Event, event_index: int, melodic_line: list[Event], shift: int
+) -> Optional[int]:
+    """
+    Find melodic interval between the given event and an adjacent event.
+
+    :param event:
+        event (it is assumed that it is not pause)
+    :param event_index:
+        index of the event in its melodic line
+    :param melodic_line:
+        melodic line containing the event
+    :param shift:
+        -1 if interval of arrival to the event is needed or
+        1 if interval of departure from the event is needed
+    :return:
+        size of melodic interval (in semitones)
+    """
+    try:
+        adjacent_event = melodic_line[event_index + shift]
+    except IndexError:
+        return None
+    if adjacent_event.pitch_class == 'pause':
+        return None
+    n_semitones = event.position_in_semitones - adjacent_event.position_in_semitones
+    return n_semitones
+
+
 def evaluate_dissonances_preparation_and_resolution(
         fragment: Fragment,
         n_semitones_to_pt_and_ngh_preparation_penalty: dict[int, float],
@@ -276,6 +304,9 @@ def evaluate_dissonances_preparation_and_resolution(
         average over all vertical intervals penalty for their preparation and resolution
     """
     score = 0
+    n_semitones_to_pt_and_ngh_preparation_penalty[None] = 0
+    n_semitones_to_pt_and_ngh_resolution_penalty[None] = 0
+    n_semitones_to_suspension_resolution_penalty[None] = 0
     event_indices = [0 for _ in fragment.melodic_lines]
     for sonority in fragment.sonorities:
         zipped = zip(sonority, fragment.melodic_lines, event_indices)
@@ -289,25 +320,16 @@ def evaluate_dissonances_preparation_and_resolution(
             event_index = event_indices[line_index]
             melodic_line = fragment.melodic_lines[line_index]
             event = melodic_line[event_index]
-            if event_index > 0:
-                previous_event = melodic_line[event_index - 1]
-                if previous_event.pitch_class != 'pause':
-                    n_semitones = event.position_in_semitones - previous_event.position_in_semitones
-                    score -= n_semitones_to_pt_and_ngh_preparation_penalty.get(n_semitones, 1.0)
-            if event_index < len(melodic_line) - 1:
-                next_event = melodic_line[event_index + 1]
-                if next_event.pitch_class != 'pause':
-                    n_semitones = next_event.position_in_semitones - event.position_in_semitones
-                    score -= n_semitones_to_pt_and_ngh_resolution_penalty.get(n_semitones, 1.0)
+            arrival_interval = find_melodic_interval(event, event_index, melodic_line, shift=-1)
+            score -= n_semitones_to_pt_and_ngh_preparation_penalty.get(arrival_interval, 1.0)
+            departure_interval = find_melodic_interval(event, event_index, melodic_line, shift=1)
+            score -= n_semitones_to_pt_and_ngh_resolution_penalty.get(departure_interval, 1.0)
         for line_index in suspension_line_indices:
             event_index = event_indices[line_index]
             melodic_line = fragment.melodic_lines[line_index]
             event = melodic_line[event_index]
-            if event_index < len(melodic_line) - 1:
-                next_event = melodic_line[event_index + 1]
-                if next_event.pitch_class != 'pause':
-                    n_semitones = next_event.position_in_semitones - event.position_in_semitones
-                    score -= n_semitones_to_suspension_resolution_penalty.get(n_semitones, 1.0)
+            departure_interval = find_melodic_interval(event, event_index, melodic_line, shift=1)
+            score -= n_semitones_to_suspension_resolution_penalty.get(departure_interval, 1.0)
 
     total_n_events = sum(len(melodic_line) for melodic_line in fragment.melodic_lines)
     n_first_events = len(fragment.melodic_lines)
