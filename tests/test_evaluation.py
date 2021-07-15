@@ -17,12 +17,14 @@ from dodecaphony.evaluation import (
     evaluate_cadence_duration,
     evaluate_climax_explicity,
     evaluate_consistency_of_rhythm_with_meter,
+    evaluate_dissonances_preparation_and_resolution,
     evaluate_harmony_dynamic,
     evaluate_smoothness_of_voice_leading,
     evaluate_stackability,
+    find_indices_of_dissonating_events,
     parse_scoring_sets_registry,
 )
-from dodecaphony.fragment import Fragment, override_calculated_attributes
+from dodecaphony.fragment import Event, Fragment, override_calculated_attributes
 
 
 @pytest.mark.parametrize(
@@ -293,6 +295,457 @@ def test_evaluate_consistency_of_rhythm_with_meter(
 
 
 @pytest.mark.parametrize(
+    "fragment, n_semitones_to_pt_and_ngh_preparation_penalty, "
+    "n_semitones_to_pt_and_ngh_resolution_penalty, n_semitones_to_suspension_resolution_penalty, "
+    "expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [4.0, 4.0, 4.0, 4.0],
+                    [4.0, 4.0, 4.0, 4.0],
+                    [4.0, 4.0, 4.0, 4.0],
+                ],
+                sonic_content=[
+                    ['G', 'E', 'C', 'G#', 'D#', 'C#', 'A', 'F', 'D', 'A#', 'F#', 'B']
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[0, 1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
+            ),
+            # `n_semitones_to_pt_and_ngh_preparation_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_pt_and_ngh_resolution_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_suspension_resolution_penalty`
+            {
+                -5: 0.3,
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.1,
+                2: 0.2,
+                3: 0.3,
+            },
+            # `expected`
+            -0.1 / 9
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [4.0, 4.0, 4.0, 4.0],
+                    [4.0, 4.0, 4.0, 4.0],
+                    [4.0, 2.0, 2.0, 4.0, 4.0],
+                ],
+                sonic_content=[
+                    ['G', 'E', 'C', 'G#', 'D#', 'pause', 'C#', 'A', 'F', 'D', 'A#', 'F#', 'B']
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[0, 1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
+            ),
+            # `n_semitones_to_pt_and_ngh_preparation_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_pt_and_ngh_resolution_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_suspension_resolution_penalty`
+            {
+                -5: 0.3,
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.1,
+                2: 0.2,
+                3: 0.3,
+            },
+            # `expected`
+            -0.01
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [4.0, 4.0, 4.0, 4.0],
+                    [4.0, 4.0, 4.0, 4.0],
+                    [4.0, 2.0, 2.0, 4.0, 4.0],
+                ],
+                sonic_content=[
+                    ['G', 'E', 'C', 'G#', 'D#', 'C#', 'pause', 'A', 'F', 'D', 'A#', 'F#', 'B']
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[0, 1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
+            ),
+            # `n_semitones_to_pt_and_ngh_preparation_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_pt_and_ngh_resolution_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_suspension_resolution_penalty`
+            {
+                -5: 0.3,
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.1,
+                2: 0.2,
+                3: 0.3,
+            },
+            # `expected`
+            -0.01
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [4.0, 4.0, 4.0, 4.0],
+                    [4.0, 4.0, 4.0, 4.0],
+                    [4.0, 4.0, 4.0, 4.0],
+                ],
+                sonic_content=[
+                    ['G#', 'D#', 'C#', 'A#', 'F#', 'B', 'G', 'E', 'C', 'A', 'F', 'D']
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[0, 1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[3],
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_sonic_content_indices=[0],
+            ),
+            # `n_semitones_to_pt_and_ngh_preparation_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_pt_and_ngh_resolution_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_suspension_resolution_penalty`
+            {
+                -5: 0.3,
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.1,
+                2: 0.2,
+                3: 0.3,
+            },
+            # `expected`
+            -0.2 / 9
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [2.0, 4.0, 2.0, 4.0],
+                    [2.0, 2.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['E', 'C', 'F', 'D', 'D#', 'B', 'G#', 'C#', 'F#', 'G', 'A', 'A#']
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[0, 1],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[2],
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0],
+            ),
+            # `n_semitones_to_pt_and_ngh_preparation_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_pt_and_ngh_resolution_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_suspension_resolution_penalty`
+            {
+                -5: 0.3,
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.1,
+                2: 0.2,
+                3: 0.3,
+            },
+            # `expected`
+            -0.1
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [2.0, 4.0, 1.0, 1.0, 4.0],
+                    [2.0, 2.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['E', 'C', 'F', 'D', 'D#', 'pause', 'B', 'G#', 'C#', 'F#', 'G', 'A', 'A#']
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[0, 1],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[2],
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0],
+            ),
+            # `n_semitones_to_pt_and_ngh_preparation_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_pt_and_ngh_resolution_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_suspension_resolution_penalty`
+            {
+                -5: 0.3,
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.1,
+                2: 0.2,
+                3: 0.3,
+            },
+            # `expected`
+            0
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [2.0, 2.0, 2.0, 6.0],
+                    [2.0, 2.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['E', 'C', 'F', 'D', 'D#', 'B', 'G#', 'C#', 'F#', 'G', 'A', 'A#']
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[0, 1],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[2],
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0],
+            ),
+            # `n_semitones_to_pt_and_ngh_preparation_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_pt_and_ngh_resolution_penalty`
+            {
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.0,
+                2: 0.0,
+                3: 0.1,
+                4: 0.2,
+            },
+            # `n_semitones_to_suspension_resolution_penalty`
+            {
+                -5: 0.3,
+                -4: 0.2,
+                -3: 0.1,
+                -2: 0.0,
+                -1: 0.0,
+                0: 0.0,
+                1: 0.1,
+                2: 0.2,
+                3: 0.3,
+            },
+            # `expected`
+            -0.2
+        ),
+    ]
+)
+def test_evaluate_dissonances_preparation_and_resolution(
+        fragment: Fragment,
+        n_semitones_to_pt_and_ngh_preparation_penalty: dict[int, float],
+        n_semitones_to_pt_and_ngh_resolution_penalty: dict[int, float],
+        n_semitones_to_suspension_resolution_penalty: dict[int, float],
+        expected: float
+) -> None:
+    """Test `evaluate_dissonances_preparation_and_resolution` function."""
+    fragment = override_calculated_attributes(fragment)
+    from pprint import pprint
+    pprint(fragment.melodic_lines)
+    result = evaluate_dissonances_preparation_and_resolution(
+        fragment,
+        n_semitones_to_pt_and_ngh_preparation_penalty,
+        n_semitones_to_pt_and_ngh_resolution_penalty,
+        n_semitones_to_suspension_resolution_penalty
+    )
+    assert result == expected
+
+
+@pytest.mark.parametrize(
     "fragment, regular_positions, ad_hoc_positions, ranges, n_semitones_to_stability, expected",
     [
         (
@@ -542,12 +995,97 @@ def test_evaluate_smoothness_of_voice_leading(
         ),
     ]
 )
-def test_stackability(
+def test_evaluate_stackability(
         fragment: Fragment, n_semitones_to_penalty: dict[int, float], expected: float
 ) -> None:
     """Test `evaluate_stackability` function."""
     fragment = override_calculated_attributes(fragment)
     result = evaluate_stackability(fragment, n_semitones_to_penalty)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "sonority, meter_numerator, expected",
+    [
+        (
+            # `sonority`
+            [
+                Event(line_index=0, start_time=2.0, duration=4.0, pitch_class='E', position_in_semitones=67),
+                Event(line_index=1, start_time=4.0, duration=2.0, pitch_class='D', position_in_semitones=65),
+                Event(line_index=2, start_time=4.0, duration=1.0, pitch_class='C', position_in_semitones=63),
+            ],
+            # `meter_numerator`
+            4,
+            # `expected`
+            ({1, 2}, {0})
+        ),
+        (
+            # `sonority`
+            [
+                Event(line_index=0, start_time=2.0, duration=4.0, pitch_class='G', position_in_semitones=70),
+                Event(line_index=1, start_time=4.0, duration=2.0, pitch_class='E', position_in_semitones=67),
+                Event(line_index=2, start_time=4.0, duration=1.0, pitch_class='C', position_in_semitones=63),
+            ],
+            # `meter_numerator`
+            4,
+            # `expected`
+            (set(), set())
+        ),
+        (
+            # `sonority`
+            [
+                Event(line_index=0, start_time=2.0, duration=2.0, pitch_class='E', position_in_semitones=67),
+                Event(line_index=1, start_time=2.0, duration=2.0, pitch_class='D', position_in_semitones=65),
+                Event(line_index=2, start_time=3.0, duration=1.0, pitch_class='C', position_in_semitones=63),
+            ],
+            # `meter_numerator`
+            4,
+            # `expected`
+            ({2}, set())
+        ),
+        (
+            # `sonority`
+            [
+                Event(line_index=0, start_time=4.0, duration=2.0, pitch_class='E', position_in_semitones=67),
+                Event(line_index=1, start_time=2.0, duration=4.0, pitch_class='D', position_in_semitones=65),
+                Event(line_index=2, start_time=4.0, duration=1.0, pitch_class='C', position_in_semitones=63),
+            ],
+            # `meter_numerator`
+            4,
+            # `expected`
+            (set(), {1})
+        ),
+        (
+            # `sonority`
+            [
+                Event(line_index=0, start_time=2.0, duration=2.0, pitch_class='pause', position_in_semitones=None),
+                Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='D', position_in_semitones=65),
+                Event(line_index=2, start_time=2.0, duration=2.0, pitch_class='C', position_in_semitones=63),
+            ],
+            # `meter_numerator`
+            4,
+            # `expected`
+            ({1}, set())
+        ),
+        (
+            # `sonority`
+            [
+                Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='E#', position_in_semitones=68),
+                Event(line_index=1, start_time=2.0, duration=2.0, pitch_class='D', position_in_semitones=65),
+                Event(line_index=2, start_time=2.0, duration=2.0, pitch_class='C', position_in_semitones=63),
+            ],
+            # `meter_numerator`
+            4,
+            # `expected`
+            ({0}, set())
+        ),
+    ]
+)
+def test_find_indices_of_dissonating_events(
+        sonority: list[Event], meter_numerator: int, expected: tuple[set[int], set[int]]
+) -> None:
+    """Test `find_indices_of_dissonating_events` function."""
+    result = find_indices_of_dissonating_events(sonority, meter_numerator)
     assert result == expected
 
 
