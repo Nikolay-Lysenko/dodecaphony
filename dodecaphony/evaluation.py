@@ -224,13 +224,12 @@ def find_indices_of_dissonating_events(
     passing_tones_and_neighbors = set()
     suspensions = set()
     sonority_start_time = max(event.start_time for event in sonority)
-    enumerated = list(enumerate(sonority))
-    pairs = itertools.combinations(enumerated, 2)
-    for (first_index, first_event), (second_index, second_event) in pairs:
+    pairs = itertools.combinations(sonority, 2)
+    for first_event, second_event in pairs:
         if first_event.pitch_class == 'pause' or second_event.pitch_class == 'pause':
             continue
         n_semitones = first_event.position_in_semitones - second_event.position_in_semitones
-        is_perfect_fourth_consonant = second_index != len(sonority)
+        is_perfect_fourth_consonant = second_event.line_index != len(sonority) - 1
         interval_type = get_type_of_interval(n_semitones, is_perfect_fourth_consonant)
         if interval_type != IntervalTypes.DISSONANCE:
             continue
@@ -241,15 +240,15 @@ def find_indices_of_dissonating_events(
         first_event_starts_on_downbeat = first_event.start_time % meter_numerator == 0
         second_event_starts_on_downbeat = second_event.start_time % meter_numerator == 0
         if first_event_continues and second_event_starts_on_downbeat:
-            suspensions.add(first_index)
+            suspensions.add(first_event.line_index)
             continue
         if second_event_continues and first_event_starts_on_downbeat:
-            suspensions.add(second_index)
+            suspensions.add(second_event.line_index)
             continue
         if not first_event_continues:
-            passing_tones_and_neighbors.add(first_index)
+            passing_tones_and_neighbors.add(first_event.line_index)
         if not second_event_continues:
-            passing_tones_and_neighbors.add(second_index)
+            passing_tones_and_neighbors.add(second_event.line_index)
     return passing_tones_and_neighbors, suspensions
 
 
@@ -278,11 +277,11 @@ def evaluate_dissonances_preparation_and_resolution(
     """
     score = 0
     event_indices = [0 for _ in fragment.melodic_lines]
-    for sonority in fragment.sonorities[1:]:
+    for sonority in fragment.sonorities:
         zipped = zip(sonority, fragment.melodic_lines, event_indices)
-        for line_index, (event, melodic_line, event_index) in enumerate(zipped):
+        for event, melodic_line, event_index in zipped:
             if event != melodic_line[event_index]:
-                event_indices[line_index] += 1
+                event_indices[event.line_index] += 1
         pt_and_ngh_line_indices, suspension_line_indices = find_indices_of_dissonating_events(
             sonority, fragment.meter_numerator
         )
