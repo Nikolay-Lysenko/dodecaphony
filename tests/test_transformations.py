@@ -13,6 +13,7 @@ from dodecaphony.transformations import (
     apply_inversion,
     apply_pause_swap,
     apply_reversion,
+    apply_rotation,
     apply_transposition,
     create_transformations_registry,
     get_duration_changes,
@@ -316,6 +317,115 @@ def test_apply_reversion(fragment: Fragment, expected_options: list[list[list[st
 
 
 @pytest.mark.parametrize(
+    "fragment, max_rotation, expected_options",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                ],
+                sonic_content=[
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause',
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=24,
+                line_ids=[1, 2],
+                upper_line_highest_position=88,
+                upper_line_lowest_position=1,
+                n_melodic_lines_by_group=[1, 1],
+                n_tone_row_instances_by_group=[2, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
+            ),
+            # `max_rotation`
+            1,
+            # `expected_options`
+            [
+                [
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause',
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                ],
+                [
+                    [
+                        'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'B', 'pause',
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                ],
+                [
+                    [
+                        'F', 'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'pause',
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                ],
+                [
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause',
+                        'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'B'
+                    ],
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                ],
+                [
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause',
+                        'F', 'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#'
+                    ],
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                ],
+                [
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause',
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                    [
+                        'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'B'
+                    ],
+                ],
+                [
+                    [
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause',
+                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                    ],
+                    [
+                        'F', 'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#'
+                    ],
+                ],
+            ]
+        ),
+    ]
+)
+def test_apply_rotation(
+        fragment: Fragment, max_rotation: int, expected_options: list[list[list[str]]]
+) -> None:
+    """Test `apply_rotation` function."""
+    fragment = apply_rotation(fragment, max_rotation)
+    assert fragment.sonic_content in expected_options
+
+
+@pytest.mark.parametrize(
     "fragment, max_transposition, expected_options",
     [
         (
@@ -436,7 +546,8 @@ def test_get_duration_changes(key: tuple[float, float], value: list[tuple[float,
 
 
 @pytest.mark.parametrize(
-    "fragment, n_transformations, transformation_names, max_transposition, expected_options",
+    "fragment, n_transformations, transformation_names, max_rotation, max_transposition, "
+    "expected_options",
     [
         (
             # `fragment`
@@ -462,6 +573,8 @@ def test_get_duration_changes(key: tuple[float, float], value: list[tuple[float,
             1,
             # `transformation_names`
             ['inversion', 'reversion'],
+            # `max_rotation`
+            1,
             # `max_transposition`
             1,
             # `expected_options`
@@ -504,10 +617,10 @@ def test_get_duration_changes(key: tuple[float, float], value: list[tuple[float,
 )
 def test_transform(
         fragment: Fragment, n_transformations: int, transformation_names: list[str],
-        max_transposition: int, expected_options: list[list[list[Event]]]
+        max_rotation: int, max_transposition: int, expected_options: list[list[list[Event]]]
 ) -> None:
     """Test `transform` function."""
-    registry = create_transformations_registry(max_transposition)
+    registry = create_transformations_registry(max_rotation, max_transposition)
     transformation_probabilities = [1 / len(transformation_names) for _ in transformation_names]
     fragment = transform(
         fragment, n_transformations, registry, transformation_names, transformation_probabilities

@@ -269,10 +269,12 @@ optimization:
   beam_width: 5
   transformation_probabilities:
     duration_change: 0.7
-    pause_swap: 0.075
+    pause_swap: 0.0
     inversion: 0.075
     reversion: 0.075
+    rotation: 0.075
     transposition: 0.075
+  max_rotation: 2
   max_transposition_in_semitones: 3
   paralleling_params:
     n_processes: null

@@ -16,7 +16,9 @@ import random
 from typing import Any, Callable
 
 from .fragment import Fragment, SUPPORTED_DURATIONS, override_calculated_attributes
-from .music_theory import TONE_ROW_LEN, invert_tone_row, revert_tone_row, transpose_tone_row
+from .music_theory import (
+    TONE_ROW_LEN, invert_tone_row, revert_tone_row, rotate_tone_row, transpose_tone_row
+)
 
 
 TRANSFORMATIONS_REGISTRY_TYPE = dict[str, tuple[Callable, list[Any]]]
@@ -213,6 +215,27 @@ def apply_reversion(fragment: Fragment) -> Fragment:
     return fragment
 
 
+def apply_rotation(fragment: Fragment, max_rotation: int) -> Fragment:
+    """
+    Rotate one random series (transformed tone row instance).
+
+    :param fragment:
+        a fragment to be modified
+    :param max_rotation:
+        maximum size of rotation (in elements)
+    :return:
+        modified fragment
+    """
+    group_index, instance_index = draw_random_indices(
+        fragment.mutable_sonic_content_indices, fragment.n_tone_row_instances_by_group
+    )
+    tone_row_instance = find_instance_by_indices(fragment, group_index, instance_index)
+    shift = random.randint(-max_rotation, max_rotation)
+    tone_row_instance = rotate_tone_row(tone_row_instance, shift)
+    fragment = replace_instance(fragment, group_index, instance_index, tone_row_instance)
+    return fragment
+
+
 def apply_transposition(fragment: Fragment, max_transposition: int) -> Fragment:
     """
     Transpose one random series (transformed tone row instance).
@@ -234,10 +257,14 @@ def apply_transposition(fragment: Fragment, max_transposition: int) -> Fragment:
     return fragment
 
 
-def create_transformations_registry(max_transposition: int) -> TRANSFORMATIONS_REGISTRY_TYPE:
+def create_transformations_registry(
+        max_rotation: int, max_transposition: int
+) -> TRANSFORMATIONS_REGISTRY_TYPE:
     """
     Get mapping from names to corresponding transformations and their arguments.
 
+    :param max_rotation:
+        maximum size of rotation (in elements)
     :param max_transposition:
         maximum interval of transposition (in semitones)
     :return:
@@ -248,6 +275,7 @@ def create_transformations_registry(max_transposition: int) -> TRANSFORMATIONS_R
         'pause_swap': (apply_pause_swap, []),
         'inversion': (apply_inversion, []),
         'reversion': (apply_reversion, []),
+        'rotation': (apply_rotation, [max_rotation]),
         'transposition': (apply_transposition, [max_transposition]),
     }
     return registry

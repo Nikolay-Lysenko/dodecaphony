@@ -69,8 +69,8 @@ def test_create_tasks(
 
 @pytest.mark.parametrize(
     "fragment, n_iterations, n_trials_per_iteration, default_n_transformations_per_trial, "
-    "n_transformations_increment, max_n_transformations_per_trial, beam_width, max_transposition, "
-    "transformation_probabilities, scoring_sets, scoring_sets_params",
+    "n_transformations_increment, max_n_transformations_per_trial, beam_width, max_rotation, "
+    "max_transposition, transformation_probabilities, scoring_sets, scoring_sets_params",
     [
         (
             # `fragment`
@@ -110,6 +110,8 @@ def test_create_tasks(
             # `max_n_transformations_per_trial`
             2,
             # `beam_width`
+            1,
+            # `max_rotation`
             1,
             # `max_transposition`
             1,
@@ -156,12 +158,12 @@ def test_create_tasks(
 def test_optimize_with_local_search(
         fragment: Fragment, n_iterations: int, n_trials_per_iteration: int,
         default_n_transformations_per_trial: int, n_transformations_increment: int,
-        max_n_transformations_per_trial: int, beam_width: int, max_transposition: int,
-        transformation_probabilities: dict[str, float], scoring_sets: list[str],
-        scoring_sets_params: list[dict[str, Any]]
+        max_n_transformations_per_trial: int, beam_width: int, max_rotation: int,
+        max_transposition: int, transformation_probabilities: dict[str, float],
+        scoring_sets: list[str], scoring_sets_params: list[dict[str, Any]]
 ) -> None:
     """Test `optimize_with_local_search` function."""
-    transformations_registry = create_transformations_registry(max_transposition)
+    transformations_registry = create_transformations_registry(max_rotation, max_transposition)
     scoring_sets_registry = parse_scoring_sets_registry(scoring_sets_params)
     optimize_with_local_search(
         fragment, n_iterations, n_trials_per_iteration, default_n_transformations_per_trial,
