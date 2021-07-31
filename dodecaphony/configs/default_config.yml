@@ -282,7 +282,7 @@ optimization:
   beam_width: 5
   transformation_probabilities:
     duration_change: 0.7
-    pause_swap: 0.075
+    pause_shift: 0.075
     inversion: 0.075
     reversion: 0.075
     transposition: 0.075
