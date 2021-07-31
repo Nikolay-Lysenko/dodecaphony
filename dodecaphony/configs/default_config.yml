@@ -17,18 +17,23 @@ scoring_sets:
   - name: default
     scoring_functions:
       - name: absence_of_doubled_pitch_classes
-        weight: 1.0
+        weights:
+          0.0: 1.0
       - name: absence_of_simultaneous_skips
-        weight: 1.0
+        weights:
+          0.0: 1.0
       - name: absence_of_voice_crossing
-        weight: 1.0
+        weights:
+          0.0: 1.0
       - name: cadence_duration
-        weight: 1.0
+        weights:
+          0.0: 1.0
         max_duration: 4.0
         last_sonority_weight: 0.9
         last_notes_weight: 0.1
       - name: climax_explicity
-        weight: 1.0
+        weights:
+          0.0: 1.0
         height_penalties:
           2: 1.0
           3: 0.8
@@ -41,7 +46,8 @@ scoring_sets:
           10: 0.0
         duplication_penalty: 0.5
       - name: consistency_of_rhythm_with_meter
-        weight: 1.0
+        weights:
+          0.0: 1.0
         consistent_patterns:
           - [6.0]
           - [4.0]
@@ -120,7 +126,8 @@ scoring_sets:
           - [1.0, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
           - [1.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
       - name: dissonances_preparation_and_resolution
-        weight: 1.0
+        weights:
+          0.0: 1.0
         n_semitones_to_pt_and_ngh_preparation_penalty:
           -11: 0.9
           -10: 0.8
@@ -190,7 +197,8 @@ scoring_sets:
           7: 0.8
           8: 0.9
       - name: harmony_dynamic
-        weight: 1.0
+        weights:
+          0.0: 1.0
         regular_positions:
           - name: downbeat
             denominator: 4
@@ -223,7 +231,8 @@ scoring_sets:
           10: 0.2
           11: 0.2
       - name: smoothness_of_voice_leading
-        weight: 1.0
+        weights:
+          0.0: 1.0
         penalty_deduction_per_line: 0.2
         n_semitones_to_penalty:
           0: 0.2
@@ -240,7 +249,8 @@ scoring_sets:
           11: 0.9
           12: 1.0
       - name: stackability
-        weight: 1.0
+        weights:
+          0.0: 1.0
         n_semitones_to_penalty:
           0: 0.0
           1: 0.0

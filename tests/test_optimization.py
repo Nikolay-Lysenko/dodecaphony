@@ -131,7 +131,7 @@ def test_create_tasks(
                     'scoring_functions': [
                         {
                             'name': 'smoothness_of_voice_leading',
-                            'weight': 1.0,
+                            'weights': {0.0: 1.0},
                             'penalty_deduction_per_line': 0.2,
                             'n_semitones_to_penalty': {
                                 0: 0.2,
