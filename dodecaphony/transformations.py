@@ -156,9 +156,9 @@ def apply_duration_change(
     return fragment
 
 
-def apply_pause_swap(fragment: Fragment) -> Fragment:
+def apply_pause_shift(fragment: Fragment) -> Fragment:
     """
-    Swap a random pause with adjacent (in terms of sonic content) non-pause event.
+    Shift a random pause one position to the left or to the right.
 
     :param fragment:
         a fragment to be modified
@@ -272,7 +272,7 @@ def create_transformations_registry(
     """
     registry = {
         'duration_change': (apply_duration_change, [get_duration_changes()]),
-        'pause_swap': (apply_pause_swap, []),
+        'pause_shift': (apply_pause_shift, []),
         'inversion': (apply_inversion, []),
         'reversion': (apply_reversion, []),
         'rotation': (apply_rotation, [max_rotation]),

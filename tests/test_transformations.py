@@ -11,7 +11,7 @@ from dodecaphony.fragment import Event, Fragment
 from dodecaphony.transformations import (
     apply_duration_change,
     apply_inversion,
-    apply_pause_swap,
+    apply_pause_shift,
     apply_reversion,
     apply_rotation,
     apply_transposition,
@@ -241,9 +241,9 @@ def test_apply_inversion(fragment: Fragment, expected_options: list[list[list[st
         ),
     ]
 )
-def test_apply_pause_swap(fragment: Fragment, expected_options: list[list[list[str]]]) -> None:
-    """Test `apply_pause_swap` function."""
-    fragment = apply_pause_swap(fragment)
+def test_apply_pause_shift(fragment: Fragment, expected_options: list[list[list[str]]]) -> None:
+    """Test `apply_pause_shift` function."""
+    fragment = apply_pause_shift(fragment)
     assert fragment.sonic_content in expected_options
 
 
