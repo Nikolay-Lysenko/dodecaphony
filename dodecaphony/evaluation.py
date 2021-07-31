@@ -13,7 +13,10 @@ from .fragment import Event, Fragment
 from .music_theory import IntervalTypes, N_SEMITONES_PER_OCTAVE, get_type_of_interval
 
 
-SCORING_SETS_REGISTRY_TYPE = dict[str, list[tuple[Callable[..., float], float, dict[str, Any]]]]
+SCORING_SETS_REGISTRY_TYPE = dict[
+    str,
+    list[tuple[Callable[..., float], dict[float, float], dict[str, Any]]]
+]
 
 
 def evaluate_absence_of_doubled_pitch_classes(fragment: Fragment) -> float:
@@ -185,24 +188,9 @@ def evaluate_consistency_of_rhythm_with_meter(
         minus one multiplied by number of measures which are split in inconsistent manner
     """
     score = 0
-    for melodic_line in fragment.melodic_lines:
-        rhythm_data = []
-        for event in melodic_line:
-            record = {
-                'measure_id': event.start_time // fragment.meter_numerator,
-                'time_since_measure_start': event.start_time % fragment.meter_numerator,
-                'duration': event.duration
-            }
-            rhythm_data.append(record)
-        for measure_id, values in itertools.groupby(rhythm_data, lambda x: x['measure_id']):
-            first_value = values.__next__()
-            if first_value['time_since_measure_start'] != 0:
-                durations = [first_value['time_since_measure_start'], first_value['duration']]
-            else:
-                durations = [first_value['duration']]
-            for value in values:
-                durations.append(value['duration'])
-            if durations not in consistent_patterns:
+    for durations_of_measures_for_one_line in fragment.durations_of_measures:
+        for durations_of_measure in durations_of_measures_for_one_line:
+            if durations_of_measure not in consistent_patterns:
                 score -= 1
     score /= len(fragment.melodic_lines) * (fragment.n_beats // fragment.meter_numerator)
     return score
@@ -442,6 +430,30 @@ def evaluate_harmony_dynamic(
     return score
 
 
+def evaluate_rhythmic_homogeneity(fragment: Fragment) -> float:
+    """
+    Evaluate rhythmic homogeneity between all measures except the last one.
+
+    :param fragment:
+        a fragment to be evaluated
+    :return:
+        a score between minis one and zero depending on rhythmic variation
+    """
+    score = 0
+    for durations_of_measures_for_one_line in fragment.durations_of_measures:
+        pairs = itertools.combinations(durations_of_measures_for_one_line[:-1], 2)
+        for first_durations, second_durations in pairs:
+            first_start_times = list(itertools.accumulate(first_durations))
+            second_start_times = list(itertools.accumulate(second_durations))
+            avg_n_starts = (len(first_start_times) + len(second_start_times)) / 2
+            total_n_starts = len(set(first_start_times + second_start_times))
+            score -= (total_n_starts / avg_n_starts - 1)
+    n_non_last_measures = (fragment.n_beats // fragment.meter_numerator) - 1
+    n_pairs = n_non_last_measures * (n_non_last_measures - 1) / 2
+    score /= len(fragment.melodic_lines) * n_pairs
+    return score
+
+
 def evaluate_smoothness_of_voice_leading(
         fragment: Fragment,
         penalty_deduction_per_line: float,
@@ -518,6 +530,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
         'consistency_of_rhythm_with_meter': evaluate_consistency_of_rhythm_with_meter,
         'dissonances_preparation_and_resolution': evaluate_dissonances_preparation_and_resolution,
         'harmony_dynamic': evaluate_harmony_dynamic,
+        'rhythmic_homogeneity': evaluate_rhythmic_homogeneity,
         'smoothness_of_voice_leading': evaluate_smoothness_of_voice_leading,
         'stackability': evaluate_stackability,
     }
@@ -597,7 +610,7 @@ def evaluate(
             curr_score = weight_score(unweighted_score, weights)
             if verbose:
                 name = scoring_fn.__name__.removeprefix('evaluate_')
-                print(f'{name:>35}: {curr_score}')
+                print(f'{name:>40}: {curr_score}')
             score += curr_score
     if verbose:
         print(f'Overall score is: {score}')
