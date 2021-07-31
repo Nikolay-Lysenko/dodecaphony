@@ -541,10 +541,31 @@ def parse_scoring_sets_registry(params: list[dict[str, Any]]) -> SCORING_SETS_RE
         scoring_fns = []
         for scoring_fn_info in scoring_set_params['scoring_functions']:
             scoring_fn = scoring_functions_registry[scoring_fn_info.pop('name')]
-            weight = scoring_fn_info.pop('weight')
-            scoring_fns.append((scoring_fn, weight, scoring_fn_info))
+            weights = scoring_fn_info.pop('weights')
+            scoring_fns.append((scoring_fn, weights, scoring_fn_info))
         scoring_sets_registry[scoring_set_name] = scoring_fns
     return scoring_sets_registry
+
+
+def weight_score(unweighted_score: float, weights: dict[float, float]) -> float:
+    """
+    Transform original score by a piecewise linear function.
+
+    :param unweighted_score:
+        original score
+    :param weights:
+        mapping from a breakpoint to a slope coefficient for an interval from the breakpoint to
+        the next-to-the-left breakpoint (or -1 if it is absent)
+    :return:
+        weighted score
+    """
+    weighted_score = 0
+    breakpoints = list(weights.keys()) + [-1.0]
+    for left_point, right_point in zip(breakpoints, breakpoints[1:]):
+        if left_point <= unweighted_score:
+            break
+        weighted_score -= (left_point - max(unweighted_score, right_point)) * weights[left_point]
+    return weighted_score
 
 
 def evaluate(
@@ -571,8 +592,9 @@ def evaluate(
     score = 0
     for scoring_set_name in scoring_sets:
         scoring_set = scoring_sets_registry[scoring_set_name]
-        for scoring_fn, fn_weight, params in scoring_set:
-            curr_score = fn_weight * scoring_fn(fragment, **params)
+        for scoring_fn, weights, params in scoring_set:
+            unweighted_score = scoring_fn(fragment, **params)
+            curr_score = weight_score(unweighted_score, weights)
             if verbose:
                 name = scoring_fn.__name__.removeprefix('evaluate_')
                 print(f'{name:>35}: {curr_score}')

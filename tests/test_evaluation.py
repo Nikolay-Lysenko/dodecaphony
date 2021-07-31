@@ -23,6 +23,7 @@ from dodecaphony.evaluation import (
     evaluate_stackability,
     find_indices_of_dissonating_events,
     parse_scoring_sets_registry,
+    weight_score,
 )
 from dodecaphony.fragment import Event, Fragment, override_calculated_attributes
 
@@ -1124,7 +1125,7 @@ def test_find_indices_of_dissonating_events(
                     'scoring_functions': [
                         {
                             'name': 'smoothness_of_voice_leading',
-                            'weight': 0.5,
+                            'weights': {0.0: 0.5},
                             'penalty_deduction_per_line': 0.2,
                             'n_semitones_to_penalty': {
                                 0: 0.2,
@@ -1160,3 +1161,18 @@ def test_parse_scoring_sets_registry(
     registry = parse_scoring_sets_registry(params)
     result = evaluate(fragment, scoring_sets, registry)
     assert round(result, 10) == round(expected, 10)
+
+
+@pytest.mark.parametrize(
+    "unweighted_score, weights, expected",
+    [
+        (-0.3, {0.0: 1.0, -0.2: 2.0, -0.5: 3.0}, -0.4),
+        (-0.7, {0.0: 1.0, -0.2: 2.0, -0.5: 3.0}, -1.4),
+    ]
+)
+def test_weight_score(
+        unweighted_score: float, weights: dict[float, float], expected: float
+) -> None:
+    """Test `weight_score` function."""
+    result = weight_score(unweighted_score, weights)
+    assert round(result, 8) == expected
