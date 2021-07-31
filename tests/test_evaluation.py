@@ -19,6 +19,7 @@ from dodecaphony.evaluation import (
     evaluate_consistency_of_rhythm_with_meter,
     evaluate_dissonances_preparation_and_resolution,
     evaluate_harmony_dynamic,
+    evaluate_rhythmic_homogeneity,
     evaluate_smoothness_of_voice_leading,
     evaluate_stackability,
     find_indices_of_dissonating_events,
@@ -882,6 +883,43 @@ def test_evaluate_harmony_dynamic(
         fragment, regular_positions, ad_hoc_positions, ranges, n_semitones_to_stability
     )
     assert round(result, 10) == expected
+
+
+@pytest.mark.parametrize(
+    "fragment, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [2.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F', 'pause'],
+                    ['A#', 'A', 'F#', 'C', 'D', 'B', 'C#', 'G#', 'F', 'D#', 'G', 'E'],
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
+            ),
+            # `expected`
+            -(1 / 9 + (0.6 + 2 / 3 + 1 / 7) / 6)
+        ),
+    ]
+)
+def test_evaluate_rhythmic_homogeneity(fragment: Fragment, expected: float) -> None:
+    """Test `evaluate_rhythmic_homogeneity` function."""
+    fragment = override_calculated_attributes(fragment)
+    result = evaluate_rhythmic_homogeneity(fragment)
+    assert round(result, 10) == round(expected, 10)
 
 
 @pytest.mark.parametrize(

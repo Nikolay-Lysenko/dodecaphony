@@ -230,6 +230,9 @@ scoring_sets:
           9: 0.6
           10: 0.2
           11: 0.2
+      - name: rhythmic_homogeneity
+        weights:
+          0.0: 1.0
       - name: smoothness_of_voice_leading
         weights:
           0.0: 1.0

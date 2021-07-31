@@ -15,6 +15,7 @@ from dodecaphony.fragment import (
     Fragment,
     FragmentParams,
     SUPPORTED_DURATIONS,
+    calculate_durations_of_measures,
     calculate_number_of_undefined_events,
     create_initial_sonic_content,
     create_initial_temporal_content,
@@ -29,6 +30,48 @@ from dodecaphony.fragment import (
     split_time_span,
     validate,
 )
+
+
+@pytest.mark.parametrize(
+    "fragment, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [2.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F', 'pause'],
+                    ['A#', 'A', 'F#', 'C', 'D', 'B', 'C#', 'G#', 'F', 'D#', 'G', 'E'],
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
+            ),
+            # `expected`
+            [
+                [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 1.0, 1.0]],
+                [[2.0, 4.0], [2.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]],
+            ]
+        ),
+    ]
+)
+def test_calculate_durations_of_measures(
+        fragment: Fragment, expected: list[list[list[float]]]
+) -> None:
+    """Test `calculate_durations_of_measures` function."""
+    fragment = override_calculated_attributes(fragment)
+    result = calculate_durations_of_measures(fragment)
+    assert result == expected
 
 
 @pytest.mark.parametrize(

@@ -83,6 +83,7 @@ class Fragment:
     mutable_sonic_content_indices: list[int]
     melodic_lines: Optional[list[list[Event]]] = None
     sonorities: Optional[list[list[Event]]] = None
+    durations_of_measures: Optional[list[list[list[float]]]] = None
 
     def __eq__(self, other: Any):
         if not isinstance(other, Fragment):
@@ -519,6 +520,42 @@ def set_pitches_of_lower_lines(
     return fragment
 
 
+def calculate_durations_of_measures(fragment: Fragment) -> list[list[list[float]]]:
+    """
+    Calculate durations of measures.
+
+    :param fragment:
+        fragment with `melodic_lines` attribute
+    :return:
+        list where for each melodic line there is a list where each measure is represented as list
+        of durations of events forming it; suspended from the previous measure event is partially
+        included and suspended to the next measure event is fully included
+    """
+    durations_of_measures = []
+    for melodic_line in fragment.melodic_lines:
+        rhythm_data = []
+        for event in melodic_line:
+            record = {
+                'measure_id': event.start_time // fragment.meter_numerator,
+                'time_since_measure_start': event.start_time % fragment.meter_numerator,
+                'duration': event.duration
+            }
+            rhythm_data.append(record)
+
+        durations_of_measures_for_one_line = []
+        for measure_id, values in itertools.groupby(rhythm_data, lambda x: x['measure_id']):
+            first_value = values.__next__()
+            if first_value['time_since_measure_start'] != 0:
+                durations = [first_value['time_since_measure_start'], first_value['duration']]
+            else:
+                durations = [first_value['duration']]
+            for value in values:
+                durations.append(value['duration'])
+            durations_of_measures_for_one_line.append(durations)
+        durations_of_measures.append(durations_of_measures_for_one_line)
+    return durations_of_measures
+
+
 def override_calculated_attributes(fragment: Fragment) -> Fragment:
     """
     Override calculated attributes with values computed based on temporal and sonic content.
@@ -532,6 +569,7 @@ def override_calculated_attributes(fragment: Fragment) -> Fragment:
     fragment.sonorities = find_sonorities(fragment.melodic_lines)
     fragment = set_pitches_of_upper_line(fragment)
     fragment = set_pitches_of_lower_lines(fragment)
+    fragment.durations_of_measures = calculate_durations_of_measures(fragment)
     return fragment
 
 
