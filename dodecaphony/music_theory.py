@@ -148,6 +148,20 @@ def revert_tone_row(tone_row: list[str]) -> list[str]:
     return tone_row[::-1]
 
 
+def rotate_tone_row(tone_row: list[str], shift: int) -> list[str]:
+    """
+    Rotate tone row.
+
+    :param tone_row:
+        tone row as list of pitch classes (like C or C#, flats are not allowed)
+    :param shift:
+        shift; if positive; tone row is rotated forward, if negative, tone row is rotated backwards
+    :return:
+        rotated tone row
+    """
+    return tone_row[shift:] + tone_row[:shift]
+
+
 def transpose_tone_row(tone_row: list[str], shift_in_semitones: int) -> list[str]:
     """
     Transpose tone row.

@@ -49,6 +49,7 @@ def main() -> None:
     scoring_sets_registry = parse_scoring_sets_registry(settings['scoring_sets'])
     scoring_sets = settings['evaluation']['scoring_sets']
     transformations_registry = create_transformations_registry(
+        settings['optimization'].pop('max_rotation'),
         settings['optimization'].pop('max_transposition_in_semitones')
     )
     fragments = optimize_with_local_search(
