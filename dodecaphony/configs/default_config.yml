@@ -274,11 +274,11 @@ evaluation:
     - default
 
 optimization:
-  n_iterations: 50
-  n_trials_per_iteration: 1000
+  n_iterations: 300
+  n_trials_per_iteration: 250
   default_n_transformations_per_trial: 2
   n_transformations_increment: 1
-  max_n_transformations_per_trial: 5
+  max_n_transformations_per_trial: 10
   beam_width: 5
   transformation_probabilities:
     duration_change: 0.7
