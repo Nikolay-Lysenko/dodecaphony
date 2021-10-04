@@ -307,13 +307,13 @@ rendering:
     velocity: 100
   sinethesizer:
     instruments:
-      1: additive_mellow_pipe
-      2: additive_mellow_pipe
-      3: additive_mellow_pipe
-      4: additive_mellow_pipe
+      1: brass
+      2: additive_cold_pipe
+      3: bowed_string
+      4: brass
     effects:
-      1: '[{"name": "panning", "left_volume_ratio": 1.0, "right_volume_ratio": 0.9}, {"name": "haas", "location": -0.125, "max_channel_delay": 0.02}]'
-      2: '[{"name": "panning", "left_volume_ratio": 0.8, "right_volume_ratio": 1.0}, {"name": "haas", "location": 0.25, "max_channel_delay": 0.02}]'
-      3: '[{"name": "panning", "left_volume_ratio": 1.0, "right_volume_ratio": 0.8}, {"name": "haas", "location": -0.25, "max_channel_delay": 0.02}]'
+      1: '[{"name": "panning", "left_volume_ratio": 0.6, "right_volume_ratio": 1.0}, {"name": "haas", "location": 0.75, "max_channel_delay": 0.02}]'
+      2: '[{"name": "panning", "left_volume_ratio": 1.0, "right_volume_ratio": 0.9}, {"name": "haas", "location": -0.125, "max_channel_delay": 0.02}]'
+      3: '[{"name": "panning", "left_volume_ratio": 1.0, "right_volume_ratio": 0.6}, {"name": "haas", "location": -0.75, "max_channel_delay": 0.02}]'
       4: '[{"name": "panning", "left_volume_ratio": 0.9, "right_volume_ratio": 1.0}, {"name": "haas", "location": 0.125, "max_channel_delay": 0.02}]'
     velocity: 1.0

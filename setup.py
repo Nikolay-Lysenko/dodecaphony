@@ -43,7 +43,7 @@ setup(
     install_requires=[
         'pretty-midi',
         'PyYAML',
-        'sinethesizer>=0.5.2',
+        'sinethesizer>=0.5.3',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
