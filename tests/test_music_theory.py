@@ -5,15 +5,124 @@ Author: Nikolay Lysenko
 """
 
 
+from typing import Optional
+
 import pytest
 
 from dodecaphony.music_theory import (
+    get_mapping_from_pitch_class_to_diatonic_scales,
     get_smallest_intervals_between_pitch_classes,
     invert_tone_row,
     revert_tone_row,
     transpose_tone_row,
     validate_tone_row,
 )
+
+
+@pytest.mark.parametrize(
+    "scale_types, key, value",
+    [
+        (
+            # `scale_types`
+            None,
+            # `key`
+            'C',
+            # `value`
+            [
+                'C-major',
+                'C#-major',
+                'D#-major',
+                'F-major',
+                'G-major',
+                'G#-major',
+                'A#-major',
+                'C-natural_minor',
+                'D-natural_minor',
+                'E-natural_minor',
+                'F-natural_minor',
+                'G-natural_minor',
+                'A-natural_minor',
+                'A#-natural_minor',
+                'C-harmonic_minor',
+                'C#-harmonic_minor',
+                'E-harmonic_minor',
+                'F-harmonic_minor',
+                'G-harmonic_minor',
+                'A-harmonic_minor',
+                'A#-harmonic_minor',
+                'C-dorian',
+                'D-dorian',
+                'D#-dorian',
+                'F-dorian',
+                'G-dorian',
+                'A-dorian',
+                'A#-dorian',
+                'C-phrygian',
+                'D-phrygian',
+                'E-phrygian',
+                'F-phrygian',
+                'G-phrygian',
+                'A-phrygian',
+                'B-phrygian',
+                'C-lydian',
+                'C#-lydian',
+                'D#-lydian',
+                'F-lydian',
+                'F#-lydian',
+                'G#-lydian',
+                'A#-lydian',
+                'C-mixolydian',
+                'D-mixolydian',
+                'D#-mixolydian',
+                'F-mixolydian',
+                'G-mixolydian',
+                'G#-mixolydian',
+                'A#-mixolydian',
+                'C-locrian',
+                'D-locrian',
+                'E-locrian',
+                'F#-locrian',
+                'G-locrian',
+                'A-locrian',
+                'B-locrian',
+                'C-whole_tone',
+                'D-whole_tone',
+                'E-whole_tone',
+                'F#-whole_tone',
+                'G#-whole_tone',
+                'A#-whole_tone',
+            ]
+        ),
+        (
+            # `scale_types`
+            ('major', 'whole_tone'),
+            # `key`
+            'C#',
+            # `value`
+            [
+                'C#-major',
+                'D-major',
+                'E-major',
+                'F#-major',
+                'G#-major',
+                'A-major',
+                'B-major',
+                'C#-whole_tone',
+                'D#-whole_tone',
+                'F-whole_tone',
+                'G-whole_tone',
+                'A-whole_tone',
+                'B-whole_tone',
+            ]
+        ),
+    ]
+)
+def test_get_mapping_from_pitch_class_to_diatonic_scales(
+        scale_types: Optional[list[str]], key: str, value: list[str]
+) -> None:
+    """Test `get_mapping_from_pitch_class_to_diatonic_scales` function."""
+    mapping = get_mapping_from_pitch_class_to_diatonic_scales(scale_types)
+    assert mapping[key] == value
 
 
 @pytest.mark.parametrize(

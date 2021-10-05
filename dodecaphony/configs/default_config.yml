@@ -250,6 +250,9 @@ scoring_sets:
           12: 1.0
   - name: optional
     scoring_functions:
+      - name: local_diatonicity
+        weights:
+          0.0: 1.0
       - name: rhythmic_homogeneity
         weights:
           0.0: 1.0

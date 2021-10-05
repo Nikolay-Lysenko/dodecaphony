@@ -7,6 +7,8 @@ Author: Nikolay Lysenko
 
 import itertools
 from enum import Enum
+from functools import cache
+from typing import Optional
 
 
 N_SEMITONES_PER_OCTAVE = 12
@@ -179,3 +181,42 @@ def transpose_tone_row(tone_row: list[str], shift_in_semitones: int) -> list[str
         new_pitch_class = POSITION_TO_PITCH_CLASS[new_position]
         transposed_tone_row.append(new_pitch_class)
     return transposed_tone_row
+
+
+@cache
+def get_mapping_from_pitch_class_to_diatonic_scales(
+        scale_types: Optional[tuple[str]] = None
+) -> dict[str, list[str]]:
+    """
+    Get mapping from pitch class to list of names of diatonic scales to which it belongs.
+
+    :param scale_types:
+        types of diatonic scales to be tested; this list may include the following values:
+        'major', 'natural_minor', 'harmonic_minor', 'dorian', 'phrygian', 'lydian', 'mixolydian',
+        'locrian', and 'whole_tone'
+    :return:
+        mapping from pitch class to list of names of diatonic scales to which it belongs
+    """
+    patterns = {
+        'major': [1, 0, 2, 0, 3, 4, 0, 5, 0, 6, 0, 7],
+        'natural_minor': [1, 0, 2, 3, 0, 4, 0, 5, 6, 0, 7, 0],
+        'harmonic_minor': [1, 0, 2, 3, 0, 4, 0, 5, 6, 0, 0, 7],
+        'dorian': [1, 0, 2, 3, 0, 4, 0, 5, 0, 6, 7, 0],
+        'phrygian': [1, 2, 0, 3, 0, 4, 0, 5, 6, 0, 7, 0],
+        'lydian': [1, 0, 2, 0, 3, 0, 4, 5, 0, 6, 0, 7],
+        'mixolydian': [1, 0, 2, 0, 3, 4, 0, 5, 0, 6, 7, 0],
+        'locrian': [1, 2, 0, 3, 0, 4, 5, 0, 6, 0, 7, 0],
+        'whole_tone': [1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0],
+    }
+    if scale_types is not None:
+        patterns = {k: v for k, v in patterns.items() if k in scale_types}
+    pitch_classes = list(PITCH_CLASS_TO_POSITION.keys())
+    result = {pitch_class: [] for pitch_class in pitch_classes}
+    cartesian_product = itertools.product(patterns.items(), enumerate(pitch_classes))
+    for (scale_type, pattern), (offset, pitch_class) in cartesian_product:
+        scale_name = f'{pitch_class}-{scale_type}'
+        rotated_pitch_classes = pitch_classes[offset:] + pitch_classes[:offset]
+        for another_pitch_class, degree in zip(rotated_pitch_classes, pattern):
+            if degree:
+                result[another_pitch_class].append(scale_name)
+    return result

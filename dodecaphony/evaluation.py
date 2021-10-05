@@ -7,10 +7,16 @@ Author: Nikolay Lysenko
 
 import itertools
 import math
+from collections import Counter
 from typing import Any, Callable, Optional
 
 from .fragment import Event, Fragment
-from .music_theory import IntervalTypes, N_SEMITONES_PER_OCTAVE, get_type_of_interval
+from .music_theory import (
+    IntervalTypes,
+    N_SEMITONES_PER_OCTAVE,
+    get_mapping_from_pitch_class_to_diatonic_scales,
+    get_type_of_interval,
+)
 
 
 SCORING_SETS_REGISTRY_TYPE = dict[
@@ -430,6 +436,47 @@ def evaluate_harmony_dynamic(
     return score
 
 
+def evaluate_local_diatonicity(
+        fragment: Fragment, depth: int = 2, scale_types: Optional[tuple[str]] = None
+) -> float:
+    """
+    Evaluate presence of diatonic scales at short periods of time.
+
+    If for every short interval there is a diatonic scale containing all its pitches,
+    the fragment might be called pantonal with frequent modulations between diatonic scales.
+
+    :param fragment:
+        a fragment to be evaluated
+    :param depth:
+        duration of a time period as number of successive sonorities
+    :param scale_types:
+        types of diatonic scales to be tested; this list may include the following values:
+        'major', 'natural_minor', 'harmonic_minor', 'dorian', 'phrygian', 'lydian', 'mixolydian',
+        'locrian', and 'whole_tone'
+    :return:
+        minus one multiplied by average fraction of pitches that are out of the most fitting
+        to the current short interval diatonic scale (with averaging over all short intervals)
+    """
+    score = 0
+    pitch_class_to_diatonic_scales = get_mapping_from_pitch_class_to_diatonic_scales(scale_types)
+    nested_pitch_classes = [[]]
+    for i in range(depth - 1):
+        nested_pitch_classes.append([event.pitch_class for event in fragment.sonorities[i]])
+    for i in range(depth - 1, len(fragment.sonorities)):
+        nested_pitch_classes.pop(0)
+        nested_pitch_classes.append([event.pitch_class for event in fragment.sonorities[i]])
+        pitch_classes = [x for y in nested_pitch_classes for x in y if x != 'pause']
+        scales = []
+        for pitch_class in pitch_classes:
+            for scale in pitch_class_to_diatonic_scales[pitch_class]:
+                scales.append(scale)
+        n_pitch_classes_from_best_scale = Counter(scales).most_common(1)[0][1]
+        score -= 1 - n_pitch_classes_from_best_scale / len(pitch_classes)
+    n_periods = len(fragment.sonorities) - depth + 1
+    score /= n_periods
+    return score
+
+
 def evaluate_rhythmic_homogeneity(fragment: Fragment) -> float:
     """
     Evaluate rhythmic homogeneity between all measures except the last one.
@@ -530,6 +577,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
         'consistency_of_rhythm_with_meter': evaluate_consistency_of_rhythm_with_meter,
         'dissonances_preparation_and_resolution': evaluate_dissonances_preparation_and_resolution,
         'harmony_dynamic': evaluate_harmony_dynamic,
+        'local_diatonicity': evaluate_local_diatonicity,
         'rhythmic_homogeneity': evaluate_rhythmic_homogeneity,
         'smoothness_of_voice_leading': evaluate_smoothness_of_voice_leading,
         'stackability': evaluate_stackability,
