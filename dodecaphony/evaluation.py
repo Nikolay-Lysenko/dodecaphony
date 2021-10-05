@@ -450,14 +450,17 @@ def evaluate_local_diatonicity(
     :param depth:
         duration of a time period as number of successive sonorities
     :param scale_types:
-        types of diatonic scales to be tested; this list may include the following values:
+        types of diatonic scales to be tested; this tuple may include the following values:
         'major', 'natural_minor', 'harmonic_minor', 'dorian', 'phrygian', 'lydian', 'mixolydian',
-        'locrian', and 'whole_tone'
+        'locrian', and 'whole_tone'; however, keep in mind that due to relative modes there is no
+        need to include all these values; if this argument is not passed, its value is set to
+        `('major', 'harmonic_minor', 'whole_tone')` which covers all supported scales
     :return:
         minus one multiplied by average fraction of pitches that are out of the most fitting
         to the current short interval diatonic scale (with averaging over all short intervals)
     """
     score = 0
+    scale_types = scale_types or ('major', 'harmonic_minor', 'whole_tone')
     pitch_class_to_diatonic_scales = get_mapping_from_pitch_class_to_diatonic_scales(scale_types)
     nested_pitch_classes = [[]]
     for i in range(depth - 1):
@@ -466,11 +469,10 @@ def evaluate_local_diatonicity(
         nested_pitch_classes.pop(0)
         nested_pitch_classes.append([event.pitch_class for event in fragment.sonorities[i]])
         pitch_classes = [x for y in nested_pitch_classes for x in y if x != 'pause']
-        scales = []
+        counter = Counter()
         for pitch_class in pitch_classes:
-            for scale in pitch_class_to_diatonic_scales[pitch_class]:
-                scales.append(scale)
-        n_pitch_classes_from_best_scale = Counter(scales).most_common(1)[0][1]
+            counter.update(pitch_class_to_diatonic_scales[pitch_class])
+        n_pitch_classes_from_best_scale = counter.most_common(1)[0][1]
         score -= 1 - n_pitch_classes_from_best_scale / len(pitch_classes)
     n_periods = len(fragment.sonorities) - depth + 1
     score /= n_periods

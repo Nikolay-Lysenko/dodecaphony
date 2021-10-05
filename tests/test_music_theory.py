@@ -86,11 +86,6 @@ from dodecaphony.music_theory import (
                 'A-locrian',
                 'B-locrian',
                 'C-whole_tone',
-                'D-whole_tone',
-                'E-whole_tone',
-                'F#-whole_tone',
-                'G#-whole_tone',
-                'A#-whole_tone',
             ]
         ),
         (
@@ -108,11 +103,6 @@ from dodecaphony.music_theory import (
                 'A-major',
                 'B-major',
                 'C#-whole_tone',
-                'D#-whole_tone',
-                'F-whole_tone',
-                'G-whole_tone',
-                'A-whole_tone',
-                'B-whole_tone',
             ]
         ),
     ]

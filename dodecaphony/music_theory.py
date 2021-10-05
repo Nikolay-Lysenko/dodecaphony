@@ -214,6 +214,8 @@ def get_mapping_from_pitch_class_to_diatonic_scales(
     result = {pitch_class: [] for pitch_class in pitch_classes}
     cartesian_product = itertools.product(patterns.items(), enumerate(pitch_classes))
     for (scale_type, pattern), (offset, pitch_class) in cartesian_product:
+        if scale_type == 'whole_tone' and pitch_class not in ['C', 'C#']:
+            continue  # Prevent creation of duplicated scales.
         scale_name = f'{pitch_class}-{scale_type}'
         rotated_pitch_classes = pitch_classes[offset:] + pitch_classes[:offset]
         for another_pitch_class, degree in zip(rotated_pitch_classes, pattern):
