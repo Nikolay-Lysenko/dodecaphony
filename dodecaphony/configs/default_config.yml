@@ -14,7 +14,7 @@ fragment:
   pauses_fraction: 0.0
 
 scoring_sets:
-  - name: default
+  - name: basic
     scoring_functions:
       - name: absence_of_doubled_pitch_classes
         weights:
@@ -230,9 +230,6 @@ scoring_sets:
           9: 0.6
           10: 0.2
           11: 0.2
-      - name: rhythmic_homogeneity
-        weights:
-          0.0: 1.0
       - name: smoothness_of_voice_leading
         weights:
           0.0: 1.0
@@ -251,6 +248,11 @@ scoring_sets:
           10: 0.8
           11: 0.9
           12: 1.0
+  - name: optional
+    scoring_functions:
+      - name: rhythmic_homogeneity
+        weights:
+          0.0: 1.0
       - name: stackability
         weights:
           0.0: 1.0
@@ -271,7 +273,7 @@ scoring_sets:
 
 evaluation:
   scoring_sets:
-    - default
+    - basic
 
 optimization:
   n_iterations: 300
