@@ -20,6 +20,7 @@ from dodecaphony.evaluation import (
     evaluate_dissonances_preparation_and_resolution,
     evaluate_harmony_dynamic,
     evaluate_local_diatonicity,
+    evaluate_presence_of_intervallic_motif,
     evaluate_rhythmic_homogeneity,
     evaluate_smoothness_of_voice_leading,
     evaluate_stackability,
@@ -927,6 +928,104 @@ def test_evaluate_local_diatonicity(
     fragment = override_calculated_attributes(fragment)
     result = evaluate_local_diatonicity(fragment, depth, scale_types)
     assert round(result, 10) == round(expected, 10)
+
+
+@pytest.mark.parametrize(
+    "fragment, motif, min_n_occurrences, inversion, reversion, elision, inverted_elision, "
+    "reverted_elision, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['B', 'pause', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F'],
+                    ['B', 'A', 'pause', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F'],
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
+            ),
+            # `motif`
+            [-2, 6, 2, -3],
+            # `min_n_occurrences`
+            [2, 2],
+            # `inversion`
+            False,
+            # `reversion`
+            False,
+            # `elision`
+            False,
+            # `inverted_elision`
+            False,
+            # `reverted_elision`
+            False,
+            # `expected`
+            -0.75
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
+                ],
+                sonic_content=[
+                    ['B', 'pause', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F'],
+                    ['B', 'A', 'pause', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F'],
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=16,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[1, 1],
+                n_tone_row_instances_by_group=[1, 1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0, 1],
+            ),
+            # `motif`
+            [-2, 6, 2, -3],
+            # `min_n_occurrences`
+            [2, 2],
+            # `inversion`
+            True,
+            # `reversion`
+            True,
+            # `elision`
+            True,
+            # `inverted_elision`
+            True,
+            # `reverted_elision`
+            False,
+            # `expected`
+            -0.5
+        ),
+    ]
+)
+def test_evaluate_presence_of_intervallic_motif(
+        fragment: Fragment, motif: list[int], min_n_occurrences: list[int],
+        inversion: bool, reversion: bool, elision: bool, inverted_elision: bool,
+        reverted_elision: bool, expected: float
+) -> None:
+    """Test `evaluate_presence_of_intervallic_motif` function."""
+    fragment = override_calculated_attributes(fragment)
+    result = evaluate_presence_of_intervallic_motif(
+        fragment, motif, min_n_occurrences, inversion, reversion,
+        elision, inverted_elision, reverted_elision
+    )
+    assert result == expected
 
 
 @pytest.mark.parametrize(

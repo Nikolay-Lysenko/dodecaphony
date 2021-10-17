@@ -7,7 +7,10 @@ Author: Nikolay Lysenko
 
 import itertools
 import math
+import re
+import string
 from collections import Counter
+from functools import cache
 from typing import Any, Callable, Optional
 
 from .fragment import Event, Fragment
@@ -479,6 +482,181 @@ def evaluate_local_diatonicity(
     return score
 
 
+@cache
+def get_mapping_from_interval_size_to_character() -> dict[Optional[int], str]:
+    """
+    Get mapping from interval size (in semitones) to its single-char encoding.
+
+    :return:
+        mapping from size (in semitones) of a directed non-compound interval to
+        its single-char representation; `None` as key relates to pauses
+    """
+    intervals = list(range(-N_SEMITONES_PER_OCTAVE, N_SEMITONES_PER_OCTAVE + 1)) + [None]
+    result = {interval: letter for interval, letter in zip(intervals, string.ascii_lowercase)}
+    return result
+
+
+def encode_interval(interval: Optional[int]) -> str:
+    """
+    Encode an interval with a single character.
+
+    :param interval:
+        interval size (in semitones)
+    :return:
+        single-character encoding of the interval
+    """
+    mapping = get_mapping_from_interval_size_to_character()
+    if interval is not None:
+        interval = math.copysign(abs(interval) % N_SEMITONES_PER_OCTAVE, interval)
+    return mapping[interval]
+
+
+def encode_line_intervals(melodic_lines: list[list[Event]]) -> list[str]:
+    """
+    Encode intervals from all melodic lines
+
+    :param melodic_lines:
+        melodic lines
+    :return:
+        strings with encoded intervals for each melodic line
+    """
+    encoded_lines = []
+    for melodic_line in melodic_lines:
+        encoded_line = ''
+        for previous_event, next_event in zip(melodic_line, melodic_line[1:]):
+            if previous_event.pitch_class == 'pause' or next_event.pitch_class == 'pause':
+                interval = None
+            else:
+                interval = next_event.position_in_semitones - previous_event.position_in_semitones
+            encoded_line += encode_interval(interval)
+        encoded_lines.append(encoded_line)
+    return encoded_lines
+
+
+def generate_elision_patterns(
+        motif: tuple[int], original_pattern: str, run: bool = False
+) -> list[str]:
+    """
+    Generate search patterns for modifications of the original motif with one pitch omitted.
+
+    :param motif:
+        sequence of directed interval sizes (in semitones) between successive pitches of a motif
+    :param original_pattern:
+        search pattern (in encoded lines) corresponding to the motif
+    :param run:
+        flag whether to generate any patterns
+    :return:
+        generated patterns corresponding to elisions of the motif
+    """
+    patterns = []
+    if not run:
+        return patterns
+    not_first = f'[^{original_pattern[0]}]'
+    first_omission_pattern = not_first + original_pattern[1:]
+    patterns.append(first_omission_pattern)
+    for i in range(len(motif) - 1):
+        motif_with_omission = motif[:i] + (motif[i] + motif[i + 1],) + motif[i + 2:]
+        omission_pattern = ''.join([encode_interval(x) for x in motif_with_omission])
+        patterns.append(omission_pattern)
+    not_last = f'[^{original_pattern[-1]}]'
+    last_omission_pattern = original_pattern[:-1] + not_last
+    patterns.append(last_omission_pattern)
+    return patterns
+
+
+@cache
+def generate_regexps_for_intervallic_motif(
+        motif: tuple[int],
+        inversion: bool = True, reversion: bool = True,
+        elision: bool = False, inverted_elision: bool = False, reverted_elision: bool = False
+) -> list['_sre.SRE_Pattern']:
+    """
+    Generate regular expressions that match intervallic motif and its modifications.
+
+    :param motif:
+        sequence of directed interval sizes (in semitones) between successive pitches of a motif
+    :param inversion:
+        flag whether to include inversion of the original motif
+    :param reversion:
+        flag whether to include reversion of the original motif
+    :param elision:
+        flag whether to include modifications of the original motif with one pitch omitted
+    :param inverted_elision:
+        flag whether to include modifications of the inverted motif with one pitch omitted;
+        if `inversion` is set to `False`, this flag affects nothing
+    :param reverted_elision:
+        flag whether to include modifications of the reverted motif with one pitch omitted;
+        if `reversion` is set to `False`, this flag affects nothing
+    :return:
+        compiled regular expressions
+    """
+    original_pattern = ''.join([encode_interval(x) for x in motif])
+    patterns = [original_pattern]
+    patterns.extend(generate_elision_patterns(motif, original_pattern, elision))
+    if inversion:
+        inverted_motif = tuple(-x for x in motif)
+        inverted_pattern = ''.join([encode_interval(x) for x in inverted_motif])
+        patterns.append(inverted_pattern)
+        patterns.extend(
+            generate_elision_patterns(inverted_motif, inverted_pattern, inverted_elision)
+        )
+    if reversion:
+        reverted_motif = motif[::-1]
+        reverted_pattern = original_pattern[::-1]
+        patterns.append(reverted_pattern)
+        patterns.extend(
+            generate_elision_patterns(reverted_motif, reverted_pattern, reverted_elision)
+        )
+    patterns = list(set(patterns))  # In particular, duplicates may occur due to symmetries.
+    regexps = [re.compile(pattern) for pattern in patterns]
+    return regexps
+
+
+def evaluate_presence_of_intervallic_motif(
+        fragment: Fragment, motif: list[int], min_n_occurrences: list[int],
+        inversion: bool = True, reversion: bool = True,
+        elision: bool = False, inverted_elision: bool = False, reverted_elision: bool = False
+) -> float:
+    """
+    Evaluate presence of used-defined intervallic motif.
+
+    :param fragment:
+        a fragment to be evaluated
+    :param motif:
+        sequence of directed interval sizes (in semitones) between successive pitches of a motif
+    :param min_n_occurrences:
+        minimum numbers of motif occurrences for each melodic line
+    :param inversion:
+        flag whether to include inversion of the original motif
+    :param reversion:
+        flag whether to include reversion of the original motif
+    :param elision:
+        flag whether to include modifications of the original motif with one pitch omitted
+    :param inverted_elision:
+        flag whether to include modifications of the inverted motif with one pitch omitted;
+        if `inversion` is set to `False`, this flag affects nothing
+    :param reverted_elision:
+        flag whether to include modifications of the reverted motif with one pitch omitted;
+        if `reversion` is set to `False`, this flag affects nothing
+    :return:
+        minus one multiplied by relative lack of motif occurrences
+    """
+    regexps = generate_regexps_for_intervallic_motif(
+        tuple(motif), inversion, reversion, elision, inverted_elision, reverted_elision
+    )
+    encoded_lines = encode_line_intervals(fragment.melodic_lines)
+    numerator = 0
+    denominator = 0
+    for threshold, encoded_line in zip(min_n_occurrences, encoded_lines):
+        n_occurrences = 0
+        for regexp in regexps:
+            n_occurrences += len(re.findall(regexp, encoded_line))
+        numerator -= max(threshold - n_occurrences, 0)
+        denominator += threshold
+    score = numerator / denominator
+    return score
+
+
 def evaluate_rhythmic_homogeneity(fragment: Fragment) -> float:
     """
     Evaluate rhythmic homogeneity between all measures except the last one.
@@ -579,6 +757,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
         'consistency_of_rhythm_with_meter': evaluate_consistency_of_rhythm_with_meter,
         'dissonances_preparation_and_resolution': evaluate_dissonances_preparation_and_resolution,
         'harmony_dynamic': evaluate_harmony_dynamic,
+        'intervallic_motif': evaluate_presence_of_intervallic_motif,
         'local_diatonicity': evaluate_local_diatonicity,
         'rhythmic_homogeneity': evaluate_rhythmic_homogeneity,
         'smoothness_of_voice_leading': evaluate_smoothness_of_voice_leading,

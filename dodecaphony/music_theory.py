@@ -58,6 +58,7 @@ N_SEMITONES_TO_INTERVAL_TYPE_WITH_DISSONANT_P4 = {
 }
 
 
+@cache
 def get_smallest_intervals_between_pitch_classes() -> dict[tuple[str, str], int]:
     """
     Get mapping from a pair of pitch classes to the smallest interval connecting them.
@@ -81,8 +82,7 @@ def get_smallest_intervals_between_pitch_classes() -> dict[tuple[str, str], int]
 
 
 def get_type_of_interval(
-        n_semitones: int,
-        is_perfect_fourth_consonant: bool = True
+        n_semitones: int, is_perfect_fourth_consonant: bool = True
 ) -> IntervalTypes:
     """
     Get type of a harmonic interval.

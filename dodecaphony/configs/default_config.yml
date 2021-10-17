@@ -230,6 +230,11 @@ scoring_sets:
           9: 0.6
           10: 0.2
           11: 0.2
+      - name: intervallic_motif
+        weights:
+          0.0: 1.0
+        motif: [-1, -3]
+        min_n_occurrences: [1, 1, 1, 1]
       - name: smoothness_of_voice_leading
         weights:
           0.0: 1.0
