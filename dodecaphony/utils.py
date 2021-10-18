@@ -10,9 +10,7 @@ from typing import Any, Callable, Optional
 
 
 def starmap_in_parallel(
-        fn: Callable,
-        args: list[Any],
-        pool_kwargs: Optional[dict[str, Any]] = None
+        fn: Callable, args: list[Any], pool_kwargs: Optional[dict[str, Any]] = None
 ) -> list[Any]:
     """
     Apply function to each collection of arguments from the given list in parallel.
@@ -46,4 +44,29 @@ def starmap_in_parallel(
     finally:
         pool.close()
         pool.join()
+    return results
+
+
+def compute_rolling_aggregate(
+        values: list[float], aggregation_fn: Callable[[list[float]], float], window_size: int
+) -> list[float]:
+    """
+    Compute rolling aggregate.
+
+    :param values:
+        list of values to be aggregated
+    :param aggregation_fn:
+        aggregation function
+    :param window_size:
+        size of rolling window
+    :return:
+        list of rolling aggregates
+    """
+    window = []
+    results = []
+    for value in values:
+        if len(window) == window_size:
+            window.pop(0)
+        window.append(value)
+        results.append(aggregation_fn(window))
     return results

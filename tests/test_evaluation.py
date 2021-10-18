@@ -11,6 +11,7 @@ import pytest
 
 from dodecaphony.evaluation import (
     evaluate,
+    evaluate_absence_of_aimless_fluctuations,
     evaluate_absence_of_doubled_pitch_classes,
     evaluate_absence_of_simultaneous_skips,
     evaluate_absence_of_voice_crossing,
@@ -29,6 +30,51 @@ from dodecaphony.evaluation import (
     weight_score,
 )
 from dodecaphony.fragment import Event, Fragment, override_calculated_attributes
+
+
+@pytest.mark.parametrize(
+    "fragment, penalties, window_size, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                ],
+                sonic_content=[
+                    ['C#', 'D#', 'C', 'E', 'B', 'D', 'F#', 'G#', 'F', 'A', 'G', 'A#'],
+                ],
+                meter_numerator=4,
+                meter_denominator=4,
+                n_beats=12,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                n_melodic_lines_by_group=[2],
+                n_tone_row_instances_by_group=[1],
+                mutable_temporal_content_indices=[0, 1],
+                mutable_sonic_content_indices=[0],
+            ),
+            # `penalties`
+            {2: 1, 6: 0.5},
+            # `window_size`
+            3,
+            # `expected`
+            -0.6875
+        ),
+    ]
+)
+def test_evaluate_absence_of_aimless_fluctuations(
+        fragment: Fragment, penalties: dict[int, float], window_size: int, expected: float
+) -> None:
+    """Test `evaluate_absence_of_aimless_fluctuations` function."""
+    fragment = override_calculated_attributes(fragment)
+    from pprint import pprint
+    pprint([x.position_in_semitones for x in fragment.melodic_lines[0]])
+    pprint([x.position_in_semitones for x in fragment.melodic_lines[1]])
+    result = evaluate_absence_of_aimless_fluctuations(fragment, penalties, window_size)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -59,7 +105,6 @@ from dodecaphony.fragment import Event, Fragment, override_calculated_attributes
             # `expected`
             -0.125
         ),
-
     ]
 )
 def test_evaluate_absence_of_doubled_pitch_classes(fragment: Fragment, expected: float) -> None:

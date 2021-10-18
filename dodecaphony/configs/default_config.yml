@@ -16,6 +16,12 @@ fragment:
 scoring_sets:
   - name: basic
     scoring_functions:
+      - name: absence_of_aimless_fluctuations
+        weights:
+          0.0: 1.0
+        penalties:
+          5: 1
+        window_size: 7
       - name: absence_of_doubled_pitch_classes
         weights:
           0.0: 1.0

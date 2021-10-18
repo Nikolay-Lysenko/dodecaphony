@@ -20,12 +20,48 @@ from .music_theory import (
     get_mapping_from_pitch_class_to_diatonic_scales,
     get_type_of_interval,
 )
+from .utils import compute_rolling_aggregate
 
 
 SCORING_SETS_REGISTRY_TYPE = dict[
     str,
     list[tuple[Callable[..., float], dict[float, float], dict[str, Any]]]
 ]
+
+
+def evaluate_absence_of_aimless_fluctuations(
+        fragment: Fragment, penalties: dict[int, float], window_size: int
+) -> float:
+    """
+    Evaluate melodic fluency based on absence of aimless fluctuations within narrow ranges.
+
+    :param fragment:
+        a fragment to be evaluated
+    :param penalties:
+        mapping from range (in semitones) covered within a window to penalty applicable to ranges
+        of not greater size; it is recommended to set maximum penalty to 1
+    :param window_size:
+        size of rolling window (in events)
+    :return:
+        multiplied by -1 penalty for narrowness averaged over all windows (including those that
+        are not penalized)
+    """
+    numerator = 0
+    denominator = 0
+    for melodic_line in fragment.melodic_lines:
+        pitches = [event.position_in_semitones for event in melodic_line]
+        pitches = [x for x in pitches if x is not None]
+        rolling_mins = compute_rolling_aggregate(pitches, min, window_size)[window_size-1:]
+        rolling_maxs = compute_rolling_aggregate(pitches, max, window_size)[window_size-1:]
+        borders = zip(rolling_mins, rolling_maxs)
+        for lower_border, upper_border in borders:
+            range_width = upper_border - lower_border
+            raw_penalties = [v for k, v in penalties.items() if k >= range_width]
+            penalty = max(raw_penalties) if raw_penalties else 0
+            numerator -= penalty
+            denominator += 1
+    score = numerator / denominator
+    return score
 
 
 def evaluate_absence_of_doubled_pitch_classes(fragment: Fragment) -> float:
@@ -749,6 +785,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
         registry of scoring functions
     """
     registry = {
+        'absence_of_aimless_fluctuations': evaluate_absence_of_aimless_fluctuations,
         'absence_of_doubled_pitch_classes': evaluate_absence_of_doubled_pitch_classes,
         'absence_of_simultaneous_skips': evaluate_absence_of_simultaneous_skips,
         'absence_of_voice_crossing': evaluate_absence_of_voice_crossing,
