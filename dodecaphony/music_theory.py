@@ -132,7 +132,8 @@ def invert_tone_row(tone_row: list[str]) -> list[str]:
         latter_position = PITCH_CLASS_TO_POSITION[latter_pitch_class]
         former_position = PITCH_CLASS_TO_POSITION[former_pitch_class]
         interval = latter_position - former_position
-        next_position = (PITCH_CLASS_TO_POSITION[inverted_tone_row[-1]] - interval) % TONE_ROW_LEN
+        next_position = (PITCH_CLASS_TO_POSITION[inverted_tone_row[-1]] - interval)
+        next_position %= N_SEMITONES_PER_OCTAVE
         next_pitch_class = POSITION_TO_PITCH_CLASS[next_position]
         inverted_tone_row.append(next_pitch_class)
     return inverted_tone_row
@@ -177,7 +178,8 @@ def transpose_tone_row(tone_row: list[str], shift_in_semitones: int) -> list[str
     """
     transposed_tone_row = []
     for pitch_class in tone_row:
-        new_position = (PITCH_CLASS_TO_POSITION[pitch_class] + shift_in_semitones) % TONE_ROW_LEN
+        new_position = (PITCH_CLASS_TO_POSITION[pitch_class] + shift_in_semitones)
+        new_position %= N_SEMITONES_PER_OCTAVE
         new_pitch_class = POSITION_TO_PITCH_CLASS[new_position]
         transposed_tone_row.append(new_pitch_class)
     return transposed_tone_row
