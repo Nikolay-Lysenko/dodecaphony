@@ -403,6 +403,11 @@ def find_sonority_type(
     """
     Find type of sonority based on its position in time.
 
+    Note that collisions are resolved according to the two following rules:
+    1) Ad hoc positions have higher precedence than regular positions;
+    2) Precedence amongst either ad hoc positions or regular positions is based on order of
+       the positions within the corresponding argument.
+
     :param sonority_start:
         start time of sonority (in reference beats)
     :param sonority_end:
@@ -424,7 +429,7 @@ def find_sonority_type(
             return ad_hoc_position['name']
     for regular_position in regular_positions:
         denominator = regular_position['denominator']
-        ratio = math.ceil(sonority_start) // denominator
+        ratio = math.floor(sonority_start) // denominator
         processed_start = sonority_start - ratio * denominator
         processed_end = sonority_end - ratio * denominator
         current_time = regular_position['remainder']

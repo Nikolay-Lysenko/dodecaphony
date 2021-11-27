@@ -26,6 +26,7 @@ from dodecaphony.evaluation import (
     evaluate_smoothness_of_voice_leading,
     evaluate_stackability,
     find_indices_of_dissonating_events,
+    find_sonority_type,
     parse_scoring_sets_registry,
     weight_score,
 )
@@ -1313,6 +1314,98 @@ def test_find_indices_of_dissonating_events(
 ) -> None:
     """Test `find_indices_of_dissonating_events` function."""
     result = find_indices_of_dissonating_events(sonority, meter_numerator)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "sonority_start, sonority_end, regular_positions, ad_hoc_positions, n_beats, expected",
+    [
+        (
+            # `sonority_start`
+            3.5,
+            # `sonority_end`
+            3.75,
+            # `regular_positions`
+            [{'name': 't3.5', 'remainder': 3.5, 'denominator': 4}],
+            # `ad_hoc_positions`
+            [],
+            # `n_beats`
+            4,
+            # `expected`
+            't3.5'
+        ),
+        (
+            # `sonority_start`
+            3,
+            # `sonority_end`
+            5,
+            # `regular_positions`
+            [{'name': 'downbeat', 'remainder': 0, 'denominator': 4}],
+            # `ad_hoc_positions`
+            [{'name': 'ending', 'time': -0.01}],
+            # `n_beats`
+            8,
+            # `expected`
+            'downbeat'
+        ),
+        (
+            # `sonority_start`
+            7,
+            # `sonority_end`
+            8,
+            # `regular_positions`
+            [{'name': 't3', 'remainder': 3, 'denominator': 4}],
+            # `ad_hoc_positions`
+            [{'name': 'ending', 'time': -0.01}],
+            # `n_beats`
+            8,
+            # `expected`
+            'ending'
+        ),
+        (
+            # `sonority_start`
+            3,
+            # `sonority_end`
+            9,
+            # `regular_positions`
+            [
+                {'name': 'downbeat', 'remainder': 0, 'denominator': 4},
+                {'name': 'middle', 'remainder': 2, 'denominator': 4},
+            ],
+            # `ad_hoc_positions`
+            [{'name': 'ending', 'time': -0.01}],
+            # `n_beats`
+            16,
+            # `expected`
+            'downbeat'
+        ),
+        (
+            # `sonority_start`
+            3,
+            # `sonority_end`
+            9,
+            # `regular_positions`
+            [
+                {'name': 'middle', 'remainder': 2, 'denominator': 4},
+                {'name': 'downbeat', 'remainder': 0, 'denominator': 4},
+            ],
+            # `ad_hoc_positions`
+            [{'name': 'ending', 'time': -0.01}],
+            # `n_beats`
+            16,
+            # `expected`
+            'middle'
+        ),
+    ]
+)
+def test_find_sonority_type(
+        sonority_start: float, sonority_end: float, regular_positions: list[dict[str, Any]],
+        ad_hoc_positions: list[dict[str, Any]], n_beats: int, expected: str
+) -> None:
+    """Test `find_sonority_type` function."""
+    result = find_sonority_type(
+        sonority_start, sonority_end, regular_positions, ad_hoc_positions, n_beats
+    )
     assert result == expected
 
 
