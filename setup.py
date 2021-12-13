@@ -17,7 +17,7 @@ with open(os.path.join(current_dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='dodecaphony',
-    version='0.1.3',
+    version='0.1.4',
     description=description,
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -43,7 +43,7 @@ setup(
     install_requires=[
         'pretty-midi',
         'PyYAML',
-        'sinethesizer>=0.5.3',
+        'sinethesizer>=0.6,<0.7',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

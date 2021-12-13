@@ -4,10 +4,10 @@ fragment:
     - n_melodic_lines: 1
       n_tone_row_instances: 1
     - n_melodic_lines: 3
-      n_tone_row_instances: 3
+      n_tone_row_instances: 4
   meter_numerator: 4
   meter_denominator: 4
-  n_measures: 4
+  n_measures: 5
   line_ids: [1, 2, 3, 4]
   upper_line_highest_note: E6
   upper_line_lowest_note: E4
@@ -323,13 +323,13 @@ rendering:
     velocity: 100
   sinethesizer:
     instruments:
-      1: brass
-      2: additive_cold_pipe
-      3: bowed_string
-      4: brass
+      1: woodwind
+      2: bowed_string
+      3: brass
+      4: woodwind
     effects:
-      1: '[{"name": "panning", "left_volume_ratio": 0.6, "right_volume_ratio": 1.0}, {"name": "haas", "location": 0.75, "max_channel_delay": 0.02}]'
-      2: '[{"name": "panning", "left_volume_ratio": 1.0, "right_volume_ratio": 0.9}, {"name": "haas", "location": -0.125, "max_channel_delay": 0.02}]'
-      3: '[{"name": "panning", "left_volume_ratio": 1.0, "right_volume_ratio": 0.6}, {"name": "haas", "location": -0.75, "max_channel_delay": 0.02}]'
-      4: '[{"name": "panning", "left_volume_ratio": 0.9, "right_volume_ratio": 1.0}, {"name": "haas", "location": 0.125, "max_channel_delay": 0.02}]'
+      1: '[{"name": "room_reverb", "room_length": 6.4, "room_width": 5, "room_height": 4, "reflection_decay_factor": 0.3, "sound_speed": 343, "listener_x": 1, "listener_y": 2.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 5.4, "sound_source_y": 2.0, "sound_source_z": 1.25, "sound_source_direction_x": -1.0, "sound_source_direction_y": -0.0, "sound_source_direction_z": 0, "angle": 1.5708, "n_reflections": 20}]'
+      2: '[{"name": "room_reverb", "room_length": 6.4, "room_width": 5, "room_height": 4, "reflection_decay_factor": 0.3, "sound_speed": 343, "listener_x": 1, "listener_y": 2.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 3.25, "sound_source_y": 4.75, "sound_source_z": 1.5, "sound_source_direction_x": -0.707, "sound_source_direction_y": -0.707, "sound_source_direction_z": 0, "angle": 1.5708, "n_reflections": 20}]'
+      3: '[{"name": "room_reverb", "room_length": 6.4, "room_width": 5, "room_height": 4, "reflection_decay_factor": 0.3, "sound_speed": 343, "listener_x": 1, "listener_y": 2.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 3.25, "sound_source_y": 0.25, "sound_source_z": 1.5, "sound_source_direction_x": -0.707, "sound_source_direction_y": 0.707, "sound_source_direction_z": 0, "angle": 1.5708, "n_reflections": 20}]'
+      4: '[{"name": "room_reverb", "room_length": 6.4, "room_width": 5, "room_height": 4, "reflection_decay_factor": 0.3, "sound_speed": 343, "listener_x": 1, "listener_y": 2.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 5.4, "sound_source_y": 3.0, "sound_source_z": 1.5, "sound_source_direction_x": -1.0, "sound_source_direction_y": -0.0, "sound_source_direction_z": 0, "angle": 1.5708, "n_reflections": 20}, {"name": "panning", "left_amplitude_ratio": 1.25, "right_amplitude_ratio": 1.25}]'
     velocity: 1.0

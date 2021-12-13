@@ -320,8 +320,7 @@ def test_create_wav_from_tsv_events(
     with open(path_to_tmp_file, 'w') as tmp_tsv_file:
         for line in tsv_content:
             tmp_tsv_file.write(line + '\n')
-    n_melodic_lines = 1
-    instruments_registry = create_sinethesizer_instruments(n_melodic_lines)
+    instruments_registry = create_sinethesizer_instruments()
     create_wav_from_tsv_events(
         path_to_tmp_file,
         path_to_another_tmp_file,

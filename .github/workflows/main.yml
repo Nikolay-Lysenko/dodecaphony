@@ -26,9 +26,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements/test.txt
     - name: Test with Pytest
-      run: pytest --cov=dodecaphony --cov-config .coveragerc
+      run: pytest --cov=dodecaphony --cov-config .coveragerc --cov-report=xml
     - name: Create and upload Codecov report
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       with:
         fail_ci_if_error: true
 
