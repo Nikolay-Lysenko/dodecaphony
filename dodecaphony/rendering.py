@@ -256,7 +256,7 @@ def make_lilypond_template(
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
     :param meter_denominator:
-        denominator in meter signature, i.e., ratio of reference beat duration to measure duration
+        denominator in meter signature, i.e., ratio of reference beat duration to the whole note
     :return:
         template
     """
@@ -346,7 +346,7 @@ def find_lilypond_duration(
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
     :param meter_denominator:
-        denominator in meter signature, i.e., ratio of reference beat duration to measure duration
+        denominator in meter signature, i.e., ratio of reference beat duration to the whole note
     :return:
         strings representing Lilypond durations of notes (a note can be split to multiple notes
         if it crosses bar or if its duration is compound and requires ties)
@@ -417,7 +417,7 @@ def convert_to_lilypond_note(
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
     :param meter_denominator:
-        denominator in meter signature, i.e., ratio of reference beat duration to measure duration
+        denominator in meter signature, i.e., ratio of reference beat duration to the whole note
     :return:
         note in Lilypond absolute notation
     """

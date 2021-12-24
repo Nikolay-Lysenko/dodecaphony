@@ -390,18 +390,17 @@ def find_sonorities(melodic_lines: list[list[Event]]) -> list[list[Event]]:
     """
     timeline = [event for melodic_line in melodic_lines for event in melodic_line]
     timeline = sorted(timeline, key=lambda event: (event.start_time, event.line_index))
-    indices = {i: -1 for i, _ in enumerate(melodic_lines)}
-    current_times = {i: 0 for i, _ in enumerate(melodic_lines)}
+    indices = [-1 for _ in melodic_lines]
+    current_times = [0 for _ in melodic_lines]
     previous_passed_time = 0
     sonorities = []
     for event in timeline:
         indices[event.line_index] += 1
         current_times[event.line_index] += event.duration
-        passed_time = min(v for k, v in current_times.items())
+        passed_time = min(current_times)
         if passed_time > previous_passed_time:
             sonorities.append([
-                melodic_line[indices[line_number]]
-                for line_number, melodic_line in enumerate(melodic_lines)
+                melodic_line[index] for melodic_line, index in zip(melodic_lines, indices)
             ])
         previous_passed_time = passed_time
     return sonorities
