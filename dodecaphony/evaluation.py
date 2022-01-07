@@ -69,8 +69,8 @@ def evaluate_absence_of_doubled_pitch_classes(fragment: Fragment) -> float:
     Evaluate absence of vertical intervals that are whole multipliers of octave.
 
     If the same pitch class sounds in two or more melodic lines simultaneously,
-    this pitch class might be perceived as 'central' and so listeners may expect that the piece is
-    tonal, whereas it is not.
+    harmonic stability increases significantly and it interrupts musical flow associated
+    with the twelve-tone technique.
 
     :param fragment:
         a fragment to be evaluated
