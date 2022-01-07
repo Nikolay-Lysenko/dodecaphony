@@ -1269,12 +1269,6 @@
           release_duration_on_velocity_order: 0.0
           release_degree: 100.0
         quasiperiodic_bandwidth: 0.0625
-        frequency_ratio: 1.0
-        amplitude_ratio: 1.0
-        event_to_amplitude_factor_fn:
-          name: power_fn_of_velocity
-          power: 1.0
-        random_detuning_range: 0.005
       frequency_ratio: 1.1
       amplitude_ratio: 1.0  # This value affects nothing because of `envelope_shaper` effect.
       event_to_amplitude_factor_fn:
