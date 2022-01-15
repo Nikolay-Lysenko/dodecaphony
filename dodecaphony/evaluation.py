@@ -845,10 +845,10 @@ def weight_score(unweighted_score: float, weights: dict[float, float]) -> float:
     """
     weighted_score = 0
     breakpoints = list(weights.keys()) + [-1.0]
-    for left_point, right_point in zip(breakpoints, breakpoints[1:]):
-        if left_point <= unweighted_score:
+    for left_point, right_point in zip(breakpoints[1:], breakpoints):
+        if right_point <= unweighted_score:
             break
-        weighted_score -= (left_point - max(unweighted_score, right_point)) * weights[left_point]
+        weighted_score -= (right_point - max(unweighted_score, left_point)) * weights[right_point]
     return weighted_score
 
 
