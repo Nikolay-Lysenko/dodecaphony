@@ -507,10 +507,10 @@ def evaluate_local_diatonicity(
     scale_types = scale_types or ('major', 'harmonic_minor', 'whole_tone')
     pitch_class_to_diatonic_scales = get_mapping_from_pitch_class_to_diatonic_scales(scale_types)
     nested_pitch_classes = []
-    for i in range(depth - 1):
-        nested_pitch_classes.append([event.pitch_class for event in fragment.sonorities[i]])
-    for i in range(depth - 1, len(fragment.sonorities)):
-        nested_pitch_classes.append([event.pitch_class for event in fragment.sonorities[i]])
+    for sonority in fragment.sonorities[:depth - 1]:
+        nested_pitch_classes.append([event.pitch_class for event in sonority])
+    for sonority in fragment.sonorities[depth - 1:]:
+        nested_pitch_classes.append([event.pitch_class for event in sonority])
         pitch_classes = [x for y in nested_pitch_classes for x in y if x != 'pause']
         counter = Counter()
         for pitch_class in pitch_classes:
