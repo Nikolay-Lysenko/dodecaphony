@@ -82,12 +82,12 @@ def find_instance_by_indices(
     :return:
         sequence of 12 pitch classes
     """
-    line = fragment.sonic_content[group_index]
+    sequence = fragment.sonic_content[group_index]
     start_event_index = instance_index * TONE_ROW_LEN
     end_event_index = (instance_index + 1) * TONE_ROW_LEN
     pitch_classes = []
     index = 0
-    for pitch_class in line:
+    for pitch_class in sequence:
         if pitch_class == 'pause':
             continue
         if index >= end_event_index:
@@ -116,17 +116,17 @@ def replace_instance(
     :return:
         modified fragment
     """
-    line = fragment.sonic_content[group_index]
+    sequence = fragment.sonic_content[group_index]
     start_event_index = instance_index * TONE_ROW_LEN
     end_event_index = (instance_index + 1) * TONE_ROW_LEN
     index_without_pauses = 0
-    for index, pitch_class in enumerate(line):
+    for index, pitch_class in enumerate(sequence):
         if pitch_class == 'pause':
             continue
         if index_without_pauses >= end_event_index:
             break
         if index_without_pauses >= start_event_index:
-            line[index] = new_instance.pop(0)
+            sequence[index] = new_instance.pop(0)
         index_without_pauses += 1
     return fragment
 
@@ -165,9 +165,10 @@ def apply_pause_shift(fragment: Fragment) -> Fragment:
     :return:
         modified fragment
     """
-    line = random.choice(fragment.sonic_content)
+    group_index = random.choice(fragment.mutable_sonic_content_indices)
+    sequence = fragment.sonic_content[group_index]
     indices = []
-    for index, (previous_pitch_class, pitch_class) in enumerate(zip(line, line[1:])):
+    for index, (previous_pitch_class, pitch_class) in enumerate(zip(sequence, sequence[1:])):
         if pitch_class == 'pause' and previous_pitch_class != 'pause':
             indices.append(index)
         if pitch_class != 'pause' and previous_pitch_class == 'pause':
@@ -175,7 +176,7 @@ def apply_pause_shift(fragment: Fragment) -> Fragment:
     if not indices:
         return fragment
     index = random.choice(indices)
-    line[index], line[index + 1] = line[index + 1], line[index]
+    sequence[index], sequence[index + 1] = sequence[index + 1], sequence[index]
     return fragment
 
 
