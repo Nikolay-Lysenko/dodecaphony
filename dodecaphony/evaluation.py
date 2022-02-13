@@ -486,7 +486,7 @@ def evaluate_local_diatonicity(
     """
     Evaluate presence of diatonic scales at short periods of time.
 
-    If for every short interval there is a diatonic scale containing all its pitches,
+    If for every short time interval there is a diatonic scale containing all its pitches,
     the fragment might be called pantonal with frequent modulations between diatonic scales.
 
     :param fragment:
@@ -506,11 +506,10 @@ def evaluate_local_diatonicity(
     score = 0
     scale_types = scale_types or ('major', 'harmonic_minor', 'whole_tone')
     pitch_class_to_diatonic_scales = get_mapping_from_pitch_class_to_diatonic_scales(scale_types)
-    nested_pitch_classes = [[]]
+    nested_pitch_classes = []
     for i in range(depth - 1):
         nested_pitch_classes.append([event.pitch_class for event in fragment.sonorities[i]])
     for i in range(depth - 1, len(fragment.sonorities)):
-        nested_pitch_classes.pop(0)
         nested_pitch_classes.append([event.pitch_class for event in fragment.sonorities[i]])
         pitch_classes = [x for y in nested_pitch_classes for x in y if x != 'pause']
         counter = Counter()
@@ -518,6 +517,7 @@ def evaluate_local_diatonicity(
             counter.update(pitch_class_to_diatonic_scales[pitch_class])
         n_pitch_classes_from_best_scale = counter.most_common(1)[0][1]
         score -= 1 - n_pitch_classes_from_best_scale / len(pitch_classes)
+        nested_pitch_classes.pop(0)
     n_periods = len(fragment.sonorities) - depth + 1
     score /= n_periods
     return score
