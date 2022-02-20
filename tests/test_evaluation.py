@@ -71,9 +71,6 @@ def test_evaluate_absence_of_aimless_fluctuations(
 ) -> None:
     """Test `evaluate_absence_of_aimless_fluctuations` function."""
     fragment = override_calculated_attributes(fragment)
-    from pprint import pprint
-    pprint([x.position_in_semitones for x in fragment.melodic_lines[0]])
-    pprint([x.position_in_semitones for x in fragment.melodic_lines[1]])
     result = evaluate_absence_of_aimless_fluctuations(fragment, penalties, window_size)
     assert result == expected
 
@@ -784,8 +781,6 @@ def test_evaluate_dissonances_preparation_and_resolution(
 ) -> None:
     """Test `evaluate_dissonances_preparation_and_resolution` function."""
     fragment = override_calculated_attributes(fragment)
-    from pprint import pprint
-    pprint(fragment.melodic_lines)
     result = evaluate_dissonances_preparation_and_resolution(
         fragment,
         n_semitones_to_pt_and_ngh_preparation_penalty,

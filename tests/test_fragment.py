@@ -691,7 +691,7 @@ def test_set_pitches_of_lower_lines(
         expected_sonorities: list[list[Event]]
 ) -> None:
     """Test `set_pitches_of_lower_lines` function."""
-    # Below three lines are added instead of setting all arguments initially,
+    # Below three lines of code are added instead of setting all arguments initially,
     # because `sonorities` and `melodic_lines` must reference to the same events.
     fragment.melodic_lines = distribute_pitch_classes(fragment)
     fragment.sonorities = find_sonorities(fragment.melodic_lines)

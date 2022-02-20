@@ -162,7 +162,7 @@ def rotate_tone_row(tone_row: list[str], shift: int) -> list[str]:
     :return:
         rotated tone row
     """
-    return tone_row[shift:] + tone_row[:shift]
+    return tone_row[-shift:] + tone_row[:-shift]
 
 
 def transpose_tone_row(tone_row: list[str], shift_in_semitones: int) -> list[str]:

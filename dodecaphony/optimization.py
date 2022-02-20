@@ -13,7 +13,7 @@ from typing import Any, Optional
 
 from .evaluation import SCORING_SETS_REGISTRY_TYPE, evaluate
 from .fragment import Fragment
-from .transformations import TRANSFORMATIONS_REGISTRY_TYPE, transform
+from .transformations import TRANSFORMATION_REGISTRY_TYPE, transform
 from .utils import starmap_in_parallel
 
 
@@ -55,7 +55,7 @@ def generate_new_records(
         tasks: list[Task],
         n_records_to_return: int,
         n_transformations_per_trial: int,
-        transformation_registry: TRANSFORMATIONS_REGISTRY_TYPE,
+        transformation_registry: TRANSFORMATION_REGISTRY_TYPE,
         transformation_names: list[str],
         transformation_probabilities: list[float],
         scoring_sets: list[str],
@@ -171,7 +171,7 @@ def optimize_with_local_search(
         n_transformations_increment: int,
         max_n_transformations_per_trial: int,
         beam_width: int,
-        transformation_registry: TRANSFORMATIONS_REGISTRY_TYPE,
+        transformation_registry: TRANSFORMATION_REGISTRY_TYPE,
         transformation_probabilities: dict[str, float],
         scoring_sets: list[str],
         scoring_sets_registry: SCORING_SETS_REGISTRY_TYPE,

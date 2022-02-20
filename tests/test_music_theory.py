@@ -14,6 +14,7 @@ from dodecaphony.music_theory import (
     get_smallest_intervals_between_pitch_classes,
     invert_tone_row,
     revert_tone_row,
+    rotate_tone_row,
     transpose_tone_row,
     validate_tone_row,
 )
@@ -155,6 +156,27 @@ def test_invert_tone_row(tone_row: list[str], expected: list[str]) -> None:
 def test_revert_tone_row(tone_row: list[str], expected: list[str]) -> None:
     """Test `revert_tone_row` function."""
     result = revert_tone_row(tone_row)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "tone_row, shift, expected",
+    [
+        (
+            ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+            -1,
+            ['A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'B'],
+        ),
+        (
+            ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
+            3,
+            ['E', 'G#', 'F', 'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#'],
+        ),
+    ]
+)
+def test_rotate_tone_row(tone_row: list[str], shift: int, expected: list[str]) -> None:
+    """Test `rotate_tone_row` function."""
+    result = rotate_tone_row(tone_row, shift)
     assert result == expected
 
 

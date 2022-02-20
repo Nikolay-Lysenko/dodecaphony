@@ -215,10 +215,8 @@ def distribute_events_between_lines(n_events: int, n_lines: int) -> list[int]:
         list of numbers of events in a particular line
     """
     results = [n_events // n_lines for _ in range(n_lines)]
-    i = 0
-    while sum(results) < n_events:
+    for i in range(n_events - sum(results)):
         results[i] += 1
-        i += 1
     return results
 
 
@@ -276,8 +274,7 @@ def replicate_tone_row(tone_row: list[str], n_instances: int) -> list[str]:
             current_instance = invert_tone_row(current_instance)
         if random.choice([True, False]):
             current_instance = revert_tone_row(current_instance)
-        for pitch_class in current_instance:
-            pitch_classes.append(pitch_class)
+        pitch_classes.extend(current_instance)
     return pitch_classes
 
 

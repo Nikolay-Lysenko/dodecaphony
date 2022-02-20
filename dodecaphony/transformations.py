@@ -21,7 +21,7 @@ from .music_theory import (
 )
 
 
-TRANSFORMATIONS_REGISTRY_TYPE = dict[str, tuple[Callable, list[Any]]]
+TRANSFORMATION_REGISTRY_TYPE = dict[str, tuple[Callable, list[Any]]]
 
 
 def get_duration_changes() -> dict[tuple[float, float], list[tuple[float, float]]]:
@@ -260,7 +260,7 @@ def apply_transposition(fragment: Fragment, max_transposition: int) -> Fragment:
 
 def create_transformations_registry(
         max_rotation: int, max_transposition: int
-) -> TRANSFORMATIONS_REGISTRY_TYPE:
+) -> TRANSFORMATION_REGISTRY_TYPE:
     """
     Get mapping from names to corresponding transformations and their arguments.
 
@@ -285,7 +285,7 @@ def create_transformations_registry(
 def transform(
         fragment: Fragment,
         n_transformations: int,
-        transformation_registry: TRANSFORMATIONS_REGISTRY_TYPE,
+        transformation_registry: TRANSFORMATION_REGISTRY_TYPE,
         transformation_names: list[str],
         transformation_probabilities: list[float]
 ) -> Fragment:
