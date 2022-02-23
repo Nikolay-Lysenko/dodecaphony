@@ -234,7 +234,7 @@ def create_yaml_from_fragment(fragment: Fragment, yaml_path: str) -> None:
     }
     result = {'temporal_content': temporal_content, 'sonic_content': sonic_content}
     with open(yaml_path, 'w') as out_file:
-        yaml.dump(result, out_file)
+        yaml.dump(result, out_file, default_flow_style=None)
 
 
 def make_lilypond_template(
