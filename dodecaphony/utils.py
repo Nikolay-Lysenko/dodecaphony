@@ -34,10 +34,8 @@ def starmap_in_parallel(
         results of applying the function to the arguments
     """
     pool_kwargs = pool_kwargs or {}
-    pool_kwargs['processes'] = pool_kwargs.get('n_processes')
-    pool_kwargs['maxtasksperchild'] = pool_kwargs.get('max_tasks_per_child')
-    old_keys = ['n_processes', 'max_tasks_per_child']
-    pool_kwargs = {k: v for k, v in pool_kwargs.items() if k not in old_keys}
+    key_renaming = {'n_processes': 'processes', 'max_tasks_per_child': 'maxtasksperchild'}
+    pool_kwargs = {key_renaming.get(k, k): v for k, v in pool_kwargs.items()}
     pool = mp.Pool(**pool_kwargs)
     try:
         results = pool.starmap(fn, args)
