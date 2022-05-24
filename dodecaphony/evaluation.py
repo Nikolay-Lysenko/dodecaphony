@@ -134,7 +134,7 @@ def evaluate_absence_of_voice_crossing(
         a fragment to be evaluated
     :param n_semitones_to_penalty:
         mapping from size of vertical interval between a pair of voices (this size is assumed to be
-        negative) to penalty for this interval
+        non-positive) to penalty for this interval
     :return:
         minus one multiplied by average over all vertical intervals penalty
     """
