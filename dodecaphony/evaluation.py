@@ -122,7 +122,9 @@ def evaluate_absence_of_simultaneous_skips(
     return score
 
 
-def evaluate_absence_of_voice_crossing(fragment: Fragment) -> float:
+def evaluate_absence_of_voice_crossing(
+        fragment: Fragment, n_semitones_to_penalty: dict[int, float]
+) -> float:
     """
     Evaluate absence of voice crossing.
 
@@ -130,19 +132,23 @@ def evaluate_absence_of_voice_crossing(fragment: Fragment) -> float:
 
     :param fragment:
         a fragment to be evaluated
+    :param n_semitones_to_penalty:
+        mapping from size of vertical interval between a pair of voices (this size is assumed to be
+        negative) to penalty for this interval
     :return:
-        minus one multiplied by sum of sizes in semitones of wrong vertical intervals
-        and divided by total number of vertical intervals
+        minus one multiplied by average over all vertical intervals penalty
     """
-    score = 0
+    numerator = 0
+    denominator = 0
     for sonority in fragment.sonorities:
         for first, second in itertools.combinations(sonority, 2):
             if first.pitch_class == 'pause' or second.pitch_class == 'pause':
                 continue
             interval = first.position_in_semitones - second.position_in_semitones
-            if interval < 0:
-                score += interval
-    score /= len(fragment.sonorities)
+            if interval <= 0:
+                numerator -= n_semitones_to_penalty.get(interval, 1)
+            denominator += 1
+    score = numerator / denominator
     return score
 
 

@@ -158,7 +158,7 @@ def test_evaluate_absence_of_simultaneous_skips(
 
 
 @pytest.mark.parametrize(
-    "fragment, expected",
+    "fragment, n_semitones_to_penalty, expected",
     [
         (
             # `fragment`
@@ -182,16 +182,31 @@ def test_evaluate_absence_of_simultaneous_skips(
                 mutable_temporal_content_indices=[0, 1],
                 mutable_sonic_content_indices=[0, 1],
             ),
+            # `n_semitones_to_penalty`
+            {
+                0: 0.5,
+                -1: 0.55,
+                -2: 0.6,
+                -3: 0.65,
+                -4: 0.7,
+                -5: 0.75,
+                -6: 0.8,
+                -7: 0.85,
+                -8: 0.9,
+                -9: 0.95,
+                -10: 1
+            },
             # `expected`
-            -0.0625
+            -0.55 / 15
         ),
     ]
 )
-def test_evaluate_absence_of_voice_crossing(fragment: Fragment, expected: float) -> None:
+def test_evaluate_absence_of_voice_crossing(
+        fragment: Fragment, n_semitones_to_penalty: dict[int, float], expected: float) -> None:
     """Test `evaluate_absence_of_voice_crossing` function."""
     fragment = override_calculated_attributes(fragment)
-    result = evaluate_absence_of_voice_crossing(fragment)
-    assert result == expected
+    result = evaluate_absence_of_voice_crossing(fragment, n_semitones_to_penalty)
+    assert round(result, 10) == round(expected, 10)
 
 
 @pytest.mark.parametrize(
