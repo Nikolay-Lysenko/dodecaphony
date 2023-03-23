@@ -243,8 +243,8 @@ def optimize_with_local_search(
 
         if current_best_score > previous_best_score:
             n_transformations_per_trial = default_n_transformations_per_trial
-        # If optimization stucks, Iterated Local Search suggests to perturb the current solution.
-        # Here. increase of neighborhood size is a form of perturbation.
+        # If optimization stucks, Iterated Local Search suggests to perturb the current solutions.
+        # Here, increase of neighborhood size is a form of perturbation.
         else:
             n_transformations_per_trial += n_transformations_increment
         # If enough perturbations are made, let us switch back to regular neighborhoods.
