@@ -717,11 +717,11 @@ def evaluate_rhythmic_homogeneity(fragment: Fragment) -> float:
     for durations_of_measures_for_one_line in fragment.durations_of_measures:
         pairs = itertools.combinations(durations_of_measures_for_one_line[:-1], 2)
         for first_durations, second_durations in pairs:
-            first_start_times = list(itertools.accumulate(first_durations))
-            second_start_times = list(itertools.accumulate(second_durations))
-            avg_n_starts = (len(first_start_times) + len(second_start_times)) / 2
-            total_n_starts = len(set(first_start_times + second_start_times))
-            score -= (total_n_starts / avg_n_starts - 1)
+            first_end_times = list(itertools.accumulate(first_durations))
+            second_end_times = list(itertools.accumulate(second_durations))
+            avg_n_ends = (len(first_end_times) + len(second_end_times)) / 2
+            total_n_ends = len(set(first_end_times + second_end_times))
+            score -= (total_n_ends / avg_n_ends - 1)
     n_non_last_measures = (fragment.n_beats // fragment.meter_numerator) - 1
     n_pairs = n_non_last_measures * (n_non_last_measures - 1) / 2
     score /= len(fragment.melodic_lines) * n_pairs
