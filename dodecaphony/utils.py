@@ -18,10 +18,10 @@ def starmap_in_parallel(
     This function contains boilerplate code that is needed for correct work
     of `pytest-cov`. Usage of `mp.Pool` as context manager is not alternative
     to this function, because:
-    1) not all covered lines of code may be marked as covered;
-    2) some files with names like '.coverage.hostname.*' may be not deleted.
-
-    See more: https://github.com/pytest-dev/pytest-cov/issues/250.
+    1) not all covered lines of code may be marked as covered
+       (see more: https://pytest-cov.readthedocs.io/en/latest/subprocess-support.html);
+    2) some files with names like '.coverage.hostname.*' may be not deleted
+       (see more: https://github.com/pytest-dev/pytest-cov/issues/250).
 
     :param fn:
         function

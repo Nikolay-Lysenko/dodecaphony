@@ -60,7 +60,7 @@ def generate_new_records(
         transformation_probabilities: list[float],
         scoring_sets: list[str],
         scoring_sets_registry: SCORING_SETS_REGISTRY_TYPE
-) -> list[Record]:
+) -> list[Record]:  # pragma: no cover  # Actually, it is covered, but `pytest-cov` misses it.
     """
     Generate records for given tasks.
 
