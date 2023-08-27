@@ -543,6 +543,10 @@ def render(fragment: Fragment, rendering_params: dict[str, Any]) -> None:  # pra
     yaml_path = os.path.join(nested_dir, 'content.yml')
     create_yaml_from_fragment(fragment, yaml_path)
 
+    meta_information_path = os.path.join(nested_dir, 'meta_information.txt')
+    with open(meta_information_path, 'w') as in_file:
+        in_file.write(rendering_params['meta_information'])
+
     lilypond_path = os.path.join(nested_dir, 'sheet_music.ly')
     create_lilypond_file_from_fragment(fragment, lilypond_path)
     create_pdf_sheet_music_with_lilypond(lilypond_path)

@@ -14,7 +14,8 @@ Each run of the tool results in creation of a fragment which can be used as a pa
 * WAV file;
 * Events file in [sinethesizer](https://github.com/Nikolay-Lysenko/sinethesizer) TSV format;
 * PDF file with sheet music and its Lilypond source;
-* YAML file that can be copied to a config for a derivative fragment.
+* YAML file that can be copied to a config for a derivative fragment;
+* Text file with meta information (such as path to config and evaluation scores).
 
 A demo piece compiled from various outputs of the tool is included in the repository as [MIDI file](https://github.com/Nikolay-Lysenko/dodecaphony/blob/master/docs/demos/demo_1.mid). There, velocities and control changes are set manually, however.
 

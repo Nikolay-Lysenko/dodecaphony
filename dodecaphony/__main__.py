@@ -29,6 +29,9 @@ def parse_cli_args() -> argparse.Namespace:
     parser.add_argument(
         '-c', '--config_path', type=str, default=None, help='path to configuration file'
     )
+    parser.add_argument(
+        '-n', '--n_fragments', type=int, default=1, help='number of fragments to render'
+    )
     cli_args = parser.parse_args()
     return cli_args
 
@@ -60,15 +63,24 @@ def main() -> None:
         **settings['optimization']
     )
 
+    reports = []
     for fragment in fragments:
-        evaluate(fragment, scoring_sets, scoring_sets_registry, verbose=True)
-        print('\n')
+        _, report = evaluate(fragment, scoring_sets, scoring_sets_registry, report=True)
+        reports.append(report)
+    print("\nEvaluation of selected fragments:\n")
+    print(*reports, sep="\n\n")
+    print()
 
     results_dir = settings['rendering']['dir']
     if not os.path.isdir(results_dir):
         os.mkdir(results_dir)
-    for fragment in fragments:
-        render(fragment, settings['rendering'])
+    for fragment, report in zip(fragments[:cli_args.n_fragments], reports):
+        rendering_params = settings['rendering']
+        rendering_params['meta_information'] = (
+            f"Config path: {os.path.abspath(config_path)}\n\n"
+            f"Evaluation scores:\n{report}"
+        )
+        render(fragment, rendering_params)
 
 
 if __name__ == '__main__':

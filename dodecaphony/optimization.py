@@ -113,7 +113,7 @@ def generate_new_records(
                 transformation_names,
                 transformation_probabilities
             )
-            score = evaluate(candidate, scoring_sets, scoring_sets_registry)
+            score, _ = evaluate(candidate, scoring_sets, scoring_sets_registry)
             score = round(score, 10)  # Prevent overflow during records comparison.
             new_records.append(Record(candidate, score))
     new_records = select_distinct_best_records(new_records, n_records_to_return)

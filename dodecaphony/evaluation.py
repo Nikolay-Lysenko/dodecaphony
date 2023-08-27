@@ -862,8 +862,8 @@ def evaluate(
         fragment: Fragment,
         scoring_sets: list[str],
         scoring_sets_registry: SCORING_SETS_REGISTRY_TYPE,
-        verbose: bool = False
-) -> float:
+        report: bool = False
+) -> tuple[float, str]:
     """
     Evaluate fragment.
 
@@ -874,21 +874,26 @@ def evaluate(
     :param scoring_sets_registry:
         mapping from a name of a scoring set to a list of triples of a scoring function,
         its weight, and its parameters
-    :param verbose:
-        if it is set to `True`, scores are printed with detailing by functions
+    :param report:
+        if it is set to `True`, detailed by functions scores are returned as a second output
     :return:
         weighted sum of scores returned by applicable scoring functions
     """
     score = 0
+    report_lines = []
     for scoring_set_name in scoring_sets:
         scoring_set = scoring_sets_registry[scoring_set_name]
         for scoring_fn, weights, params in scoring_set:
             unweighted_score = scoring_fn(fragment, **params)
             curr_score = weight_score(unweighted_score, weights)
-            if verbose:
-                name = scoring_fn.__name__.removeprefix('evaluate_')
-                print(f'{name:>40}: {curr_score}')
+            if report:
+                fn_name = scoring_fn.__name__.removeprefix('evaluate_')
+                report_line = f'{fn_name:>40}: {curr_score}'
+                report_lines.append(report_line)
             score += curr_score
-    if verbose:
-        print(f'Overall score is: {score}')
-    return score
+    if report:
+        report_lines.append(f'Overall score is: {score}')
+        report_str = '\n'.join(report_lines)
+    else:
+        report_str = ""
+    return score, report_str

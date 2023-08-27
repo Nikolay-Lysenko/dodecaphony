@@ -1488,7 +1488,7 @@ def test_parse_scoring_sets_registry(
     """Test `parse_scoring_sets_registry` function."""
     fragment = override_calculated_attributes(fragment)
     registry = parse_scoring_sets_registry(params)
-    result = evaluate(fragment, scoring_sets, registry)
+    result, _ = evaluate(fragment, scoring_sets, registry)
     assert round(result, 10) == round(expected, 10)
 
 

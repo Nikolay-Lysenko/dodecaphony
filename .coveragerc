@@ -9,6 +9,7 @@ exclude_lines =
     pragma: no cover
     def __repr__
     if verbose:
+    if report:
     if .debug:
     if __name__ == .__main__.:
     raise AssertionError
@@ -20,4 +21,3 @@ exclude_lines =
     return NotImplemented
     pass
     continue
-
