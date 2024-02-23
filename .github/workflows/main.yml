@@ -29,6 +29,7 @@ jobs:
       run: pytest --cov=dodecaphony --cov-config .coveragerc --cov-report=xml
     - name: Create and upload Codecov report
       uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
         fail_ci_if_error: true
-
