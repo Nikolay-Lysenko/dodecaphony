@@ -203,9 +203,9 @@ def calculate_number_of_undefined_events(
     return n_events
 
 
-def distribute_events_between_lines(n_events: int, n_lines: int) -> list[int]:
+def distribute_events_among_lines(n_events: int, n_lines: int) -> list[int]:
     """
-    Distribute evenly the specified number of events between the specified number of lines.
+    Distribute evenly the specified number of events among the specified number of lines.
 
     :param n_events:
         number of events
@@ -248,7 +248,7 @@ def create_initial_temporal_content(params: FragmentParams) -> list[list[float]]
         )
         indices_of_undefined_lines = [x for x in line_indices if x not in params.temporal_content]
         n_undefined_lines = len(indices_of_undefined_lines)
-        n_events_per_line = distribute_events_between_lines(n_undefined_events, n_undefined_lines)
+        n_events_per_line = distribute_events_among_lines(n_undefined_events, n_undefined_lines)
         for line_index, n_events in zip(indices_of_undefined_lines, n_events_per_line):
             durations = split_time_span(params.n_measures, n_events, meter_numerator)
             temporal_content[line_index] = durations
@@ -352,7 +352,7 @@ def create_grouped_rhythm_only_lines(fragment: Fragment) -> list[list[list[Event
 
 def distribute_pitch_classes(fragment: Fragment) -> list[list[Event]]:
     """
-    Distribute pitch classes across melodic lines.
+    Distribute pitch classes among melodic lines.
 
     :param fragment:
         fragment with non-empty temporal content and sonic content
