@@ -6,8 +6,8 @@ Author: Nikolay Lysenko
 
 
 import argparse
+import importlib.resources
 import os
-from pkg_resources import resource_filename
 
 import yaml
 
@@ -40,8 +40,7 @@ def main() -> None:
     """Parse CLI arguments and run requested tasks."""
     cli_args = parse_cli_args()
 
-    default_config_path = 'configs/default_config.yml'
-    default_config_path = resource_filename(__name__, default_config_path)
+    default_config_path = importlib.resources.files("dodecaphony") / 'configs/default_config.yml'
     config_path = cli_args.config_path or default_config_path
     with open(config_path) as config_file:
         settings = yaml.load(config_file, Loader=yaml.FullLoader)
