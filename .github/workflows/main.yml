@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9.17, 3.10.12, 3.11.4]
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -28,7 +28,7 @@ jobs:
     - name: Test with Pytest
       run: pytest --cov=dodecaphony --cov-config .coveragerc --cov-report=xml
     - name: Create and upload Codecov report
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
 
