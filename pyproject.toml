@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dodecaphony"
+version = "0.1.5"
+description = "Algorithmic composition of twelve-tone fragments"
+readme = "README.md"
+keywords = ["ai_music", "algorithmic_composition", "dodecaphony", "schoenberg", "twelve_tone"]
+urls = {Homepage = "https://github.com/Nikolay-Lysenko/dodecaphony"}
+authors = [{name = "Nikolay Lysenko", email = "nikolay-lysenco@yandex.ru"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Artistic Software",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3"
+]
+requires-python = ">=3.9"
+dependencies = [
+    "pretty-midi",
+    "PyYAML",
+    "sinethesizer>=0.6,<0.7",
+]
+
+[tool.setuptools]
+packages = ["dodecaphony"]
+
+[tool.setuptools.package-data]
+"dodecaphony.configs" = ["default_config.yml", "sinethesizer_presets.yml"]
