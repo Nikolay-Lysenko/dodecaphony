@@ -333,8 +333,7 @@ def get_lilypond_order_of_voices(n_voices: int) -> list[int]:
 def find_lilypond_duration(
         duration: float,
         time_in_measure: float,
-        meter_numerator: int,
-        meter_denominator: int
+        meter_numerator: int
 ) -> list[str]:
     """
     Find duration of a note in Lilypond reciprocal format.
@@ -345,14 +344,12 @@ def find_lilypond_duration(
         number of previous beats passed from the start of the current measure
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
-    :param meter_denominator:
-        denominator in meter signature, i.e., ratio of reference beat duration to the whole note
     :return:
         strings representing Lilypond durations of notes (a note can be split to multiple notes
         if it crosses bar or if its duration is compound and requires ties)
     """
     if time_in_measure + duration <= meter_numerator:
-        reciprocal_duration = meter_denominator / duration
+        reciprocal_duration = meter_numerator / duration
         supported_reciprocal_durations = {
             16: ['16'],
             32 / 3: ['16.'],
@@ -390,25 +387,19 @@ def find_lilypond_duration(
         remaining_results = find_lilypond_duration(
             remaining_duration,
             time_in_measure,
-            meter_numerator,
-            meter_denominator
+            meter_numerator
         )
         remaining_results[-1] = remaining_results[-1] + '~'
         left_over_bar_duration = duration - meter_numerator + time_in_measure
         left_over_bar_results = find_lilypond_duration(
             left_over_bar_duration,
             0,
-            meter_numerator,
-            meter_denominator
+            meter_numerator
         )
         return remaining_results + left_over_bar_results
 
 
-def convert_to_lilypond_note(
-        event: Event,
-        meter_numerator: int,
-        meter_denominator: int
-) -> str:
+def convert_to_lilypond_note(event: Event, meter_numerator: int) -> str:
     """
     Convert `Event` instance to note in Lilypond absolute notation.
 
@@ -416,8 +407,6 @@ def convert_to_lilypond_note(
         event
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
-    :param meter_denominator:
-        denominator in meter signature, i.e., ratio of reference beat duration to the whole note
     :return:
         note in Lilypond absolute notation
     """
@@ -438,12 +427,7 @@ def convert_to_lilypond_note(
 
     start_time = event.start_time
     time_in_measure = start_time % meter_numerator
-    durations = find_lilypond_duration(
-        event.duration,
-        time_in_measure,
-        meter_numerator,
-        meter_denominator
-    )
+    durations = find_lilypond_duration(event.duration, time_in_measure, meter_numerator)
     note = [f"{note_without_duration}{duration}" for duration in durations]
     note = " ".join(note)
     if event.pitch_class in ['pause', 'skip']:
@@ -478,7 +462,7 @@ def create_lilypond_file_from_fragment(fragment: Fragment, output_path: str) -> 
         melodic_line = fragment.melodic_lines[index]
         lilypond_voice = []
         for event in melodic_line:
-            note = convert_to_lilypond_note(event, fragment.meter_numerator, fragment.meter_denominator)
+            note = convert_to_lilypond_note(event, fragment.meter_numerator)
             lilypond_voice.append(note)
         lilypond_voice = " ".join(lilypond_voice)
         lilypond_voices.append(lilypond_voice)
