@@ -717,20 +717,14 @@ def evaluate_motion_to_perfect_consonances(fragment: Fragment) -> float:
             if interval_type == IntervalTypes.PERFECT_CONSONANCE:
                 score -= 1
             if (
-                    not first_event_continues
-                    and not second_event_continues
-                    and first_previous_event.pitch_class != 'pause'
-                    and second_previous_event.pitch_class != 'pause'
-                    and (
-                        (
-                            first_event.position_in_semitones
-                            - first_previous_event.position_in_semitones
-                        )
-                        * (
-                            second_event.position_in_semitones
-                            - second_previous_event.position_in_semitones
-                        ) > 0
+                    (
+                        first_event.position_in_semitones
+                        - first_previous_event.position_in_semitones
                     )
+                    * (
+                        second_event.position_in_semitones
+                        - second_previous_event.position_in_semitones
+                    ) > 0
             ):
                 score -= 1
     score /= len(fragment.sonorities) - 1
