@@ -1,17 +1,126 @@
 fragment:
   tone_row: [B, A#, G, C#, D#, C, D, A, F#, E, G#, F]
   groups:
-    - n_melodic_lines: 1
-      n_tone_row_instances: 1
-    - n_melodic_lines: 3
-      n_tone_row_instances: 4
-  meter_numerator: 4
-  meter_denominator: 4
-  n_measures: 5
-  line_ids: [1, 2, 3, 4]
+    - melodic_line_indices: [0]
+      tone_row_instances:
+        - {}
+        - {}
+        - {}
+        - {}
+      n_pauses: 0
+      immutable_pauses_indices: []
+    - melodic_line_indices: [1]
+      tone_row_instances:
+        - pitch_classes: null
+          dependence:
+            group_index: 0
+            tone_row_instance_index: 0
+            transformation: transposition
+            transformation_params:
+              shift_in_semitones: 0
+        - pitch_classes: null
+          dependence:
+            group_index: 0
+            tone_row_instance_index: 1
+            transformation: transposition
+            transformation_params:
+              shift_in_semitones: 0
+        - pitch_classes: null
+          dependence:
+            group_index: 0
+            tone_row_instance_index: 2
+            transformation: transposition
+            transformation_params:
+              shift_in_semitones: 0
+      n_pauses: 4
+      immutable_pauses_indices: [0, 1, 2, 3]
+  line_ids: [1, 2]
   upper_line_highest_note: E6
   upper_line_lowest_note: E4
-  pauses_fraction: 0.0
+  n_measures: 5
+  meter_numerator: 4
+  meter_denominator: 4
+  measure_durations:
+    - [4.0]
+    - [3.0, 1.0]
+    - [3.0, 0.75, 0.25]
+    - [3.0, 0.5, 0.5]
+    - [3.0, 0.5, 0.25, 0.25]
+    - [3.0, 0.25, 0.25, 0.25, 0.25]
+    - [2.0, 2.0]
+    - [2.0, 1.5, 0.5]
+    - [2.0, 1.5, 0.25, 0.25]
+    - [2.0, 1.0, 1.0]
+    - [2.0, 1.0, 0.75, 0.25]
+    - [2.0, 1.0, 0.5, 0.5]
+    - [2.0, 1.0, 0.5, 0.25, 0.25]
+    - [2.0, 1.0, 0.25, 0.25, 0.25, 0.25]
+    - [2.0, 0.75, 0.75, 0.5]
+    - [2.0, 0.75, 0.5, 0.25, 0.25, 0.25]
+    - [2.0, 0.75, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [2.0, 0.5, 0.5, 0.5, 0.5]
+    - [2.0, 0.5, 0.5, 0.5, 0.25, 0.25]
+    - [2.0, 0.5, 0.25, 0.25, 0.5, 0.25, 0.25]
+    - [2.0, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [2.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.5, 0.5, 1.5, 0.5]
+    - [1.5, 0.5, 1.5, 0.25, 0.25]
+    - [1.5, 0.5, 1.0, 1.0]
+    - [1.5, 0.5, 1.0, 0.75, 0.25]
+    - [1.5, 0.5, 1.0, 0.5, 0.5]
+    - [1.5, 0.5, 1.0, 0.5, 0.25, 0.25]
+    - [1.5, 0.5, 1.0, 0.25, 0.25, 0.25, 0.25]
+    - [1.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    - [1.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25]
+    - [1.5, 0.5, 0.5, 0.25, 0.25, 0.5, 0.25, 0.25]
+    - [1.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.5, 0.25, 0.25, 1.5, 0.5]
+    - [1.5, 0.25, 0.25, 1.5, 0.25, 0.25]
+    - [1.5, 0.25, 0.25, 1.0, 1.0]
+    - [1.5, 0.25, 0.25, 1.0, 0.75, 0.25]
+    - [1.5, 0.25, 0.25, 1.0, 0.5, 0.5]
+    - [1.5, 0.25, 0.25, 1.0, 0.5, 0.25, 0.25]
+    - [1.5, 0.25, 0.25, 1.0, 0.25, 0.25, 0.25, 0.25]
+    - [1.5, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5]
+    - [1.5, 0.25, 0.25, 0.5, 0.5, 0.5, 0.25, 0.25]
+    - [1.5, 0.25, 0.25, 0.5, 0.25, 0.25, 0.5, 0.25, 0.25]
+    - [1.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 1.0, 1.0, 1.0]
+    - [1.0, 1.0, 1.0, 0.75, 0.25]
+    - [1.0, 1.0, 1.0, 0.5, 0.5]
+    - [1.0, 1.0, 1.0, 0.5, 0.25, 0.25]
+    - [1.0, 1.0, 1.0, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 1.0, 0.5, 0.5, 0.5, 0.5]
+    - [1.0, 1.0, 0.5, 0.5, 0.5, 0.25, 0.25]
+    - [1.0, 1.0, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 1.0, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 1.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 0.5, 0.5, 1.0, 1.0]
+    - [1.0, 0.5, 0.5, 1.0, 0.75, 0.25]
+    - [1.0, 0.5, 0.5, 1.0, 0.5, 0.5]
+    - [1.0, 0.5, 0.5, 1.0, 0.5, 0.25, 0.25]
+    - [1.0, 0.5, 0.5, 1.0, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 0.5, 0.5, 0.75, 0.25, 1.0]
+    - [1.0, 0.5, 0.5, 0.75, 0.25, 0.75, 0.25]
+    - [1.0, 0.5, 0.5, 0.75, 0.25, 0.5, 0.5]
+    - [1.0, 0.5, 0.5, 0.75, 0.25, 0.5, 0.25, 0.25]
+    - [1.0, 0.5, 0.5, 0.75, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.25]
+    - [1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    - [1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25]
+    - [1.0, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [1.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    - [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25]
+    - [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25]
+    - [0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+    - [0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
 
 scoring_sets:
   - name: basic_melody
@@ -36,11 +145,17 @@ scoring_sets:
           9: 0.1
           10: 0.0
         duplication_penalty: 0.5
+      - name: direction_change_after_large_skip
+        weights:
+          0.0: 1.0
+        min_skip_in_semitones: 5
+        max_opposite_move_in_semitones: 2
+        large_opposite_move_relative_penalty: 0.8
       - name: intervallic_motif
         weights:
           0.0: 1.0
         motif: [-1, -3]
-        min_n_occurrences: [1, 1, 1, 1]
+        min_n_occurrences: [1, 1]
       - name: smoothness_of_voice_leading
         weights:
           0.0: 1.0
@@ -88,7 +203,7 @@ scoring_sets:
         max_duration: 4.0
         last_sonority_weight: 0.9
         last_notes_weight: 0.1
-      - name: harmony_dynamic
+      - name: harmony_dynamic_by_positions
         weights:
           0.0: 1.0
         regular_positions:
@@ -122,88 +237,6 @@ scoring_sets:
           9: 0.6
           10: 0.2
           11: 0.2
-  - name: basic_rhythm
-    scoring_functions:
-      - name: consistency_of_rhythm_with_meter
-        weights:
-          0.0: 1.0
-        consistent_patterns:
-          - [6.0]
-          - [4.0]
-          - [3.0, 1.0]
-          - [3.0, 0.75, 0.25]
-          - [3.0, 0.5, 0.5]
-          - [3.0, 0.5, 0.25, 0.25]
-          - [3.0, 0.25, 0.25, 0.25, 0.25]
-          - [2.0, 4.0]
-          - [2.0, 2.0]
-          - [2.0, 1.5, 0.5]
-          - [2.0, 1.5, 0.25, 0.25]
-          - [2.0, 1.0, 1.0]
-          - [2.0, 1.0, 0.75, 0.25]
-          - [2.0, 1.0, 0.5, 0.5]
-          - [2.0, 1.0, 0.5, 0.25, 0.25]
-          - [2.0, 1.0, 0.25, 0.25, 0.25, 0.25]
-          - [2.0, 0.75, 0.75, 0.5]
-          - [2.0, 0.75, 0.5, 0.25, 0.25, 0.25]
-          - [2.0, 0.75, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [2.0, 0.5, 0.5, 0.5, 0.5]
-          - [2.0, 0.5, 0.5, 0.5, 0.25, 0.25]
-          - [2.0, 0.5, 0.25, 0.25, 0.5, 0.25, 0.25]
-          - [2.0, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [2.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.5, 0.5, 1.5, 0.5]
-          - [1.5, 0.5, 1.5, 0.25, 0.25]
-          - [1.5, 0.5, 1.0, 1.0]
-          - [1.5, 0.5, 1.0, 0.75, 0.25]
-          - [1.5, 0.5, 1.0, 0.5, 0.5]
-          - [1.5, 0.5, 1.0, 0.5, 0.25, 0.25]
-          - [1.5, 0.5, 1.0, 0.25, 0.25, 0.25, 0.25]
-          - [1.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-          - [1.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25]
-          - [1.5, 0.5, 0.5, 0.25, 0.25, 0.5, 0.25 0.25]
-          - [1.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.5, 0.25, 0.25, 1.5, 0.5]
-          - [1.5, 0.25, 0.25, 1.5, 0.25, 0.25]
-          - [1.5, 0.25, 0.25, 1.0, 1.0]
-          - [1.5, 0.25, 0.25, 1.0, 0.75, 0.25]
-          - [1.5, 0.25, 0.25, 1.0, 0.5, 0.5]
-          - [1.5, 0.25, 0.25, 1.0, 0.5, 0.25, 0.25]
-          - [1.5, 0.25, 0.25, 1.0, 0.25, 0.25, 0.25, 0.25]
-          - [1.5, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5]
-          - [1.5, 0.25, 0.25, 0.5, 0.5, 0.5, 0.25, 0.25]
-          - [1.5, 0.25, 0.25, 0.5, 0.25, 0.25, 0.5, 0.25 0.25]
-          - [1.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 1.0, 4.0]
-          - [1.0, 1.0, 1.0, 1.0]
-          - [1.0, 1.0, 1.0, 0.75, 0.25]
-          - [1.0, 1.0, 1.0, 0.5, 0.5]
-          - [1.0, 1.0, 1.0, 0.5, 0.25, 0.25]
-          - [1.0, 1.0, 1.0, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 1.0, 0.5, 0.5, 0.5, 0.5]
-          - [1.0, 1.0, 0.5, 0.5, 0.5, 0.25, 0.25]
-          - [1.0, 1.0, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 1.0, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 1.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 0.5, 0.5, 4.0]
-          - [1.0, 0.5, 0.5, 1.0, 1.0]
-          - [1.0, 0.5, 0.5, 1.0, 0.75, 0.25]
-          - [1.0, 0.5, 0.5, 1.0, 0.5, 0.5]
-          - [1.0, 0.5, 0.5, 1.0, 0.5, 0.25, 0.25]
-          - [1.0, 0.5, 0.5, 1.0, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 0.5, 0.5, 0.75, 0.25, 1.0]
-          - [1.0, 0.5, 0.5, 0.75, 0.25, 0.75, 0.25]
-          - [1.0, 0.5, 0.5, 0.75, 0.25, 0.5, 0.5]
-          - [1.0, 0.5, 0.5, 0.75, 0.25, 0.5, 0.25, 0.25]
-          - [1.0, 0.5, 0.5, 0.75, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.25]
-          - [1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-          - [1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25]
-          - [1.0, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-          - [1.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
   - name: strict_counterpoint
     scoring_functions:
       - name: dissonances_preparation_and_resolution
@@ -258,15 +291,16 @@ scoring_sets:
           10: 0.8
           11: 0.9
         n_semitones_to_suspension_resolution_penalty:
-          -10: 0.9
-          -9: 0.8
-          -8: 0.7
-          -7: 0.6
-          -6: 0.5
-          -5: 0.4
-          -4: 0.3
-          -3: 0.2
-          -2: 0.1
+          -11: 0.9
+          -10: 0.8
+          -9: 0.7
+          -8: 0.6
+          -7: 0.5
+          -6: 0.4
+          -5: 0.3
+          -4: 0.2
+          -3: 0.1
+          -2: 0.0
           -1: 0.0
           0: 0.1
           1: 0.2
@@ -277,6 +311,50 @@ scoring_sets:
           6: 0.7
           7: 0.8
           8: 0.9
+      - name: motion_to_perfect_consonances
+        weights:
+          0.0: 1.0
+  - name: tonal
+    scoring_functions:
+      - name: pitch_class_prominence
+        weights:
+          0.0: 1.0
+        pitch_class_to_prominence_range:
+          C: [0.3, 1.0]
+          C#: [0.0, 0.05]
+          D: [0.05, 0.1]
+          D#: [0.0, 0.05]
+          E: [0.2, 1.0]
+          F: [0.05, 0.1]
+          F#: [0.0, 0.05]
+          G: [0.25, 1.0]
+          G#: [0.0, 0.05]
+          A: [0.05, 0.1]
+          A#: [0.0, 0.05]
+          B: [0.05, 0.1]
+        regular_positions:
+          - name: downbeat
+            denominator: 4
+            remainder: 0
+          - name: middle
+            denominator: 4
+            remainder: 2
+        ad_hoc_positions:
+          - name: beginning
+            time: 0
+          - name: ending
+            time: -0.01
+        event_type_to_weight:
+          beginning: 8
+          ending: 10
+          downbeat: 5
+          middle: 2
+        default_weight: 1
+      - name: pitch_class_distribution
+        weights:
+          0.0: 1.0
+        line_id_to_banned_pitch_classes:
+          4: ['C#', 'D#', 'F#', 'G#', 'A#']
   - name: optional_melody
     scoring_functions:
       - name: stackability
@@ -298,10 +376,10 @@ scoring_sets:
           12: 1.0
   - name: optional_harmony
     scoring_functions:
-      - name: local_diatonicity
+      - name: local_diatonicity_at_all_lines_level
         weights:
           0.0: 1.0
-  - name: optional_rhythm
+  - name: rhythmic_homogeneity
     scoring_functions:
       - name: rhythmic_homogeneity
         weights:
@@ -311,23 +389,38 @@ evaluation:
   scoring_sets:
     - basic_melody
     - basic_harmony
-    - basic_rhythm
     - strict_counterpoint
+    - tonal
 
 optimization:
-  n_iterations: 300
+  n_iterations: 200
   n_trials_per_iteration: 250
-  default_n_transformations_per_trial: 2
-  n_transformations_increment: 1
-  max_n_transformations_per_trial: 10
   beam_width: 5
-  transformation_probabilities:
-    duration_change: 0.7
-    pause_shift: 0.0
-    inversion: 0.075
-    reversion: 0.075
-    rotation: 0.075
-    transposition: 0.075
+  neighborhoods:
+    - n_transformations_per_trial: 2
+      transformation_probabilities:
+        inversion: 0.075
+        reversion: 0.075
+        rotation: 0.075
+        transposition: 0.075
+        measure_durations_change: 0.625
+        measure_pair_durations_change: 0.075
+        pause_shift: 0.0
+      max_rotation: 2
+      max_transposition_in_semitones: 3
+    - n_transformations_per_trial: 3
+      transformation_probabilities:
+        inversion: 0.075
+        reversion: 0.075
+        rotation: 0.075
+        transposition: 0.075
+        measure_durations_change: 0.6
+        measure_pair_durations_change: 0.1
+        pause_shift: 0.0
+  perturbation:
+    n_transformations: 1
+    transformation_probabilities:
+      line_durations_change: 1.0
   max_rotation: 2
   max_transposition_in_semitones: 3
   paralleling_params:
@@ -343,18 +436,12 @@ rendering:
     instruments:
       1: 0
       2: 0
-      3: 0
-      4: 0
     velocity: 100
   sinethesizer:
     instruments:
-      1: woodwind
-      2: bowed_string
-      3: brass
-      4: woodwind
+      1: irish_flute
+      2: breathy_violon
     effects:
-      1: '[{"name": "room_reverb", "room_length": 6.4, "room_width": 5, "room_height": 4, "reflection_decay_factor": 0.3, "sound_speed": 343, "listener_x": 1, "listener_y": 2.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 5.4, "sound_source_y": 2.0, "sound_source_z": 1.25, "sound_source_direction_x": -1.0, "sound_source_direction_y": -0.0, "sound_source_direction_z": 0, "angle": 1.5708, "n_reflections": 20}]'
-      2: '[{"name": "room_reverb", "room_length": 6.4, "room_width": 5, "room_height": 4, "reflection_decay_factor": 0.3, "sound_speed": 343, "listener_x": 1, "listener_y": 2.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 3.25, "sound_source_y": 4.75, "sound_source_z": 1.5, "sound_source_direction_x": -0.707, "sound_source_direction_y": -0.707, "sound_source_direction_z": 0, "angle": 1.5708, "n_reflections": 20}]'
-      3: '[{"name": "room_reverb", "room_length": 6.4, "room_width": 5, "room_height": 4, "reflection_decay_factor": 0.3, "sound_speed": 343, "listener_x": 1, "listener_y": 2.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 3.25, "sound_source_y": 0.25, "sound_source_z": 1.5, "sound_source_direction_x": -0.707, "sound_source_direction_y": 0.707, "sound_source_direction_z": 0, "angle": 1.5708, "n_reflections": 20}]'
-      4: '[{"name": "room_reverb", "room_length": 6.4, "room_width": 5, "room_height": 4, "reflection_decay_factor": 0.3, "sound_speed": 343, "listener_x": 1, "listener_y": 2.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 5.4, "sound_source_y": 3.0, "sound_source_z": 1.5, "sound_source_direction_x": -1.0, "sound_source_direction_y": -0.0, "sound_source_direction_z": 0, "angle": 1.5708, "n_reflections": 20}, {"name": "panning", "left_amplitude_ratio": 1.25, "right_amplitude_ratio": 1.25}]'
+      1: '[{"name": "room_reverb", "room_length": 65, "room_width": 25, "room_height": 15, "reflection_decay_factor": 0.8, "sound_speed": 343, "listener_x": 45, "listener_y": 12.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 52.0, "sound_source_y": 0.3756443470178592, "sound_source_z": 4, "sound_source_direction_x": -0.5000000000000001, "sound_source_direction_y": 0.8660254037844386, "sound_source_direction_z": 0, "angle": 1.5707963267948966, "n_reflections": 30}]'
+      2: '[{"name": "room_reverb", "room_length": 65, "room_width": 25, "room_height": 15, "reflection_decay_factor": 0.8, "sound_speed": 343, "listener_x": 45, "listener_y": 12.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 52.0, "sound_source_y": 24.62435565298214, "sound_source_z": 4, "sound_source_direction_x": -0.5000000000000001, "sound_source_direction_y": -0.8660254037844386, "sound_source_direction_z": 0, "angle": 1.5707963267948966, "n_reflections": 30}, {"name": "panning", "left_amplitude_ratio": 0.35, "right_amplitude_ratio": 0.35}]'
     velocity: 1.0

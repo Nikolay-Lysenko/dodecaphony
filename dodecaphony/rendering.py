@@ -215,7 +215,7 @@ def create_wav_from_tsv_events(
 
 def create_yaml_from_fragment(fragment: Fragment, yaml_path: str) -> None:
     """
-    Create YAML file that can be used for setting temporal and sonic content in a runtime config.
+    Create YAML file that facilitates re-use of `fragment` in configs.
 
     :param fragment:
         musical fragment
@@ -224,15 +224,30 @@ def create_yaml_from_fragment(fragment: Fragment, yaml_path: str) -> None:
     :return:
         None
     """
+    groups = []
+    zipped = zip(
+        fragment.grouped_tone_row_instances,
+        fragment.grouped_mutable_pauses_indices,
+        fragment.grouped_immutable_pauses_indices,
+        fragment.group_index_to_line_indices.items()
+    )
+    for instances, mutable_pauses_indices, immutable_pauses_indices, (_, line_indices) in zipped:
+        tone_row_instances = [{'pitch_classes': instance.pitch_classes} for instance in instances]
+        pauses_indices = sorted(mutable_pauses_indices + immutable_pauses_indices)
+        n_pauses = len(pauses_indices)
+        group = {
+            'melodic_line_indices': line_indices,
+            'tone_row_instances': tone_row_instances,
+            'n_pauses': n_pauses,
+            'immutable_pauses_indices': pauses_indices,
+        }
+        groups.append(group)
+
     temporal_content = {
         i: {'durations': durations}
         for i, durations in enumerate(fragment.temporal_content)
     }
-    sonic_content = {
-        i: {'pitch_classes': pitch_classes}
-        for i, pitch_classes in enumerate(fragment.sonic_content)
-    }
-    result = {'temporal_content': temporal_content, 'sonic_content': sonic_content}
+    result = {'groups': groups, 'temporal_content': temporal_content}
     with open(yaml_path, 'w') as out_file:
         yaml.dump(result, out_file, default_flow_style=None)
 
@@ -261,7 +276,7 @@ def make_lilypond_template(
         template
     """
     raw_template = (
-        "\\version \"2.18.2\"\n"
+        "\\version \"2.22.1\"\n"
         "\\layout {{{{\n"
         "    indent = #0\n"
         "}}}}\n"
@@ -529,7 +544,7 @@ def render(fragment: Fragment, rendering_params: dict[str, Any]) -> None:  # pra
 
     meta_information_path = os.path.join(nested_dir, 'meta_information.txt')
     with open(meta_information_path, 'w') as in_file:
-        in_file.write(rendering_params['meta_information'])
+        in_file.write(rendering_params['meta_information'] + '\n')
 
     lilypond_path = os.path.join(nested_dir, 'sheet_music.ly')
     create_lilypond_file_from_fragment(fragment, lilypond_path)

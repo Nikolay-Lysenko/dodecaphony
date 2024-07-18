@@ -13,7 +13,7 @@ import yaml
 
 from .evaluation import evaluate, parse_scoring_sets_registry
 from .fragment import FragmentParams, initialize_fragment
-from .optimization import optimize_with_local_search
+from .optimization import optimize_with_variable_neighborhood_search
 from .rendering import render
 from .transformations import create_transformations_registry
 
@@ -54,7 +54,7 @@ def main() -> None:
         settings['optimization'].pop('max_rotation'),
         settings['optimization'].pop('max_transposition_in_semitones')
     )
-    fragments = optimize_with_local_search(
+    fragments = optimize_with_variable_neighborhood_search(
         initial_fragment,
         transformation_registry=transformations_registry,
         scoring_sets=scoring_sets,

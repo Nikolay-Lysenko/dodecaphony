@@ -93,18 +93,23 @@ def generate_new_records(
         incumbent_solution = task.incumbent_solution
         for trial_id in range(task.n_trials):
             candidate = Fragment(
-                [copy.copy(x) for x in incumbent_solution.temporal_content],
-                [copy.copy(x) for x in incumbent_solution.sonic_content],
+                copy.deepcopy(incumbent_solution.temporal_content),
+                copy.deepcopy(incumbent_solution.grouped_tone_row_instances),
+                [copy.copy(x) for x in incumbent_solution.grouped_mutable_pauses_indices],
+                [copy.copy(x) for x in incumbent_solution.grouped_immutable_pauses_indices],
+                incumbent_solution.n_beats,
                 incumbent_solution.meter_numerator,
                 incumbent_solution.meter_denominator,
-                incumbent_solution.n_beats,
+                incumbent_solution.measure_durations_by_n_events,
                 incumbent_solution.line_ids,
                 incumbent_solution.upper_line_highest_position,
                 incumbent_solution.upper_line_lowest_position,
-                incumbent_solution.n_melodic_lines_by_group,
-                incumbent_solution.n_tone_row_instances_by_group,
+                incumbent_solution.tone_row_len,
+                incumbent_solution.group_index_to_line_indices,
                 incumbent_solution.mutable_temporal_content_indices,
-                incumbent_solution.mutable_sonic_content_indices
+                incumbent_solution.mutable_independent_tone_row_instances_indices,
+                incumbent_solution.mutable_dependent_tone_row_instances_indices,
+                [copy.copy(x) for x in incumbent_solution.sonic_content]
             )
             candidate = transform(
                 candidate,
@@ -163,22 +168,20 @@ def create_tasks(
     return tasks
 
 
-def optimize_with_local_search(
+def optimize_with_variable_neighborhood_search(
         fragment: Fragment,
         n_iterations: int,
         n_trials_per_iteration: int,
-        default_n_transformations_per_trial: int,
-        n_transformations_increment: int,
-        max_n_transformations_per_trial: int,
         beam_width: int,
         transformation_registry: TRANSFORMATION_REGISTRY_TYPE,
-        transformation_probabilities: dict[str, float],
+        neighborhoods: list[dict[str, Any]],
+        perturbation: dict[str, Any],
         scoring_sets: list[str],
         scoring_sets_registry: SCORING_SETS_REGISTRY_TYPE,
         paralleling_params: Optional[dict[str, Any]] = None
 ) -> list[Fragment]:
     """
-    Optimize initial fragment with local beam search.
+    Optimize initial fragment with VNS (Variable Neighborhood Search).
 
     :param fragment:
         initial fragment
@@ -188,20 +191,18 @@ def optimize_with_local_search(
     :param n_trials_per_iteration:
         number of transformed fragments to generate and evaluate per each incumbent solution
         at each iteration
-    :param default_n_transformations_per_trial:
-        default number of transformations to be applied to generate a new fragment
-    :param n_transformations_increment:
-        increment of number of transformations added after every iteration such that global
-        best score has not been improved after it; default number is used again as soon as
-        global best score improves
-    :param max_n_transformations_per_trial:
-        maximum number of transformations to be applied to generate a new fragment
     :param beam_width:
         number of incumbent solutions to consider at each iteration
     :param transformation_registry:
         mapping from names to corresponding transformations and their arguments
-    :param transformation_probabilities:
-        mapping from transformation name to its probability
+    :param neighborhoods:
+        list of neighborhood parameters such as:
+        - number of transformations to be applied to generate a new fragment
+        - mapping from transformation name to its probability
+    :param perturbation:
+        perturbation parameters such as:
+        - number of transformations to be applied to generate a perturbed fragment
+        - mapping from transformation name to its probability
     :param scoring_sets:
         names of scoring sets to be used for fragments evaluation
     :param scoring_sets_registry:
@@ -215,9 +216,19 @@ def optimize_with_local_search(
     incumbent_solutions = [fragment]
     records = []
     previous_best_score = -1e9
-    n_transformations_per_trial = default_n_transformations_per_trial
-    transformation_names = list(transformation_probabilities.keys())
-    transformation_probabilities = list(transformation_probabilities.values())
+    current_cycle_best_score = -1e9
+    current_cycle_initial_score = -1e9
+
+    neighborhood_index = 0
+    neighborhood = neighborhoods[neighborhood_index]
+    n_transformations_per_trial = neighborhood['n_transformations_per_trial']
+    transformation_names = list(neighborhood['transformation_probabilities'].keys())
+    transformation_probabilities = list(neighborhood['transformation_probabilities'].values())
+
+    n_transformations_per_perturbation = perturbation['n_transformations']
+    perturbation_names = list(perturbation['transformation_probabilities'].keys())
+    perturbation_probabilities = list(perturbation['transformation_probabilities'].values())
+
     paralleling_params = paralleling_params or {}
 
     for iteration_id in range(n_iterations):
@@ -239,21 +250,38 @@ def optimize_with_local_search(
         new_records = [record for records in nested_new_records for record in records]
         best_new_records = select_distinct_best_records(new_records, beam_width)
         current_best_score = best_new_records[0].score
-        incumbent_solutions = [record.fragment for record in best_new_records]
+        current_cycle_best_score = max(current_cycle_best_score, current_best_score)
 
         if current_best_score > previous_best_score:
-            n_transformations_per_trial = default_n_transformations_per_trial
-        # If optimization stucks, Iterated Local Search suggests to perturb the current solutions.
-        # Here, increase of neighborhood size is a form of perturbation.
+            incumbent_solutions = [record.fragment for record in best_new_records]
+            previous_best_score = current_best_score
         else:
-            n_transformations_per_trial += n_transformations_increment
-        # If enough perturbations are made, let us switch back to regular neighborhoods.
-        if n_transformations_per_trial > max_n_transformations_per_trial:
-            n_transformations_per_trial = default_n_transformations_per_trial
+            neighborhood_index += 1
+            if neighborhood_index == len(neighborhoods):
+                if current_cycle_best_score <= current_cycle_initial_score:
+                    perturbed_records = generate_new_records(
+                        [Task(fragment, 1) for fragment in incumbent_solutions],
+                        beam_width,
+                        n_transformations_per_perturbation,
+                        transformation_registry,
+                        perturbation_names,
+                        perturbation_probabilities,
+                        scoring_sets,
+                        scoring_sets_registry
+                    )
+                    incumbent_solutions = [record.fragment for record in perturbed_records]
+                    current_best_score = max(record.score for record in perturbed_records)
+                    previous_best_score = current_cycle_best_score = current_best_score
+                    best_new_records = select_distinct_best_records(perturbed_records, beam_width)
+                neighborhood_index = 0
+                current_cycle_initial_score = current_cycle_best_score
+            neighborhood = neighborhoods[neighborhood_index]
+            n_transformations_per_trial = neighborhood['n_transformations_per_trial']
+            transformation_names = list(neighborhood['transformation_probabilities'].keys())
+            transformation_probabilities = list(neighborhood['transformation_probabilities'].values())
 
-        records = select_distinct_best_records(records + new_records, beam_width)
+        records = select_distinct_best_records(records + best_new_records, beam_width)
         global_best_score = records[0].score
-        previous_best_score = current_best_score
         print(
             f'Iteration #{iteration_id:>3}: '
             f'global_best_score = {global_best_score:.5f}, '

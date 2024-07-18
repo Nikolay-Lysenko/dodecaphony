@@ -11,7 +11,7 @@ import pretty_midi
 import pytest
 import yaml
 
-from dodecaphony.fragment import Fragment, override_calculated_attributes
+from dodecaphony.fragment import Fragment, ToneRowInstance, override_calculated_attributes
 from dodecaphony.rendering import (
     create_lilypond_file_from_fragment,
     create_midi_from_fragment,
@@ -20,6 +20,7 @@ from dodecaphony.rendering import (
     create_wav_from_tsv_events,
     create_yaml_from_fragment,
 )
+from .conftest import MEASURE_DURATIONS_BY_N_EVENTS
 
 
 @pytest.mark.parametrize(
@@ -29,27 +30,31 @@ from dodecaphony.rendering import (
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0],
-                    [2.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                    [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 1.0, 1.0]],
+                    [[2.0, 4.0], [2.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]],
                 ],
-                sonic_content=[
-                    ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'pause', 'F'],
-                    ['F', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'])],
+                    [ToneRowInstance(['F', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'])],
                 ],
+                grouped_mutable_pauses_indices=[[11], []],
+                grouped_immutable_pauses_indices=[[], []],
+                n_beats=16,
                 meter_numerator=4,
                 meter_denominator=4,
-                n_beats=16,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
-                n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1],
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0], 1: [1]},
                 mutable_temporal_content_indices=[0, 1],
-                mutable_sonic_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (1, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
             ),
             # `expected`
             (
-                "\\version \"2.18.2\"\n"
+                "\\version \"2.22.1\"\n"
                 "\\layout {\n"
                 "    indent = #0\n"
                 "}\n"
@@ -75,7 +80,7 @@ def test_create_lilypond_file_from_fragment(
         path_to_tmp_file: str, fragment: Fragment, expected: str
 ) -> None:
     """Test `create_lilypond_file_from_fragment` function."""
-    fragment = override_calculated_attributes(fragment)
+    override_calculated_attributes(fragment)
     create_lilypond_file_from_fragment(fragment, path_to_tmp_file)
     with open(path_to_tmp_file) as in_file:
         result = in_file.read()
@@ -89,23 +94,27 @@ def test_create_lilypond_file_from_fragment(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
-                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                    [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0]],
+                    [[2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0]],
                 ],
-                sonic_content=[
-                    ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
-                    ['F', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'])],
+                    [ToneRowInstance(['F', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'])],
                 ],
+                grouped_mutable_pauses_indices=[[], []],
+                grouped_immutable_pauses_indices=[[], []],
+                n_beats=16,
                 meter_numerator=4,
                 meter_denominator=4,
-                n_beats=16,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
-                n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1],
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0], 1: [1]},
                 mutable_temporal_content_indices=[0, 1],
-                mutable_sonic_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (1, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
             ),
             # `note_number`
             5,
@@ -120,23 +129,27 @@ def test_create_lilypond_file_from_fragment(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
-                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                    [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0]],
+                    [[2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0]],
                 ],
-                sonic_content=[
-                    ['B', 'A#', 'G', 'C#', 'D#', 'pause', 'D', 'A', 'F#', 'E', 'G#', 'F'],
-                    ['F', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'D', 'A', 'F#', 'E', 'G#', 'F'])],
+                    [ToneRowInstance(['F', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'])],
                 ],
+                grouped_mutable_pauses_indices=[[5], []],
+                grouped_immutable_pauses_indices=[[], []],
+                n_beats=16,
                 meter_numerator=4,
                 meter_denominator=4,
-                n_beats=16,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
-                n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1],
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0], 1: [1]},
                 mutable_temporal_content_indices=[0, 1],
-                mutable_sonic_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (1, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
             ),
             # `note_number`
             5,
@@ -153,7 +166,7 @@ def test_create_midi_from_fragment(
         path_to_tmp_file: str, fragment: Fragment, note_number: int, expected: dict[str, float]
 ) -> None:
     """Test `create_midi_from_fragment` function."""
-    fragment = override_calculated_attributes(fragment)
+    override_calculated_attributes(fragment)
     create_midi_from_fragment(
         fragment,
         path_to_tmp_file,
@@ -181,101 +194,109 @@ def test_create_midi_from_fragment(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
-                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                    [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0]],
+                    [[2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0]],
                 ],
-                sonic_content=[
-                    ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
-                    ['F', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'])],
+                    [ToneRowInstance(['F', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'])],
                 ],
+                grouped_mutable_pauses_indices=[[], []],
+                grouped_immutable_pauses_indices=[[], []],
+                n_beats=16,
                 meter_numerator=4,
                 meter_denominator=4,
-                n_beats=16,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
-                n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1],
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0], 1: [1]},
                 mutable_temporal_content_indices=[0, 1],
-                mutable_sonic_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (1, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
             ),
             # `expected`
             (
                 "instrument\tstart_time\tduration\tfrequency\tvelocity\teffects\tline_id\n"
-                "additive_mellow_pipe\t1.0\t1.0\tF4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t1.0\t0.5\tB4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t1.5\t0.5\tA#4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t2.0\t1.0\tG#3\t1.0\t\t2\n"
-                "additive_mellow_pipe\t2.0\t0.5\tG4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t2.5\t0.5\tC#5\t1.0\t\t1\n"
-                "additive_mellow_pipe\t3.0\t0.5\tE4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t3.0\t1.0\tD#5\t1.0\t\t1\n"
-                "additive_mellow_pipe\t3.5\t0.5\tF#4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t4.0\t0.5\tA4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t4.0\t1.0\tC5\t1.0\t\t1\n"
-                "additive_mellow_pipe\t4.5\t0.5\tD4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t5.0\t1.0\tC4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t5.0\t0.5\tD5\t1.0\t\t1\n"
-                "additive_mellow_pipe\t5.5\t0.5\tA4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t6.0\t1.0\tD#4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t6.0\t0.5\tF#4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t6.5\t0.5\tE4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t7.0\t0.5\tC#4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t7.0\t1.0\tG#4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t7.5\t0.5\tG4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t8.0\t0.5\tA#3\t1.0\t\t2\n"
-                "additive_mellow_pipe\t8.0\t1.0\tF4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t8.5\t0.5\tB3\t1.0\t\t2\n"
+                "breathy_open_diapason\t1.0\t1.0\tF4\t1.0\t\t2\n"
+                "breathy_open_diapason\t1.0\t0.5\tB4\t1.0\t\t1\n"
+                "breathy_open_diapason\t1.5\t0.5\tA#4\t1.0\t\t1\n"
+                "breathy_open_diapason\t2.0\t1.0\tG#3\t1.0\t\t2\n"
+                "breathy_open_diapason\t2.0\t0.5\tG4\t1.0\t\t1\n"
+                "breathy_open_diapason\t2.5\t0.5\tC#5\t1.0\t\t1\n"
+                "breathy_open_diapason\t3.0\t0.5\tE4\t1.0\t\t2\n"
+                "breathy_open_diapason\t3.0\t1.0\tD#5\t1.0\t\t1\n"
+                "breathy_open_diapason\t3.5\t0.5\tF#4\t1.0\t\t2\n"
+                "breathy_open_diapason\t4.0\t0.5\tA4\t1.0\t\t2\n"
+                "breathy_open_diapason\t4.0\t1.0\tC5\t1.0\t\t1\n"
+                "breathy_open_diapason\t4.5\t0.5\tD4\t1.0\t\t2\n"
+                "breathy_open_diapason\t5.0\t1.0\tC4\t1.0\t\t2\n"
+                "breathy_open_diapason\t5.0\t0.5\tD5\t1.0\t\t1\n"
+                "breathy_open_diapason\t5.5\t0.5\tA4\t1.0\t\t1\n"
+                "breathy_open_diapason\t6.0\t1.0\tD#4\t1.0\t\t2\n"
+                "breathy_open_diapason\t6.0\t0.5\tF#4\t1.0\t\t1\n"
+                "breathy_open_diapason\t6.5\t0.5\tE4\t1.0\t\t1\n"
+                "breathy_open_diapason\t7.0\t0.5\tC#4\t1.0\t\t2\n"
+                "breathy_open_diapason\t7.0\t1.0\tG#4\t1.0\t\t1\n"
+                "breathy_open_diapason\t7.5\t0.5\tG4\t1.0\t\t2\n"
+                "breathy_open_diapason\t8.0\t0.5\tA#3\t1.0\t\t2\n"
+                "breathy_open_diapason\t8.0\t1.0\tF4\t1.0\t\t1\n"
+                "breathy_open_diapason\t8.5\t0.5\tB3\t1.0\t\t2\n"
             )
         ),
         (
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
-                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                    [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0]],
+                    [[2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0]],
                 ],
-                sonic_content=[
-                    ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
-                    ['pause', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'])],
+                    [ToneRowInstance(['G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'])],
                 ],
+                grouped_mutable_pauses_indices=[[], [0]],
+                grouped_immutable_pauses_indices=[[], []],
+                n_beats=16,
                 meter_numerator=4,
                 meter_denominator=4,
-                n_beats=16,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
-                n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1],
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0], 1: [1]},
                 mutable_temporal_content_indices=[0, 1],
-                mutable_sonic_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (1, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
             ),
             # `expected`
             (
                 "instrument\tstart_time\tduration\tfrequency\tvelocity\teffects\tline_id\n"
-                "additive_mellow_pipe\t1.0\t0.5\tB4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t1.5\t0.5\tA#4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t2.0\t1.0\tG#3\t1.0\t\t2\n"
-                "additive_mellow_pipe\t2.0\t0.5\tG4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t2.5\t0.5\tC#5\t1.0\t\t1\n"
-                "additive_mellow_pipe\t3.0\t0.5\tE4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t3.0\t1.0\tD#5\t1.0\t\t1\n"
-                "additive_mellow_pipe\t3.5\t0.5\tF#4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t4.0\t0.5\tA4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t4.0\t1.0\tC5\t1.0\t\t1\n"
-                "additive_mellow_pipe\t4.5\t0.5\tD4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t5.0\t1.0\tC4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t5.0\t0.5\tD5\t1.0\t\t1\n"
-                "additive_mellow_pipe\t5.5\t0.5\tA4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t6.0\t1.0\tD#4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t6.0\t0.5\tF#4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t6.5\t0.5\tE4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t7.0\t0.5\tC#4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t7.0\t1.0\tG#4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t7.5\t0.5\tG4\t1.0\t\t2\n"
-                "additive_mellow_pipe\t8.0\t0.5\tA#3\t1.0\t\t2\n"
-                "additive_mellow_pipe\t8.0\t1.0\tF4\t1.0\t\t1\n"
-                "additive_mellow_pipe\t8.5\t0.5\tB3\t1.0\t\t2\n"
+                "breathy_open_diapason\t1.0\t0.5\tB4\t1.0\t\t1\n"
+                "breathy_open_diapason\t1.5\t0.5\tA#4\t1.0\t\t1\n"
+                "breathy_open_diapason\t2.0\t1.0\tG#3\t1.0\t\t2\n"
+                "breathy_open_diapason\t2.0\t0.5\tG4\t1.0\t\t1\n"
+                "breathy_open_diapason\t2.5\t0.5\tC#5\t1.0\t\t1\n"
+                "breathy_open_diapason\t3.0\t0.5\tE4\t1.0\t\t2\n"
+                "breathy_open_diapason\t3.0\t1.0\tD#5\t1.0\t\t1\n"
+                "breathy_open_diapason\t3.5\t0.5\tF#4\t1.0\t\t2\n"
+                "breathy_open_diapason\t4.0\t0.5\tA4\t1.0\t\t2\n"
+                "breathy_open_diapason\t4.0\t1.0\tC5\t1.0\t\t1\n"
+                "breathy_open_diapason\t4.5\t0.5\tD4\t1.0\t\t2\n"
+                "breathy_open_diapason\t5.0\t1.0\tC4\t1.0\t\t2\n"
+                "breathy_open_diapason\t5.0\t0.5\tD5\t1.0\t\t1\n"
+                "breathy_open_diapason\t5.5\t0.5\tA4\t1.0\t\t1\n"
+                "breathy_open_diapason\t6.0\t1.0\tD#4\t1.0\t\t2\n"
+                "breathy_open_diapason\t6.0\t0.5\tF#4\t1.0\t\t1\n"
+                "breathy_open_diapason\t6.5\t0.5\tE4\t1.0\t\t1\n"
+                "breathy_open_diapason\t7.0\t0.5\tC#4\t1.0\t\t2\n"
+                "breathy_open_diapason\t7.0\t1.0\tG#4\t1.0\t\t1\n"
+                "breathy_open_diapason\t7.5\t0.5\tG4\t1.0\t\t2\n"
+                "breathy_open_diapason\t8.0\t0.5\tA#3\t1.0\t\t2\n"
+                "breathy_open_diapason\t8.0\t1.0\tF4\t1.0\t\t1\n"
+                "breathy_open_diapason\t8.5\t0.5\tB3\t1.0\t\t2\n"
             )
         ),
     ]
@@ -284,12 +305,12 @@ def test_create_tsv_events_from_fragment(
         path_to_tmp_file: str, fragment: Fragment, expected: str
 ) -> None:
     """Test `create_tsv_events_from_fragment` function."""
-    fragment = override_calculated_attributes(fragment)
+    override_calculated_attributes(fragment)
     create_tsv_events_from_fragment(
         fragment,
         path_to_tmp_file,
         beat_in_seconds=0.5,
-        instruments={k: 'additive_mellow_pipe' for k in fragment.line_ids},
+        instruments={k: 'breathy_open_diapason' for k in fragment.line_ids},
         effects={k: '' for k in fragment.line_ids},
         velocity=1.0,
         opening_silence_in_seconds=1.0
@@ -305,8 +326,8 @@ def test_create_tsv_events_from_fragment(
         (
             [
                 'instrument\tstart_time\tduration\tfrequency\tvelocity\teffects\tline_id',
-                'additive_mellow_pipe\t1\t1\tA0\t1\t\t1',
-                'additive_mellow_pipe\t2\t1\t1\t1\t[{"name": "tremolo", "frequency": 1}]\t1'
+                'breathy_open_diapason\t1\t1\tA0\t1\t\t1',
+                'breathy_open_diapason\t2\t1\t27.5\t1\t[{"name": "tremolo", "frequency": 1}]\t1'
             ],
             1.0
         ),
@@ -336,34 +357,48 @@ def test_create_wav_from_tsv_events(
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0],
-                    [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0],
+                    [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0]],
+                    [[2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0]],
                 ],
-                sonic_content=[
-                    ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'],
-                    ['pause', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'])],
+                    [ToneRowInstance(['G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B'])],
                 ],
+                grouped_mutable_pauses_indices=[[], [0]],
+                grouped_immutable_pauses_indices=[[], []],
+                n_beats=16,
                 meter_numerator=4,
                 meter_denominator=4,
-                n_beats=16,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
-                n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[1, 1],
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0], 1: [1]},
                 mutable_temporal_content_indices=[0, 1],
-                mutable_sonic_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (1, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
             ),
             # `expected`
             {
-                "temporal_content": {
-                    0: {'durations': [1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]},
-                    1: {'durations': [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0]},
+                'groups': [
+                    {
+                        'melodic_line_indices': [0],
+                        'tone_row_instances': [{'pitch_classes': ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']}],
+                        'n_pauses': 0,
+                        'immutable_pauses_indices': [],
+                    },
+                    {
+                        'melodic_line_indices': [1],
+                        'tone_row_instances': [{'pitch_classes': ['G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B']}],
+                        'n_pauses': 1,
+                        'immutable_pauses_indices': [0],
+                    },
+                ],
+                'temporal_content': {
+                    0: {'durations': [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0]]},
+                    1: {'durations': [[2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0]]},
                 },
-                'sonic_content': {
-                    0: {'pitch_classes': ['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']},
-                    1: {'pitch_classes': ['pause', 'G#', 'E', 'F#', 'A', 'D', 'C', 'D#', 'C#', 'G', 'A#', 'B']},
-                }
             }
         ),
     ]

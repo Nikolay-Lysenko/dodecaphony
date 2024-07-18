@@ -10,11 +10,16 @@ from typing import Any
 import pytest
 
 from dodecaphony.evaluation import parse_scoring_sets_registry
-from dodecaphony.fragment import Fragment
+from dodecaphony.fragment import Fragment, ToneRowInstance, override_calculated_attributes
 from dodecaphony.optimization import (
-    Record, Task, create_tasks, optimize_with_local_search, select_distinct_best_records
+    Record,
+    Task,
+    create_tasks,
+    optimize_with_variable_neighborhood_search,
+    select_distinct_best_records
 )
 from dodecaphony.transformations import create_transformations_registry
+from .conftest import MEASURE_DURATIONS_BY_N_EVENTS
 
 
 @pytest.mark.parametrize(
@@ -68,60 +73,78 @@ def test_create_tasks(
 
 
 @pytest.mark.parametrize(
-    "fragment, n_iterations, n_trials_per_iteration, default_n_transformations_per_trial, "
-    "n_transformations_increment, max_n_transformations_per_trial, beam_width, max_rotation, "
-    "max_transposition, transformation_probabilities, scoring_sets, scoring_sets_params",
+    "fragment, n_iterations, n_trials_per_iteration, beam_width, neighborhoods, perturbation, "
+    "max_rotation, max_transposition, scoring_sets, scoring_sets_params",
     [
         (
             # `fragment`
             Fragment(
                 temporal_content=[
-                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-                    [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                    [[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 0.5, 0.5], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]],
+                    [[2.0, 2.0], [2.0, 2.0], [2.0, 2.0], [2.0, 2.0], [2.0, 2.0], [2.0, 2.0]],
                 ],
-                sonic_content=[
+                grouped_tone_row_instances=[
                     [
-                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F', 'pause',
-                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                        ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']),
+                        ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']),
                     ],
                     [
-                        'B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'
+                        ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']),
                     ],
                 ],
+                grouped_mutable_pauses_indices=[[12], []],
+                grouped_immutable_pauses_indices=[[], []],
+                n_beats=24,
                 meter_numerator=4,
                 meter_denominator=4,
-                n_beats=24,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
                 line_ids=[1, 2],
                 upper_line_highest_position=55,
                 upper_line_lowest_position=41,
-                n_melodic_lines_by_group=[1, 1],
-                n_tone_row_instances_by_group=[2, 1],
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0], 1: [1]},
                 mutable_temporal_content_indices=[0, 1],
-                mutable_sonic_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (0, 1), (1, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
             ),
             # `n_iterations`
             10,
             # `n_trials_per_iteration`
             10,
-            # `default_n_transformations_per_trial`
-            1,
-            # `n_transformations_increment`
-            1,
-            # `max_n_transformations_per_trial`
-            2,
             # `beam_width`
             1,
+            # `neighborhoods`
+            [
+                {
+                    'n_transformations_per_trial': 1,
+                    'transformation_probabilities': {
+                        'inversion': 0.25,
+                        'reversion': 0.25,
+                        'transposition': 0.25,
+                        'measure_durations_change': 0.25,
+                    },
+                },
+                {
+                    'n_transformations_per_trial': 2,
+                    'transformation_probabilities': {
+                        'inversion': 0.25,
+                        'reversion': 0.25,
+                        'rotation': 0.25,
+                        'measure_durations_change': 0.25,
+                    },
+                },
+            ],
+            # `perturbation`
+            {
+                    'n_transformations': 1,
+                    'transformation_probabilities': {
+                        'line_durations_change': 1.0,
+                    },
+            },
             # `max_rotation`
             1,
             # `max_transposition`
             1,
-            # `transformation_probabilities`
-            {
-                'duration_change': 0.25,
-                'inversion': 0.25,
-                'reversion': 0.25,
-                'transposition': 0.25,
-            },
             # `scoring_sets`
             ['default'],
             # `scoring_sets_params`
@@ -155,20 +178,19 @@ def test_create_tasks(
         ),
     ]
 )
-def test_optimize_with_local_search(
+def test_optimize_with_variable_neighborhood_search(
         fragment: Fragment, n_iterations: int, n_trials_per_iteration: int,
-        default_n_transformations_per_trial: int, n_transformations_increment: int,
-        max_n_transformations_per_trial: int, beam_width: int, max_rotation: int,
-        max_transposition: int, transformation_probabilities: dict[str, float],
+        beam_width: int, neighborhoods: list[dict[str, Any]], perturbation: dict[str, Any],
+        max_rotation: int, max_transposition: int,
         scoring_sets: list[str], scoring_sets_params: list[dict[str, Any]]
 ) -> None:
-    """Test `optimize_with_local_search` function."""
+    """Test `optimize_with_variable_neighborhood_search` function."""
     transformations_registry = create_transformations_registry(max_rotation, max_transposition)
     scoring_sets_registry = parse_scoring_sets_registry(scoring_sets_params)
-    optimize_with_local_search(
-        fragment, n_iterations, n_trials_per_iteration, default_n_transformations_per_trial,
-        n_transformations_increment, max_n_transformations_per_trial, beam_width,
-        transformations_registry, transformation_probabilities, scoring_sets, scoring_sets_registry
+    override_calculated_attributes(fragment)
+    optimize_with_variable_neighborhood_search(
+        fragment, n_iterations, n_trials_per_iteration, beam_width, transformations_registry,
+        neighborhoods, perturbation, scoring_sets, scoring_sets_registry
     )
 
 

@@ -6,13 +6,13 @@ Author: Nikolay Lysenko
 
 
 import itertools
+from collections.abc import Callable
 from enum import Enum
 from functools import cache
 from typing import Optional
 
 
 N_SEMITONES_PER_OCTAVE = 12
-TONE_ROW_LEN = 12
 PITCH_CLASS_TO_POSITION = {
     'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
     'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
@@ -85,7 +85,7 @@ def get_type_of_interval(
         n_semitones: int, is_perfect_fourth_consonant: bool = True
 ) -> IntervalTypes:
     """
-    Get type of a harmonic interval.
+    Get type of harmonic interval.
 
     :param n_semitones:
         interval size in semitones
@@ -100,22 +100,6 @@ def get_type_of_interval(
         n_semitones_to_consonance = N_SEMITONES_TO_INTERVAL_TYPE_WITH_DISSONANT_P4
     n_semitones %= len(n_semitones_to_consonance)
     return n_semitones_to_consonance[n_semitones]
-
-
-def validate_tone_row(tone_row: list[str]) -> None:
-    """
-    Validate tone row.
-
-    :param tone_row:
-        tone row as list of pitch classes (like C or C#, flats are not allowed)
-    :return:
-        None
-    """
-    if len(tone_row) != TONE_ROW_LEN:
-        raise ValueError("Tone row must have 12 elements.")
-    positions = [PITCH_CLASS_TO_POSITION[pitch_class] for pitch_class in tone_row]
-    if sorted(positions) != list(range(TONE_ROW_LEN)):
-        raise ValueError("All pitch classes must be included in a tone row.")
 
 
 def invert_tone_row(tone_row: list[str]) -> list[str]:
@@ -165,7 +149,7 @@ def rotate_tone_row(tone_row: list[str], shift: int) -> list[str]:
     return tone_row[-shift:] + tone_row[:-shift]
 
 
-def transpose_tone_row(tone_row: list[str], shift_in_semitones: int) -> list[str]:
+def transpose_tone_row(tone_row: list[str], shift_in_semitones: int = 0) -> list[str]:
     """
     Transpose tone row.
 
@@ -183,6 +167,23 @@ def transpose_tone_row(tone_row: list[str], shift_in_semitones: int) -> list[str
         new_pitch_class = POSITION_TO_PITCH_CLASS[new_position]
         transposed_tone_row.append(new_pitch_class)
     return transposed_tone_row
+
+
+@cache
+def get_tone_row_transformations_registry() -> dict[str, Callable]:
+    """
+    Get mapping from tone row transformation name to function performing this transformation.
+
+    return:
+        mapping from tone row transformation name to function performing this transformation
+    """
+    registry = {
+        'inversion': invert_tone_row,
+        'reversion': revert_tone_row,
+        'rotation': rotate_tone_row,
+        'transposition': transpose_tone_row,
+    }
+    return registry
 
 
 @cache
