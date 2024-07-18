@@ -1,23 +1,44 @@
+# The section named `fragment` describes internal structure of the output piece.
 fragment:
+  # Here, the primary tone row is set.
+  # In the twelve-tone technique, the tone row is a sequence of pitch classes to be used as a building block.
   tone_row: [B, A#, G, C#, D#, C, D, A, F#, E, G#, F]
+  # Output piece consists of one or more simultaneous melodies. These melodies are divided into groups.
+  # Within a group, melodies share the same tone row instances.
+  # A shared tone row instance first passes vertically over group melodies and only then moves horizontally.
   groups:
+    # The indexation goes upwards down. Thus, the first group is formed by the topmost melody (also known as the upper voice).
     - melodic_line_indices: [0]
+      # This melody is 48 notes long, because there are four tone row instances.
       tone_row_instances:
+        # Each tone row instance can be an arbitrary form of the tone row.
+        # Empty dictionary means that there are no restrictions.
         - {}
         - {}
         - {}
         - {}
+      # This melody has no pauses at all.
       n_pauses: 0
       immutable_pauses_indices: []
+    # The second group is formed by single melody too.
+    # Since there are no other melodies, this melody is also the lowest one (also known as the bass).
     - melodic_line_indices: [1]
+      # This melody is 36 notes long, because there are four tone row instances.
       tone_row_instances:
+        # Empty `pitch_classes` attribute means that tone row instance is not set initially.
         - pitch_classes: null
+          # This tone row instance is derived from the first tone row instance of the upper voice.
+          # It is the result of transposing that instance zero semitones up, i.e., they are equal.
+          # However, they are equal only as sequences of pitch classes.
+          # Durations of notes may be different, so it is not an exact imitation.
           dependence:
             group_index: 0
             tone_row_instance_index: 0
             transformation: transposition
             transformation_params:
               shift_in_semitones: 0
+        # The bass continues to imitate the upper voice (up to changes in the rhythm).
+        # The second tone row instance of the bass is a copy of the second tone row instance of the upper voice.
         - pitch_classes: null
           dependence:
             group_index: 0
@@ -25,6 +46,8 @@ fragment:
             transformation: transposition
             transformation_params:
               shift_in_semitones: 0
+        # Again, the bass continues to imitate the upper voice (up to changes in the rhythm).
+        # The third tone row instance of the bass is a copy of the third tone row instance of the upper voice.
         - pitch_classes: null
           dependence:
             group_index: 0
@@ -32,14 +55,23 @@ fragment:
             transformation: transposition
             transformation_params:
               shift_in_semitones: 0
+      # This melody has 4 pauses in addition to its 36 notes.
       n_pauses: 4
+      # These pauses are frozen at the first 4 positions to provide a proper time delay for imitation.
       immutable_pauses_indices: [0, 1, 2, 3]
+  # Multiple output fragments can be merged into a single larger piece.
+  # IDs of lines are needed to play all their parts with the same instruments.
   line_ids: [1, 2]
+  # Below, range of the upper line is set. Both ends are included.
   upper_line_highest_note: E6
   upper_line_lowest_note: E4
+  # The output piece has 5 measures (bars).
   n_measures: 5
+  # The piece is written in the standard 4/4 meter.
   meter_numerator: 4
   meter_denominator: 4
+  # This is the list of allowed measure durations.
+  # Values are in reference beats, i.e., 4.0 is the semibreve note and 1.0 is the quarter note.
   measure_durations:
     - [4.0]
     - [3.0, 1.0]
@@ -122,15 +154,29 @@ fragment:
     - [0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
     - [0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
 
+# The section named `scoring_sets` defines sets of evaluational criteria.
+# If a criterion is listed below, it does not automatically mean that it is applied.
+# The set with the criterion also must be listed in the `evaluation` section.
 scoring_sets:
+  # Set names can be arbitrary.
+  # The name of this set suggests that it evaluates universal melodic qualities.
   - name: basic_melody
+    # The set consists of evaluational functions listed below.
     scoring_functions:
+      # Each name must be a key in the registry from `evaluation.py` module.
       - name: absence_of_aimless_fluctuations
+        # Each scoring function from `evaluation.py` returns a score that usually lies between -1 and 0.
+        # With `weights` subsection, it is possible to apply a piecewise linear function to the score.
+        # It is good enough to leave this block untouched.
         weights:
           0.0: 1.0
+        # In the registry, name of the function is mapped to `evaluate_absence_of_aimless_fluctuations` function.
+        # Please look at the `evaluation.py` module to see what it does.
+        # This function has `penalties` and `window_size` arguments. Below, their values are passed.
         penalties:
           5: 1
         window_size: 7
+      # The above logic applies to all of the scoring functions listed below.
       - name: climax_explicity
         weights:
           0.0: 1.0
@@ -385,6 +431,7 @@ scoring_sets:
         weights:
           0.0: 1.0
 
+# The section named `evaluation` lists scoring sets to be used.
 evaluation:
   scoring_sets:
     - basic_melody
@@ -392,11 +439,20 @@ evaluation:
     - strict_counterpoint
     - tonal
 
+# The section named `optimization` defines parameters of Variable Neighborhood Search algorithm.
 optimization:
+  # Computational time grows linearly with it, but final score stops to improve after some time.
   n_iterations: 200
+  # Number of slightly different fragments to be evaluated at each iteration.
   n_trials_per_iteration: 250
+  # Number of the best fragments to be used as incumbent solutions.
   beam_width: 5
+  # This subsection defines which fragments are considered slightly different.
+  # If there are no improvements in one neighborhood, the next one is chosen.
+  # If better fragments are not found in all neighborhood, incumbent solutions are perturbed.
   neighborhoods:
+    # Two random transformations are applied with the below probabilities.
+    # See `transformations.py` module for more details.
     - n_transformations_per_trial: 2
       transformation_probabilities:
         inversion: 0.075
@@ -415,30 +471,47 @@ optimization:
         measure_durations_change: 0.6
         measure_pair_durations_change: 0.1
         pause_shift: 0.0
+  # If optimization is stuck, one random melodic line gets completely new durations of its events.
   perturbation:
     n_transformations: 1
     transformation_probabilities:
       line_durations_change: 1.0
+  # Below, parameters of some transformations are passed.
   max_rotation: 2
   max_transposition_in_semitones: 3
+  # Parameters of parallel execution are passed.
   paralleling_params:
     n_processes: null
 
+# The section named `rendering` describes output properties.
 rendering:
+  # Results are saved in the directory named `outputs`.
   dir: outputs
+  # Parameters applicable to both MIDI and WAV output files.
   common:
+    # Reference beat lasts 0.5 sec (i.e., a measure lasts 2 sec)
     beat_in_seconds: 0.5
+    # The output piece starts with one second of silence.
     opening_silence_in_seconds: 1.0
+    # The output piece ends with one second of silence (and there can be long decay of the last notes before the silence).
     trailing_silence_in_seconds: 1.0
+  # MIDI output settings.
   midi:
+    # According to General MIDI specification, 0 is ID of 'Acoustic Grand Piano' instrument.
+    # So, both lines are played with it.
     instruments:
       1: 0
       2: 0
+    # Velocity is the force of sound extraction. It may affect loudness and timbre. Its values are integers between 0 and 127.
     velocity: 100
+  # WAV output settings.
   sinethesizer:
+    # The upper voice is played with 'irish_flute' instrument and the bass voice is played with 'breathy_violon' instrument.
+    # To see all available instruments, please look at the `dodecaphony/configs/sinethesizer_presets.yml` file.
     instruments:
       1: irish_flute
       2: breathy_violon
+    # JSON strings specifying `sinethesizer` effects applied to the lines.
     effects:
       1: '[{"name": "room_reverb", "room_length": 65, "room_width": 25, "room_height": 15, "reflection_decay_factor": 0.8, "sound_speed": 343, "listener_x": 45, "listener_y": 12.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 52.0, "sound_source_y": 0.3756443470178592, "sound_source_z": 4, "sound_source_direction_x": -0.5000000000000001, "sound_source_direction_y": 0.8660254037844386, "sound_source_direction_z": 0, "angle": 1.5707963267948966, "n_reflections": 30}]'
       2: '[{"name": "room_reverb", "room_length": 65, "room_width": 25, "room_height": 15, "reflection_decay_factor": 0.8, "sound_speed": 343, "listener_x": 45, "listener_y": 12.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 52.0, "sound_source_y": 24.62435565298214, "sound_source_z": 4, "sound_source_direction_x": -0.5000000000000001, "sound_source_direction_y": -0.8660254037844386, "sound_source_direction_z": 0, "angle": 1.5707963267948966, "n_reflections": 30}, {"name": "panning", "left_amplitude_ratio": 0.35, "right_amplitude_ratio": 0.35}]'
