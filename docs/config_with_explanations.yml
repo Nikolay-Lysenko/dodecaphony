@@ -23,7 +23,7 @@ fragment:
     # The second group is formed by single melody too.
     # Since there are no other melodies, this melody is also the lowest one (also known as the bass).
     - melodic_line_indices: [1]
-      # This melody is 36 notes long, because there are four tone row instances.
+      # This melody is 36 notes long, because there are three tone row instances.
       tone_row_instances:
         # Empty `pitch_classes` attribute means that tone row instance is not set initially.
         - pitch_classes: null
@@ -60,7 +60,7 @@ fragment:
       # These pauses are frozen at the first 4 positions to provide a proper time delay for imitation.
       immutable_pauses_indices: [0, 1, 2, 3]
   # Multiple output fragments can be merged into a single larger piece.
-  # IDs of lines are needed to play all their parts with the same instruments.
+  # Line IDs are needed to compile the complete melodic line from its parts.
   line_ids: [1, 2]
   # Below, range of the upper line is set. Both ends are included.
   upper_line_highest_note: E6
@@ -155,7 +155,7 @@ fragment:
     - [0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
 
 # The section named `scoring_sets` defines sets of evaluational criteria.
-# If a criterion is listed below, it does not automatically mean that it is applied.
+# If a criterion is listed below, this does not automatically mean that it is applied.
 # The set with the criterion also must be listed in the `evaluation` section.
 scoring_sets:
   # Set names can be arbitrary.
@@ -164,15 +164,16 @@ scoring_sets:
     # The set consists of evaluational functions listed below.
     scoring_functions:
       # Each name must be a key in the registry from `evaluation.py` module.
+      # In the registry, the below name is mapped to `evaluate_absence_of_aimless_fluctuations` function.
+      # Please look at the `evaluation.py` module to see what it does.
       - name: absence_of_aimless_fluctuations
         # Each scoring function from `evaluation.py` returns a score that usually lies between -1 and 0.
         # With `weights` subsection, it is possible to apply a piecewise linear function to the score.
         # It is good enough to leave this block untouched.
         weights:
           0.0: 1.0
-        # In the registry, name of the function is mapped to `evaluate_absence_of_aimless_fluctuations` function.
-        # Please look at the `evaluation.py` module to see what it does.
-        # This function has `penalties` and `window_size` arguments. Below, their values are passed.
+        # The `evaluate_absence_of_aimless_fluctuations` function has `penalties` and `window_size` arguments.
+        # Below, their values are passed.
         penalties:
           5: 1
         window_size: 7
@@ -197,11 +198,6 @@ scoring_sets:
         min_skip_in_semitones: 5
         max_opposite_move_in_semitones: 2
         large_opposite_move_relative_penalty: 0.8
-      - name: intervallic_motif
-        weights:
-          0.0: 1.0
-        motif: [-1, -3]
-        min_n_occurrences: [1, 1]
       - name: smoothness_of_voice_leading
         weights:
           0.0: 1.0
@@ -360,6 +356,12 @@ scoring_sets:
       - name: motion_to_perfect_consonances
         weights:
           0.0: 1.0
+      - name: movement_to_final_sonority
+        weights:
+          0.0: 1.0
+        contrary_motion_term: 0.5
+        conjunct_motion_term: 0.5
+        bass_downward_skip_term: 0.0
   - name: tonal
     scoring_functions:
       - name: pitch_class_prominence
@@ -396,11 +398,6 @@ scoring_sets:
           downbeat: 5
           middle: 2
         default_weight: 1
-      - name: pitch_class_distribution
-        weights:
-          0.0: 1.0
-        line_id_to_banned_pitch_classes:
-          4: ['C#', 'D#', 'F#', 'G#', 'A#']
   - name: optional_melody
     scoring_functions:
       - name: stackability
@@ -432,6 +429,7 @@ scoring_sets:
           0.0: 1.0
 
 # The section named `evaluation` lists scoring sets to be used.
+# So, 'stackability', 'optional_harmony', and 'rhythmic_homogeneity' are not used.
 evaluation:
   scoring_sets:
     - basic_melody
@@ -448,7 +446,7 @@ optimization:
   # Number of the best fragments to be used as incumbent solutions.
   beam_width: 5
   # This subsection defines which fragments are considered slightly different.
-  # If there are no improvements in one neighborhood, the next one is chosen.
+  # If there are no improvements in one neighborhood, the next one is explored.
   # If better fragments are not found in all neighborhood, incumbent solutions are perturbed.
   neighborhoods:
     # Two random transformations are applied with the below probabilities.
@@ -462,6 +460,7 @@ optimization:
         measure_durations_change: 0.625
         measure_pair_durations_change: 0.075
         pause_shift: 0.0
+    # Now, three random transformations are applied with altered probabilities.
     - n_transformations_per_trial: 3
       transformation_probabilities:
         inversion: 0.075
@@ -515,4 +514,5 @@ rendering:
     effects:
       1: '[{"name": "room_reverb", "room_length": 65, "room_width": 25, "room_height": 15, "reflection_decay_factor": 0.8, "sound_speed": 343, "listener_x": 45, "listener_y": 12.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 52.0, "sound_source_y": 0.3756443470178592, "sound_source_z": 4, "sound_source_direction_x": -0.5000000000000001, "sound_source_direction_y": 0.8660254037844386, "sound_source_direction_z": 0, "angle": 1.5707963267948966, "n_reflections": 30}]'
       2: '[{"name": "room_reverb", "room_length": 65, "room_width": 25, "room_height": 15, "reflection_decay_factor": 0.8, "sound_speed": 343, "listener_x": 45, "listener_y": 12.5, "listener_z": 1.7, "listener_direction_x": 1, "listener_direction_y": 0, "sound_source_x": 52.0, "sound_source_y": 24.62435565298214, "sound_source_z": 4, "sound_source_direction_x": -0.5000000000000001, "sound_source_direction_y": -0.8660254037844386, "sound_source_direction_z": 0, "angle": 1.5707963267948966, "n_reflections": 30}, {"name": "panning", "left_amplitude_ratio": 0.35, "right_amplitude_ratio": 0.35}]'
+    # Velocity values are float numbers between 0 and 1.
     velocity: 1.0

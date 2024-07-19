@@ -151,11 +151,6 @@ scoring_sets:
         min_skip_in_semitones: 5
         max_opposite_move_in_semitones: 2
         large_opposite_move_relative_penalty: 0.8
-      - name: intervallic_motif
-        weights:
-          0.0: 1.0
-        motif: [-1, -3]
-        min_n_occurrences: [1, 1]
       - name: smoothness_of_voice_leading
         weights:
           0.0: 1.0
@@ -314,6 +309,12 @@ scoring_sets:
       - name: motion_to_perfect_consonances
         weights:
           0.0: 1.0
+      - name: movement_to_final_sonority
+        weights:
+          0.0: 1.0
+        contrary_motion_term: 0.5
+        conjunct_motion_term: 0.5
+        bass_downward_skip_term: 0.0
   - name: tonal
     scoring_functions:
       - name: pitch_class_prominence
@@ -350,11 +351,6 @@ scoring_sets:
           downbeat: 5
           middle: 2
         default_weight: 1
-      - name: pitch_class_distribution
-        weights:
-          0.0: 1.0
-        line_id_to_banned_pitch_classes:
-          4: ['C#', 'D#', 'F#', 'G#', 'A#']
   - name: optional_melody
     scoring_functions:
       - name: stackability
