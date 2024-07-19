@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dodecaphony"
-version = "0.1.5"
-description = "Algorithmic composition of twelve-tone fragments"
+version = "0.2.0"
+description = "Algorithmic composition of modern classical music in the twelve-tone technique"
 readme = "README.md"
 keywords = ["ai_music", "algorithmic_composition", "dodecaphony", "schoenberg", "twelve_tone"]
 urls = {Homepage = "https://github.com/Nikolay-Lysenko/dodecaphony"}
