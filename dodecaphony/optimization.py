@@ -131,7 +131,7 @@ def create_tasks(
         paralleling_params: dict[str, Any]
 ) -> list[list[Task]]:
     """
-    Distribute incumbent solutions and trials to improve them between processes.
+    Distribute incumbent solutions and trials to improve them among processes.
 
     :param incumbent_solutions:
         fragments such that their neighborhoods should be searched

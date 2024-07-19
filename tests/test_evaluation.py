@@ -25,7 +25,7 @@ from dodecaphony.evaluation import (
     evaluate_local_diatonicity_at_line_level,
     evaluate_motion_to_perfect_consonances,
     evaluate_movement_to_final_sonority,
-    evaluate_pitch_class_distribution_across_lines,
+    evaluate_pitch_class_distribution_among_lines,
     evaluate_pitch_class_prominence,
     evaluate_presence_of_intervallic_motif,
     evaluate_presence_of_required_pauses,
@@ -1459,12 +1459,12 @@ def test_evaluate_movement_to_final_sonority(
         ),
     ]
 )
-def test_evaluate_pitch_class_distribution_across_lines(
+def test_evaluate_pitch_class_distribution_among_lines(
         fragment: Fragment, line_id_to_banned_pitch_classes: dict[int, list[str]], expected: float
 ) -> None:
-    """Test `evaluate_pitch_class_distribution_across_lines` function."""
+    """Test `evaluate_pitch_class_distribution_among_lines` function."""
     override_calculated_attributes(fragment)
-    result = evaluate_pitch_class_distribution_across_lines(
+    result = evaluate_pitch_class_distribution_among_lines(
         fragment, line_id_to_banned_pitch_classes
     )
     assert round(result, 10) == round(expected, 10)

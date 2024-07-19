@@ -793,11 +793,11 @@ def evaluate_movement_to_final_sonority(
     return score
 
 
-def evaluate_pitch_class_distribution_across_lines(
+def evaluate_pitch_class_distribution_among_lines(
         fragment: Fragment, line_id_to_banned_pitch_classes: dict[int, list[str]]
 ) -> float:
     """
-    Evaluate that pitch classes are distributed across lines according to user specifications.
+    Evaluate that pitch classes are distributed among lines according to user specifications.
 
     For example, it is possible to use some pitch classes only in melody and the remaining
     pitch classes only in accompaniment.
@@ -866,7 +866,7 @@ def evaluate_pitch_class_prominence(
         event_type_to_weight: dict[str, float], default_weight: float = 1
 ) -> float:
     """
-    Evaluate that accents are distributed across pitch classes according to user specifications.
+    Evaluate that accents are distributed among pitch classes according to user specifications.
 
     :param fragment:
         a fragment to be evaluated
@@ -1163,7 +1163,7 @@ def evaluate_presence_of_vertical_intervals(
 
 def evaluate_rhythmic_homogeneity(fragment: Fragment) -> float:
     """
-    Evaluate rhythmic homogeneity between all measures except the last one.
+    Evaluate rhythmic homogeneity among all measures except the last one.
 
     :param fragment:
         a fragment to be evaluated
@@ -1420,7 +1420,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
         'local_diatonicity_at_line_level': evaluate_local_diatonicity_at_line_level,
         'motion_to_perfect_consonances': evaluate_motion_to_perfect_consonances,
         'movement_to_final_sonority': evaluate_movement_to_final_sonority,
-        'pitch_class_distribution': evaluate_pitch_class_distribution_across_lines,
+        'pitch_class_distribution': evaluate_pitch_class_distribution_among_lines,
         'pitch_class_prominence': evaluate_pitch_class_prominence,
         'presence_of_required_pauses': evaluate_presence_of_required_pauses,
         'presence_of_vertical_intervals': evaluate_presence_of_vertical_intervals,

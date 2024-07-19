@@ -97,7 +97,7 @@ class Fragment:
 
 def validate_line_indices(params: FragmentParams) -> None:
     """
-    Validate distribution of line indices across groups.
+    Validate distribution of line indices among groups.
 
     :param params:
         parameters of a fragment to be created
@@ -323,9 +323,9 @@ def group_durations_by_measures(durations: list[float], meter_numerator: int) ->
     return grouped_durations
 
 
-def distribute_events_between_lines(n_events: int, n_lines: int) -> list[int]:
+def distribute_events_among_lines(n_events: int, n_lines: int) -> list[int]:
     """
-    Distribute evenly the specified number of events between the specified number of lines.
+    Distribute evenly the specified number of events among the specified number of lines.
 
     :param n_events:
         number of events
@@ -367,7 +367,7 @@ def create_initial_temporal_content(
         n_undefined_events = n_events - n_defined_events
         indices_of_undefined_lines = [x for x in line_indices if x not in params.temporal_content]
         n_undefined_lines = len(indices_of_undefined_lines)
-        n_events_per_line = distribute_events_between_lines(n_undefined_events, n_undefined_lines)
+        n_events_per_line = distribute_events_among_lines(n_undefined_events, n_undefined_lines)
         for line_index, n_events in zip(indices_of_undefined_lines, n_events_per_line):
             durations = split_time_span(params.n_measures, n_events, measure_durations_by_n_events)
             temporal_content[line_index] = durations
