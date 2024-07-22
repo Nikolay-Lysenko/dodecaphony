@@ -401,7 +401,6 @@ optimization:
         transposition: 0.075
         measure_durations_change: 0.625
         measure_pair_durations_change: 0.075
-        pause_shift: 0.0
     - n_transformations_per_trial: 3
       transformation_probabilities:
         inversion: 0.075
@@ -410,7 +409,6 @@ optimization:
         transposition: 0.075
         measure_durations_change: 0.6
         measure_pair_durations_change: 0.1
-        pause_shift: 0.0
   perturbation:
     n_transformations: 1
     transformation_probabilities:

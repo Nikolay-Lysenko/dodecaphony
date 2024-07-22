@@ -60,17 +60,17 @@ fragment:
       # These pauses are frozen at the first 4 positions to provide a proper time delay for imitation.
       immutable_pauses_indices: [0, 1, 2, 3]
   # Multiple output fragments can be merged into a single larger piece.
-  # Line IDs are needed to compile the complete melodic line from its parts.
+  # Line ID is needed to compile the complete melodic line from its parts.
   line_ids: [1, 2]
   # Below, range of the upper line is set. Both ends are included.
   upper_line_highest_note: E6
   upper_line_lowest_note: E4
   # The output piece has 5 measures (bars).
   n_measures: 5
-  # The piece is written in the standard 4/4 meter.
+  # The piece should be written in the standard 4/4 meter.
   meter_numerator: 4
   meter_denominator: 4
-  # This is the list of allowed measure durations.
+  # This is the list of allowed options for splitting a measure span into spans of separate notes.
   # Values are in reference beats, i.e., 4.0 is the semibreve note and 1.0 is the quarter note.
   measure_durations:
     - [4.0]
@@ -429,7 +429,7 @@ scoring_sets:
           0.0: 1.0
 
 # The section named `evaluation` lists scoring sets to be used.
-# So, 'stackability', 'optional_harmony', and 'rhythmic_homogeneity' are not used.
+# So, 'stackability', 'local_diatonicity_at_all_lines_level', and 'rhythmic_homogeneity' are not evaluated.
 evaluation:
   scoring_sets:
     - basic_melody
@@ -459,7 +459,6 @@ optimization:
         transposition: 0.075
         measure_durations_change: 0.625
         measure_pair_durations_change: 0.075
-        pause_shift: 0.0
     # Now, three random transformations are applied with altered probabilities.
     - n_transformations_per_trial: 3
       transformation_probabilities:
@@ -469,16 +468,15 @@ optimization:
         transposition: 0.075
         measure_durations_change: 0.6
         measure_pair_durations_change: 0.1
-        pause_shift: 0.0
   # If optimization is stuck, one random melodic line gets completely new durations of its events.
   perturbation:
     n_transformations: 1
     transformation_probabilities:
       line_durations_change: 1.0
-  # Below, parameters of some transformations are passed.
+  # Parameters of `create_transformations_registry` function from `transformations.py` module.
   max_rotation: 2
   max_transposition_in_semitones: 3
-  # Parameters of parallel execution are passed.
+  # Parameters of parallel execution.
   paralleling_params:
     n_processes: null
 
