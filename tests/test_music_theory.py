@@ -10,8 +10,10 @@ from typing import Optional
 import pytest
 
 from dodecaphony.music_theory import (
+    IntervalTypes,
     get_mapping_from_pitch_class_to_diatonic_scales,
     get_smallest_intervals_between_pitch_classes,
+    get_type_of_interval,
     invert_tone_row,
     revert_tone_row,
     rotate_tone_row,
@@ -126,6 +128,22 @@ def test_get_smallest_intervals_between_pitch_classes(key: tuple[str, str], valu
     """Test `get_smallest_intervals_between_pitch_classes` function."""
     mapping = get_smallest_intervals_between_pitch_classes()
     assert mapping[key] == value
+
+
+@pytest.mark.parametrize(
+    "n_semitones, is_perfect_fourth_consonant, expected",
+    [
+        (5, True, IntervalTypes.IMPERFECT_CONSONANCE),
+        (5, False, IntervalTypes.DISSONANCE),
+        (-5, True, IntervalTypes.IMPERFECT_CONSONANCE),
+    ]
+)
+def test_get_type_of_interval(
+        n_semitones: int, is_perfect_fourth_consonant: bool, expected: IntervalTypes
+) -> None:
+    """Test `get_type_of_interval` function."""
+    result = get_type_of_interval(n_semitones, is_perfect_fourth_consonant)
+    assert result == expected
 
 
 @pytest.mark.parametrize(

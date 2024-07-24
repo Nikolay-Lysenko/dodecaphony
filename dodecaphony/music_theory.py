@@ -98,6 +98,7 @@ def get_type_of_interval(
         n_semitones_to_consonance = N_SEMITONES_TO_INTERVAL_TYPE_WITH_CONSONANT_P4
     else:
         n_semitones_to_consonance = N_SEMITONES_TO_INTERVAL_TYPE_WITH_DISSONANT_P4
+    n_semitones = abs(n_semitones)
     n_semitones %= len(n_semitones_to_consonance)
     return n_semitones_to_consonance[n_semitones]
 
