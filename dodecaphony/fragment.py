@@ -220,12 +220,12 @@ def group_measure_durations_by_n_events(
         measure_durations: list[list[float]]
 ) -> dict[int, list[list[float]]]:
     """
-    Create mapping from number of events to ways of splitting a measure to this number of events.
+    Map number of events to ways of splitting a measure into this number of events.
 
     :param measure_durations:
         list of all measure splits that can be used
     :return:
-        mapping from number of events to ways of splitting a measure to this number of events
+        mapping from number of events to ways of splitting a measure into this number of events
     """
     result = {}
     for durations in measure_durations:
@@ -246,7 +246,7 @@ def distribute_events_among_measures(
     :param n_events:
         number of events
     :param measure_durations_by_n_events:
-        mapping from number of events to ways of splitting a measure to this number of events
+        mapping from number of events to ways of splitting a measure into this number of events
     :return:
         list of numbers of events from a measure for all measures
     """
@@ -271,7 +271,7 @@ def split_time_span(
     :param n_events:
         number of events
     :param measure_durations_by_n_events:
-        mapping from number of events to ways of splitting a measure to this number of events
+        mapping from number of events to ways of splitting a measure into this number of events
     :return:
         durations of events (in reference beats) grouped by measure
     """
@@ -294,8 +294,8 @@ def group_durations_by_measures(durations: list[float], meter_numerator: int) ->
 
     Output is a list where each measure is represented as list of durations of events forming it;
     suspended from the previous measure event is partially included
-    and suspended to the next measure event is fully included,
-    as of 2023-03-26, such suspensions may occur only in lines with immutable predefined
+    and suspended to the next measure event is fully included.
+    As of 2023-03-26, such suspensions may occur only in lines with immutable predefined
     temporal content.
 
     :param durations:
@@ -349,23 +349,23 @@ def create_initial_temporal_content(
     :param params:
         parameters of a fragment to be created
     :param measure_durations_by_n_events:
-        mapping from number of events to ways of splitting a measure to this number of events
+        mapping from number of events to ways of splitting a measure into this number of events
     :return:
         lists of event durations (in reference beats) for each melodic line
     """
-    initial_durations = []
+    flat_durations = []
     temporal_content = []
     for line_index, line_id in enumerate(params.line_ids):
         durations = params.temporal_content.get(line_index, {}).get('durations', [])
-        initial_durations.append(durations)
+        flat_durations.append(durations)
         temporal_content.append(group_durations_by_measures(durations, params.meter_numerator))
     for group_index, group_params in enumerate(params.groups):
         n_pauses = group_params.get('n_pauses', 0)
         n_events = len(group_params['tone_row_instances']) * len(params.tone_row) + n_pauses
         line_indices = group_params['melodic_line_indices']
-        n_defined_events = sum(len(initial_durations[line_index]) for line_index in line_indices)
+        n_defined_events = sum(len(flat_durations[line_index]) for line_index in line_indices)
         n_undefined_events = n_events - n_defined_events
-        indices_of_undefined_lines = [x for x in line_indices if x not in params.temporal_content]
+        indices_of_undefined_lines = [i for i in line_indices if not temporal_content[i]]
         n_undefined_lines = len(indices_of_undefined_lines)
         n_events_per_line = distribute_events_among_lines(n_undefined_events, n_undefined_lines)
         for line_index, n_events in zip(indices_of_undefined_lines, n_events_per_line):
@@ -376,7 +376,7 @@ def create_initial_temporal_content(
 
 def maybe_transform_pitch_classes(tone_row: list[str]) -> list[str]:
     """
-    Get pitch classes of a tone row in prime form, inversion, retrograde, or retrograde inversion.
+    Get pitch classes of a tone row in its prime form or one of its altered forms.
 
     :param tone_row:
         tone row as list of pitch classes (like C or C#, flats are not allowed)
@@ -545,7 +545,7 @@ def set_sonic_content(fragment: Fragment) -> None:
     """
     Fill data structure that keeps track of pitch classes.
 
-    This data structure is a list where for each group of melodic lines sharing the same series
+    This data structure is a list where for each group of melodic lines sharing the same series,
     sonic content of the series is stored (i.e., there is a sequence consisting of pitch classes
     and pauses)
 
@@ -692,7 +692,7 @@ def transpose_down(position: int, max_position: int) -> int:
 
 def set_pitches_of_upper_line(fragment: Fragment) -> None:
     """
-    Set exact pitches of events from upper line.
+    Set exact pitches of events from the upper line.
 
     :param fragment:
         fragment with `melodic_lines` attribute where pitch classes are set
@@ -726,13 +726,13 @@ def set_pitches_of_lower_lines(
     Set exact pitches of events from all melodic lines except the upper one.
 
     :param fragment:
-        fragment with `melodic_lines` attribute where pitch classes are set and exact pitches
-        are set in the upper line
+        fragment with `melodic_lines` attribute where pitch classes are set
+        and exact pitches are set in the upper line
     :param max_interval:
-        maximum interval (in semitones) between two simultaneously sounding events from adjacent
-        melodic lines
+        maximum interval (in semitones) between two simultaneously sounding events
+        from adjacent melodic lines
     :param default_shift:
-        downward shift (in semitones) of upper threshold when upper event is pause
+        downward shift (in semitones) of upper threshold when upper event is a pause
     :return:
         None
     """
