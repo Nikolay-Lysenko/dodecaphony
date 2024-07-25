@@ -5,7 +5,7 @@ Note that intermediate functions from this module modify only `temporal_content`
 `tone_row_instances` attributes, but `sonic_content`, `melodic_lines` and `sonorities` attributes
 are left unchanged.
 This is done for the sake of performance. It is cheaper to update all dependent attributes
-just once after all transformations are applied. So use `transform` function to get
+just once after all transformations are applied. So, use `transform` function to get
 consistent fragment.
 
 Author: Nikolay Lysenko
@@ -15,11 +15,26 @@ Author: Nikolay Lysenko
 import random
 from typing import Any, Callable
 
-from .fragment import Fragment, override_calculated_attributes, split_time_span
+from .fragment import Fragment, ToneRowInstance, override_calculated_attributes, split_time_span
 from .music_theory import invert_tone_row, revert_tone_row, rotate_tone_row, transpose_tone_row
 
 
 TRANSFORMATION_REGISTRY_TYPE = dict[str, tuple[Callable, list[Any]]]
+
+
+def draw_tone_row_instance(fragment: Fragment) -> ToneRowInstance:
+    """
+    Draw one random tone row instance.
+
+    :param fragment:
+        a fragment to be modified
+    :return:
+        random tone row instance
+    """
+    indices = fragment.mutable_independent_tone_row_instances_indices
+    group_index, instance_index = random.choice(indices)
+    tone_row_instance = fragment.grouped_tone_row_instances[group_index][instance_index]
+    return tone_row_instance
 
 
 def apply_inversion(fragment: Fragment) -> Fragment:
@@ -31,9 +46,7 @@ def apply_inversion(fragment: Fragment) -> Fragment:
     :return:
         modified fragment
     """
-    indices = fragment.mutable_independent_tone_row_instances_indices
-    group_index, instance_index = random.choice(indices)
-    tone_row_instance = fragment.grouped_tone_row_instances[group_index][instance_index]
+    tone_row_instance = draw_tone_row_instance(fragment)
     tone_row_instance.pitch_classes = invert_tone_row(tone_row_instance.pitch_classes)
     return fragment
 
@@ -47,9 +60,7 @@ def apply_reversion(fragment: Fragment) -> Fragment:
     :return:
         modified fragment
     """
-    indices = fragment.mutable_independent_tone_row_instances_indices
-    group_index, instance_index = random.choice(indices)
-    tone_row_instance = fragment.grouped_tone_row_instances[group_index][instance_index]
+    tone_row_instance = draw_tone_row_instance(fragment)
     tone_row_instance.pitch_classes = revert_tone_row(tone_row_instance.pitch_classes)
     return fragment
 
@@ -65,9 +76,7 @@ def apply_rotation(fragment: Fragment, max_rotation: int) -> Fragment:
     :return:
         modified fragment
     """
-    indices = fragment.mutable_independent_tone_row_instances_indices
-    group_index, instance_index = random.choice(indices)
-    tone_row_instance = fragment.grouped_tone_row_instances[group_index][instance_index]
+    tone_row_instance = draw_tone_row_instance(fragment)
     shift = random.randint(-max_rotation, max_rotation)
     tone_row_instance.pitch_classes = rotate_tone_row(tone_row_instance.pitch_classes, shift)
     return fragment
@@ -84,31 +93,9 @@ def apply_transposition(fragment: Fragment, max_transposition: int) -> Fragment:
     :return:
         modified fragment
     """
-    indices = fragment.mutable_independent_tone_row_instances_indices
-    group_index, instance_index = random.choice(indices)
-    tone_row_instance = fragment.grouped_tone_row_instances[group_index][instance_index]
+    tone_row_instance = draw_tone_row_instance(fragment)
     shift = random.randint(-max_transposition, max_transposition)
     tone_row_instance.pitch_classes = transpose_tone_row(tone_row_instance.pitch_classes, shift)
-    return fragment
-
-
-def apply_line_durations_change(fragment: Fragment) -> Fragment:
-    """
-    Change durations of all events from a random melodic line.
-
-    :param fragment:
-        a fragment to be modified
-    :return:
-        modified fragment
-    """
-    line_index = random.choice(fragment.mutable_temporal_content_indices)
-    line_durations = fragment.temporal_content[line_index]
-    n_measures = len(line_durations)
-    n_events = len([x for measure_durations in line_durations for x in measure_durations])
-    new_line_durations = split_time_span(
-        n_measures, n_events, fragment.measure_durations_by_n_events
-    )
-    fragment.temporal_content[line_index] = new_line_durations
     return fragment
 
 
@@ -133,9 +120,9 @@ def apply_measure_durations_change(fragment: Fragment) -> Fragment:
     return fragment
 
 
-def apply_measure_pair_durations_change(fragment: Fragment) -> Fragment:
+def apply_crossmeasure_event_transfer(fragment: Fragment) -> Fragment:
     """
-    Change durations of events from two random measures of a single melodic line.
+    Move an event from one random measure to another random measure and change their splittings.
 
     :param fragment:
         a fragment to be modified
@@ -160,6 +147,26 @@ def apply_measure_pair_durations_change(fragment: Fragment) -> Fragment:
     fragment.temporal_content[line_index][first_index] = new_first_durations
     new_second_durations = random.choice(fragment.measure_durations_by_n_events[second_key])
     fragment.temporal_content[line_index][second_index] = new_second_durations
+    return fragment
+
+
+def apply_line_durations_change(fragment: Fragment) -> Fragment:
+    """
+    Change durations of all events from a random melodic line.
+
+    :param fragment:
+        a fragment to be modified
+    :return:
+        modified fragment
+    """
+    line_index = random.choice(fragment.mutable_temporal_content_indices)
+    line_durations = fragment.temporal_content[line_index]
+    n_measures = len(line_durations)
+    n_events = len([x for measure_durations in line_durations for x in measure_durations])
+    new_line_durations = split_time_span(
+        n_measures, n_events, fragment.measure_durations_by_n_events
+    )
+    fragment.temporal_content[line_index] = new_line_durations
     return fragment
 
 
@@ -212,9 +219,9 @@ def create_transformations_registry(
         'rotation': (apply_rotation, [max_rotation]),
         'transposition': (apply_transposition, [max_transposition]),
         # Rhythm transformations.
+        'crossmeasure_event_transfer': (apply_crossmeasure_event_transfer, []),
         'line_durations_change': (apply_line_durations_change, []),
         'measure_durations_change': (apply_measure_durations_change, []),
-        'measure_pair_durations_change': (apply_measure_pair_durations_change, []),
         'pause_shift': (apply_pause_shift, []),
     }
     return registry

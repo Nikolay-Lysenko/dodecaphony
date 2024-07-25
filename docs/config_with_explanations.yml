@@ -458,7 +458,7 @@ optimization:
         rotation: 0.075
         transposition: 0.075
         measure_durations_change: 0.625
-        measure_pair_durations_change: 0.075
+        crossmeasure_event_transfer: 0.075
     # Now, three random transformations are applied with altered probabilities.
     - n_transformations_per_trial: 3
       transformation_probabilities:
@@ -467,7 +467,7 @@ optimization:
         rotation: 0.075
         transposition: 0.075
         measure_durations_change: 0.6
-        measure_pair_durations_change: 0.1
+        crossmeasure_event_transfer: 0.1
   # If optimization is stuck, one random melodic line gets completely new durations of its events.
   perturbation:
     n_transformations: 1

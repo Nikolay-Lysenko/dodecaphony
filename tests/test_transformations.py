@@ -10,10 +10,10 @@ from copy import deepcopy
 
 from dodecaphony.fragment import Event, Fragment, ToneRowInstance, override_calculated_attributes
 from dodecaphony.transformations import (
+    apply_crossmeasure_event_transfer,
     apply_inversion,
     apply_line_durations_change,
     apply_measure_durations_change,
-    apply_measure_pair_durations_change,
     apply_pause_shift,
     apply_reversion,
     apply_rotation,
@@ -22,6 +22,89 @@ from dodecaphony.transformations import (
     transform,
 )
 from .conftest import MEASURE_DURATIONS_BY_N_EVENTS
+
+
+@pytest.mark.parametrize(
+    "fragment, expected_n_changes",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [
+                        ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']),
+                    ],
+                ],
+                grouped_mutable_pauses_indices=[[]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=12,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0]},
+                mutable_temporal_content_indices=[0],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `expected_n_changes`
+            2
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[4.0], [4.0], [4.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [
+                        ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']),
+                    ],
+                ],
+                grouped_mutable_pauses_indices=[[]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=12,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0]},
+                mutable_temporal_content_indices=[0],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `expected_n_changes`
+            0
+        ),
+    ]
+)
+def test_apply_crossmeasure_event_transfer(fragment: Fragment, expected_n_changes: int) -> None:
+    """Test `apply_crossmeasure_event_transfer` function."""
+    initial_temporal_content = deepcopy(fragment.temporal_content)
+    fragment = apply_crossmeasure_event_transfer(fragment)
+    override_calculated_attributes(fragment)
+    n_changes = 0
+    zipped = zip(initial_temporal_content, fragment.temporal_content)
+    for initial_line_temporal_content, line_temporal_content in zipped:
+        nested_zipped = zip(initial_line_temporal_content, line_temporal_content)
+        for initial_measure_durations, measure_durations in nested_zipped:
+            if initial_measure_durations != measure_durations:
+                n_changes += 1
+                valid_values = (
+                    MEASURE_DURATIONS_BY_N_EVENTS.get(len(initial_measure_durations) - 1, [])
+                    + MEASURE_DURATIONS_BY_N_EVENTS.get(len(initial_measure_durations) + 1, [])
+                )
+                assert measure_durations in valid_values
+    assert n_changes == expected_n_changes
 
 
 @pytest.mark.parametrize(
@@ -257,89 +340,6 @@ def test_apply_measure_durations_change(fragment: Fragment, expected_n_changes: 
             if initial_measure_durations != measure_durations:
                 n_changes += 1
                 valid_values = MEASURE_DURATIONS_BY_N_EVENTS[len(initial_measure_durations)]
-                assert measure_durations in valid_values
-    assert n_changes == expected_n_changes
-
-
-@pytest.mark.parametrize(
-    "fragment, expected_n_changes",
-    [
-        (
-            # `fragment`
-            Fragment(
-                temporal_content=[
-                    [[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]],
-                ],
-                grouped_tone_row_instances=[
-                    [
-                        ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']),
-                    ],
-                ],
-                grouped_mutable_pauses_indices=[[]],
-                grouped_immutable_pauses_indices=[[]],
-                n_beats=12,
-                meter_numerator=4,
-                meter_denominator=4,
-                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
-                line_ids=[1],
-                upper_line_highest_position=55,
-                upper_line_lowest_position=41,
-                tone_row_len=12,
-                group_index_to_line_indices={0: [0]},
-                mutable_temporal_content_indices=[0],
-                mutable_independent_tone_row_instances_indices=[(0, 0)],
-                mutable_dependent_tone_row_instances_indices=[]
-            ),
-            # `expected_n_changes`
-            2
-        ),
-        (
-            # `fragment`
-            Fragment(
-                temporal_content=[
-                    [[4.0], [4.0], [4.0]],
-                ],
-                grouped_tone_row_instances=[
-                    [
-                        ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']),
-                    ],
-                ],
-                grouped_mutable_pauses_indices=[[]],
-                grouped_immutable_pauses_indices=[[]],
-                n_beats=12,
-                meter_numerator=4,
-                meter_denominator=4,
-                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
-                line_ids=[1],
-                upper_line_highest_position=55,
-                upper_line_lowest_position=41,
-                tone_row_len=12,
-                group_index_to_line_indices={0: [0]},
-                mutable_temporal_content_indices=[0],
-                mutable_independent_tone_row_instances_indices=[(0, 0)],
-                mutable_dependent_tone_row_instances_indices=[]
-            ),
-            # `expected_n_changes`
-            0
-        ),
-    ]
-)
-def test_apply_measure_pair_durations_change(fragment: Fragment, expected_n_changes: int) -> None:
-    """Test `apply_measure_pair_durations_change` function."""
-    initial_temporal_content = deepcopy(fragment.temporal_content)
-    fragment = apply_measure_pair_durations_change(fragment)
-    override_calculated_attributes(fragment)
-    n_changes = 0
-    zipped = zip(initial_temporal_content, fragment.temporal_content)
-    for initial_line_temporal_content, line_temporal_content in zipped:
-        nested_zipped = zip(initial_line_temporal_content, line_temporal_content)
-        for initial_measure_durations, measure_durations in nested_zipped:
-            if initial_measure_durations != measure_durations:
-                n_changes += 1
-                valid_values = (
-                    MEASURE_DURATIONS_BY_N_EVENTS.get(len(initial_measure_durations) - 1, [])
-                    + MEASURE_DURATIONS_BY_N_EVENTS.get(len(initial_measure_durations) + 1, [])
-                )
                 assert measure_durations in valid_values
     assert n_changes == expected_n_changes
 
