@@ -41,7 +41,7 @@ def create_midi_from_fragment(
         trailing_silence_in_seconds: float = 1.0
 ) -> None:
     """
-    Create MIDI file from a fragment created by this package.
+    Create MIDI file from a fragment.
 
     :param fragment:
         musical fragment
@@ -50,8 +50,7 @@ def create_midi_from_fragment(
     :param beat_in_seconds:
         duration of one beat in seconds
     :param instruments:
-        mapping from IDs of melodic lines to IDs of instruments (according to General MIDI
-        specification) that play them
+        mapping from IDs of melodic lines to General MIDI IDs of instruments that should play them
     :param velocity:
         one common velocity for all notes
     :param opening_silence_in_seconds:
@@ -117,8 +116,8 @@ def create_tsv_events_from_fragment(
     :param beat_in_seconds:
         duration of one beat in seconds
     :param instruments:
-        mapping from IDs of melodic lines to names of instruments (from a `sinethesizer` preset)
-        that play them
+        mapping from IDs of melodic lines to names of instruments that should play them;
+        these names must be taken from `sinethesizer` presets
     :param effects:
         mapping from IDs of melodic lines to sound effects to be applied to all events
         from the corresponding lines
@@ -184,7 +183,8 @@ def create_sinethesizer_instruments() -> dict[str, Instrument]:
 
 
 def create_wav_from_tsv_events(
-        events_path: str, output_path: str,
+        events_path: str,
+        output_path: str,
         instruments_registry: dict[str, Instrument],
         trailing_silence_in_seconds: float
 ) -> None:
@@ -196,7 +196,7 @@ def create_wav_from_tsv_events(
     :param output_path:
         path where resulting WAV file is going to be saved
     :param instruments_registry:
-        mapping from instrument names to instruments itself
+        mapping from instrument names to the instruments itself
     :param trailing_silence_in_seconds:
         number of seconds with silence to add at the end of the composition
     :return:
@@ -505,8 +505,12 @@ def create_pdf_sheet_music_with_lilypond(lilypond_path: str) -> None:  # pragma:
         )
         process.communicate()
     except Exception:
-        print("Rendering sheet music to PDF failed. Do you have Lilypond?")
+        print("=== START OF TRACEBACK ===")
         print(traceback.format_exc())
+        print("=== END OF TRACEBACK ===")
+        print("Rendering sheet music to PDF failed. Do you have Lilypond?")
+        print("To install Lilypond, please read the tutorial:")
+        print("https://lilypond.org/doc/v2.24/Documentation/learning/installing")
 
 
 def render(fragment: Fragment, rendering_params: dict[str, Any]) -> None:  # pragma: no cover

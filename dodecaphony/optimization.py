@@ -65,12 +65,12 @@ def generate_new_records(
     Generate records for given tasks.
 
     :param tasks:
-        fragments such that their neighborhoods should be searched and numbers of transformed
-        fragments to generate and evaluate for each of them
+        fragments such that their neighborhoods should be searched
+        and numbers of transformed fragments to generate and evaluate for each of them
     :param n_records_to_return:
-        number of best records to return; this argument is added to the function for the sake of
-        performance, because it reduces amount of data returned by a child process to a
-        parent process
+        number of best records to return;
+        this argument is added to the function for the sake of performance,
+        because it reduces amount of data returned by a child process to a parent process
     :param n_transformations_per_trial:
         number of transformations to be applied to generate a new fragment
     :param transformation_registry:
@@ -78,8 +78,8 @@ def generate_new_records(
     :param transformation_names:
         names of transformations to choose from
     :param transformation_probabilities:
-        probabilities of corresponding transformations; this argument must have the same length
-        as `transformation_names`
+        probabilities of corresponding transformations;
+        this argument must have the same length as `transformation_names`
     :param scoring_sets:
         names of scoring sets to be used for fragments evaluation
     :param scoring_sets_registry:
@@ -138,7 +138,7 @@ def create_tasks(
     :param n_trials_per_iteration:
         number of transformed fragments to generate and evaluate per each incumbent solution
     :param paralleling_params:
-        settings of parallel running of trials
+        settings of running trials in parallel
     :return:
         tasks for each process
     """
@@ -209,7 +209,7 @@ def optimize_with_variable_neighborhood_search(
         mapping from a name of a scoring set to a list of triples of a scoring function,
         its weight, and its parameters
     :param paralleling_params:
-        settings of parallel running of trials
+        settings of running trials in parallel
     :return:
         optimized fragments
     """
