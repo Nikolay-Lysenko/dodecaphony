@@ -536,7 +536,8 @@ def evaluate_movement_to_final_sonority(
         contribution of binary indicator whether there is a pair of melodic lines
         having contrary motion to a consonant interval
     :param conjunct_motion_term:
-        contribution of binary indicator whether all lines except the bass lines have no skips
+        contribution of binary indicator whether all lines have no skips;
+        the bass line is excluded if `bass_downward_skip_term` is greater than zero
     :param bass_downward_skip_term:
         contribution of binary indicator whether bass line moves downward with a skip
     :return:
@@ -569,9 +570,10 @@ def evaluate_movement_to_final_sonority(
             continue
         if first_move * second_move < 0:
             is_contrary_motion_to_consonance_absent = False
+            break
     score -= int(is_contrary_motion_to_consonance_absent) * contrary_motion_term
 
-    if bass_indicators[-1]:
+    if bass_indicators[-1] and bass_downward_skip_term > 0:
         non_bass_final_moves = final_moves[:-1]
     else:
         non_bass_final_moves = final_moves

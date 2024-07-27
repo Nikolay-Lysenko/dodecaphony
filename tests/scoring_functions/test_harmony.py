@@ -1028,13 +1028,13 @@ def test_evaluate_motion_to_perfect_consonances(fragment: Fragment, expected: fl
                 mutable_dependent_tone_row_instances_indices=[]
             ),
             # `contrary_motion_term`
-            0.5,
+            0.6,
             # `conjunct_motion_term`
             0.3,
             # `bass_downward_skip_term`
-            0.2,
+            0.1,
             # `expected`
-            -0.5
+            -0.4
         ),
         (
             Fragment(
@@ -1132,13 +1132,45 @@ def test_evaluate_motion_to_perfect_consonances(fragment: Fragment, expected: fl
                 mutable_dependent_tone_row_instances_indices=[]
             ),
             # `contrary_motion_term`
-            0.5,
+            0.6,
             # `conjunct_motion_term`
             0.3,
             # `bass_downward_skip_term`
-            0.2,
+            0.1,
             # `expected`
-            -0.5
+            -0.6
+        ),
+        (
+            Fragment(
+                temporal_content=[
+                    [[2.0, 4.0], [2.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F'])],
+                ],
+                grouped_mutable_pauses_indices=[[]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=16,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0]},
+                mutable_temporal_content_indices=[0],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `contrary_motion_term`
+            0.7,
+            # `conjunct_motion_term`
+            0.3,
+            # `bass_downward_skip_term`
+            0.0,
+            # `expected`
+            -1.0
         ),
     ]
 )
