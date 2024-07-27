@@ -165,9 +165,9 @@ scoring_sets:
     scoring_functions:
       # Each name must be a key in the registry from `evaluation.py` module.
       # In the registry, the below name is mapped to `evaluate_absence_of_aimless_fluctuations` function.
-      # Please look at the `evaluation.py` module to see what it does.
+      # Please look at the `scoring_functions/melody.py` module to see what it does.
       - name: absence_of_aimless_fluctuations
-        # Each scoring function from `evaluation.py` returns a score that usually lies between -1 and 0.
+        # Each scoring function from `scoring_functions` package returns a score that usually lies between -1 and 0.
         # With `weights` subsection, it is possible to apply a piecewise linear function to the score.
         # It is good enough to leave this block untouched.
         weights:
@@ -177,7 +177,7 @@ scoring_sets:
         penalties:
           5: 1
         window_size: 7
-      # The above logic applies to all of the scoring functions listed below.
+      # The above logic applies to all the scoring functions listed below.
       - name: climax_explicity
         weights:
           0.0: 1.0

@@ -86,7 +86,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
 
 def parse_scoring_sets_registry(params: list[dict[str, Any]]) -> SCORING_SETS_REGISTRY_TYPE:
     """
-    Parse mapping from names of scoring sets to scoring sets itself.
+    Parse mapping from names of scoring sets to the scoring sets itself.
 
     :param params:
         raw parameters of scoring sets obtained from a config
@@ -109,13 +109,13 @@ def parse_scoring_sets_registry(params: list[dict[str, Any]]) -> SCORING_SETS_RE
 
 def weight_score(unweighted_score: float, weights: dict[float, float]) -> float:
     """
-    Transform original score by a piecewise linear function.
+    Transform original score with a piecewise linear function.
 
     :param unweighted_score:
         original score
     :param weights:
-        mapping from a breakpoint to a slope coefficient for an interval from the breakpoint to
-        the next-to-the-left breakpoint (or -1 if it is absent)
+        mapping from a breakpoint to a slope coefficient for an interval
+        from the breakpoint to the next-to-the-left breakpoint (or -1 if it is absent)
     :return:
         weighted score
     """
@@ -145,7 +145,7 @@ def evaluate(
         mapping from a name of a scoring set to a list of triples of a scoring function,
         its weight, and its parameters
     :param report:
-        if it is set to `True`, detailed by functions scores are returned as a second output
+        if it is set to `True`, scores detailed to function level are returned as a second output
     :return:
         weighted sum of scores returned by applicable scoring functions
     """
