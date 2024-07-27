@@ -14,8 +14,6 @@ from dodecaphony.fragment import Event, Fragment
 from dodecaphony.music_theory import (
     IntervalTypes,
     N_SEMITONES_PER_OCTAVE,
-    N_SEMITONES_TO_INTERVAL_TYPE_WITH_CONSONANT_P4,
-    N_SEMITONES_TO_INTERVAL_TYPE_WITH_DISSONANT_P4,
     get_mapping_from_pitch_class_to_diatonic_scales,
     get_type_of_interval,
 )
@@ -557,16 +555,12 @@ def evaluate_movement_to_final_sonority(
         bass_indicators.append(melodic_line[-1].line_index == len(fragment.melodic_lines) - 1)
 
     is_contrary_motion_to_consonance_absent = True
+    consonant_types = [IntervalTypes.PERFECT_CONSONANCE, IntervalTypes.IMPERFECT_CONSONANCE]
     zipped = zip(final_pitches, final_moves, bass_indicators)
     pairs = itertools.combinations(zipped, 2)
     for (first, first_move, _), (second, second_move, is_bass) in pairs:
-        n_semitones = abs(first - second) % N_SEMITONES_PER_OCTAVE
-        if is_bass:
-            n_semitones_to_interval_type = N_SEMITONES_TO_INTERVAL_TYPE_WITH_DISSONANT_P4
-        else:
-            n_semitones_to_interval_type = N_SEMITONES_TO_INTERVAL_TYPE_WITH_CONSONANT_P4
-        consonant_types = [IntervalTypes.PERFECT_CONSONANCE, IntervalTypes.IMPERFECT_CONSONANCE]
-        if n_semitones_to_interval_type[n_semitones] not in consonant_types:
+        interval_type = get_type_of_interval(first - second, not is_bass)
+        if interval_type not in consonant_types:
             continue
         if first_move * second_move < 0:
             is_contrary_motion_to_consonance_absent = False
