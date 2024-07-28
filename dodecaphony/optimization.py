@@ -109,7 +109,10 @@ def generate_new_records(
                 incumbent_solution.mutable_temporal_content_indices,
                 incumbent_solution.mutable_independent_tone_row_instances_indices,
                 incumbent_solution.mutable_dependent_tone_row_instances_indices,
-                [copy.copy(x) for x in incumbent_solution.sonic_content]
+                (
+                    [copy.copy(x) for x in incumbent_solution.sonic_content]
+                    if 'pause_shift' in transformation_names else None
+                )
             )
             candidate = transform(
                 candidate,
