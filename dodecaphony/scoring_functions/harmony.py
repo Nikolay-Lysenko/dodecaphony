@@ -21,11 +21,11 @@ from dodecaphony.music_theory import (
 
 def evaluate_absence_of_doubled_pitch_classes(fragment: Fragment) -> float:
     """
-    Evaluate absence of vertical intervals that are whole multipliers of octave.
+    Evaluate absence of vertical intervals that are multiples of an octave (except unisons).
 
-    If the same pitch class sounds in two or more melodic lines simultaneously,
-    harmonic stability increases significantly and it interrupts musical flow associated
-    with the twelve-tone technique.
+    If the same pitch class sounds in two or more simultaneous pitches,
+    harmonic stability increases significantly and this interrupts musical flow
+    associated with the twelve-tone technique.
 
     :param fragment:
         a fragment to be evaluated
@@ -39,7 +39,7 @@ def evaluate_absence_of_doubled_pitch_classes(fragment: Fragment) -> float:
             if first.pitch_class == 'pause' or second.pitch_class == 'pause':
                 continue
             interval = first.position_in_semitones - second.position_in_semitones
-            if interval % N_SEMITONES_PER_OCTAVE == 0:
+            if interval != 0 and interval % N_SEMITONES_PER_OCTAVE == 0:
                 score -= 1
     score /= len(fragment.sonorities)
     return score
