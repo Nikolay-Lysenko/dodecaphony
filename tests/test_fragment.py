@@ -13,6 +13,7 @@ from dodecaphony.fragment import (
     Event,
     Fragment,
     FragmentParams,
+    Sonority,
     ToneRowInstance,
     create_initial_grouped_tone_row_instances,
     create_initial_temporal_content,
@@ -436,22 +437,54 @@ def test_set_melodic_lines_and_their_pitch_classes(fragment: Fragment, expected:
             ],
             # `expected_sonorities`
             [
-                [
-                    Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='C', position_in_semitones=51),
-                    Event(line_index=1, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=41),
-                ],
-                [
-                    Event(line_index=0, start_time=1.0, duration=1.0, pitch_class='A', position_in_semitones=48),
-                    Event(line_index=1, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=38),
-                ],
-                [
-                    Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
-                    Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=46),
-                ],
-                [
-                    Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
-                    Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=36),
-                ],
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='C', position_in_semitones=51),
+                        Event(line_index=1, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=41),
+                    ],
+                    [
+                        Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='C', position_in_semitones=51),
+                        Event(line_index=1, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=41),
+                    ],
+                    0.0,
+                    1.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=1.0, duration=1.0, pitch_class='A', position_in_semitones=48),
+                        Event(line_index=1, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=38),
+                    ],
+                    [
+                        Event(line_index=0, start_time=1.0, duration=1.0, pitch_class='A', position_in_semitones=48),
+                        Event(line_index=1, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=38),
+                    ],
+                    1.0,
+                    2.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
+                        Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=46),
+                    ],
+                    [
+                        Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
+                        Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=46),
+                    ],
+                    2.0,
+                    3.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
+                        Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=36),
+                    ],
+                    [
+                        Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
+                        Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=36),
+                    ],
+                    3.0,
+                    4.0
+                ),
             ]
         ),
         (
@@ -512,26 +545,62 @@ def test_set_melodic_lines_and_their_pitch_classes(fragment: Fragment, expected:
             ],
             # `expected_sonorities`
             [
-                [
-                    Event(line_index=0, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=51),
-                    Event(line_index=1, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=39),
-                    Event(line_index=2, start_time=0.0, duration=1.0, pitch_class='G', position_in_semitones=34),
-                ],
-                [
-                    Event(line_index=0, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=51),
-                    Event(line_index=1, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=39),
-                    Event(line_index=2, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=38),
-                ],
-                [
-                    Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
-                    Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=41),
-                    Event(line_index=2, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=34),
-                ],
-                [
-                    Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
-                    Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=32),
-                    Event(line_index=2, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=24),
-                ],
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=51),
+                        Event(line_index=1, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=39),
+                        Event(line_index=2, start_time=0.0, duration=1.0, pitch_class='G', position_in_semitones=34),
+                    ],
+                    [
+                        Event(line_index=0, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=51),
+                        Event(line_index=1, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=39),
+                        Event(line_index=2, start_time=0.0, duration=1.0, pitch_class='G', position_in_semitones=34),
+                    ],
+                    0.0,
+                    1.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=51),
+                        Event(line_index=1, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=39),
+                        Event(line_index=2, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=38),
+                    ],
+                    [
+                        Event(line_index=0, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=51),
+                        Event(line_index=1, start_time=0.0, duration=2.0, pitch_class='C', position_in_semitones=39),
+                        Event(line_index=2, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=38),
+                    ],
+                    1.0,
+                    2.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
+                        Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=41),
+                        Event(line_index=2, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=34),
+                    ],
+                    [
+                        Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
+                        Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=41),
+                        Event(line_index=2, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=34),
+                    ],
+                    2.0,
+                    3.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
+                        Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=32),
+                        Event(line_index=2, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=24),
+                    ],
+                    [
+                        Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
+                        Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=32),
+                        Event(line_index=2, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=24),
+                    ],
+                    3.0,
+                    4.0
+                ),
             ]
         ),
         (
@@ -594,26 +663,61 @@ def test_set_melodic_lines_and_their_pitch_classes(fragment: Fragment, expected:
             ],
             # `expected_sonorities`
             [
-                [
-                    Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='C', position_in_semitones=51),
-                    Event(line_index=1, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=41),
-                    Event(line_index=2, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=29),
-                ],
-                [
-                    Event(line_index=0, start_time=1.0, duration=1.0, pitch_class='A', position_in_semitones=48),
-                    Event(line_index=1, start_time=1.0, duration=1.0, pitch_class='pause', position_in_semitones=None),
-                    Event(line_index=2, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=14),
-                ],
-                [
-                    Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
-                    Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=46),
-                    Event(line_index=2, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=22),
-                ],
-                [
-                    Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
-                    Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=36),
-                    Event(line_index=2, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=24),
-                ],
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='C', position_in_semitones=51),
+                        Event(line_index=1, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=41),
+                        Event(line_index=2, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=29),
+                    ],
+                    [
+                        Event(line_index=0, start_time=0.0, duration=1.0, pitch_class='C', position_in_semitones=51),
+                        Event(line_index=1, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=41),
+                        Event(line_index=2, start_time=0.0, duration=1.0, pitch_class='D', position_in_semitones=29),
+                    ],
+                    0.0,
+                    1.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=1.0, duration=1.0, pitch_class='A', position_in_semitones=48),
+                        Event(line_index=1, start_time=1.0, duration=1.0, pitch_class='pause', position_in_semitones=None),
+                        Event(line_index=2, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=14),
+                    ],
+                    [
+                        Event(line_index=0, start_time=1.0, duration=1.0, pitch_class='A', position_in_semitones=48),
+                        Event(line_index=2, start_time=1.0, duration=1.0, pitch_class='B', position_in_semitones=14),
+                    ],
+                    1.0,
+                    2.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
+                        Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=46),
+                        Event(line_index=2, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=22),
+                    ],
+                    [
+                        Event(line_index=0, start_time=2.0, duration=1.0, pitch_class='D', position_in_semitones=53),
+                        Event(line_index=1, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=46),
+                        Event(line_index=2, start_time=2.0, duration=1.0, pitch_class='G', position_in_semitones=22),
+                    ],
+                    2.0,
+                    3.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
+                        Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=36),
+                        Event(line_index=2, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=24),
+                    ],
+                    [
+                        Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='F', position_in_semitones=44),
+                        Event(line_index=1, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=36),
+                        Event(line_index=2, start_time=3.0, duration=1.0, pitch_class='A', position_in_semitones=24),
+                    ],
+                    3.0,
+                    4.0
+                ),
             ]
         ),
     ]
@@ -873,35 +977,59 @@ def test_set_sonic_content(
             # `melodic_lines`
             [
                 [
-                    Event(line_index=0, start_time=0.0, duration=3.0),
-                    Event(line_index=0, start_time=3.0, duration=1.0),
+                    Event(line_index=0, start_time=0.0, duration=3.0, pitch_class='C'),
+                    Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='D'),
                 ],
                 [
-                    Event(line_index=1, start_time=0.0, duration=2.0),
-                    Event(line_index=1, start_time=2.0, duration=2.0),
+                    Event(line_index=1, start_time=0.0, duration=2.0, pitch_class='pause'),
+                    Event(line_index=1, start_time=2.0, duration=2.0, pitch_class='pause'),
                 ],
                 [
-                    Event(line_index=2, start_time=0.0, duration=2.0),
-                    Event(line_index=2, start_time=2.0, duration=2.0),
+                    Event(line_index=2, start_time=0.0, duration=2.0, pitch_class='E'),
+                    Event(line_index=2, start_time=2.0, duration=2.0, pitch_class='F'),
                 ],
             ],
             # `expected`
             [
-                [
-                    Event(line_index=0, start_time=0.0, duration=3.0),
-                    Event(line_index=1, start_time=0.0, duration=2.0),
-                    Event(line_index=2, start_time=0.0, duration=2.0),
-                ],
-                [
-                    Event(line_index=0, start_time=0.0, duration=3.0),
-                    Event(line_index=1, start_time=2.0, duration=2.0),
-                    Event(line_index=2, start_time=2.0, duration=2.0),
-                ],
-                [
-                    Event(line_index=0, start_time=3.0, duration=1.0),
-                    Event(line_index=1, start_time=2.0, duration=2.0),
-                    Event(line_index=2, start_time=2.0, duration=2.0),
-                ],
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=0.0, duration=3.0, pitch_class='C'),
+                        Event(line_index=1, start_time=0.0, duration=2.0, pitch_class='pause'),
+                        Event(line_index=2, start_time=0.0, duration=2.0, pitch_class='E'),
+                    ],
+                    [
+                        Event(line_index=0, start_time=0.0, duration=3.0, pitch_class='C'),
+                        Event(line_index=2, start_time=0.0, duration=2.0, pitch_class='E'),
+                    ],
+                    0.0,
+                    2.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=0.0, duration=3.0, pitch_class='C'),
+                        Event(line_index=1, start_time=2.0, duration=2.0, pitch_class='pause'),
+                        Event(line_index=2, start_time=2.0, duration=2.0, pitch_class='F'),
+                    ],
+                    [
+                        Event(line_index=0, start_time=0.0, duration=3.0, pitch_class='C'),
+                        Event(line_index=2, start_time=2.0, duration=2.0, pitch_class='F'),
+                    ],
+                    2.0,
+                    3.0
+                ),
+                Sonority(
+                    [
+                        Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='D'),
+                        Event(line_index=1, start_time=2.0, duration=2.0, pitch_class='pause'),
+                        Event(line_index=2, start_time=2.0, duration=2.0, pitch_class='F'),
+                    ],
+                    [
+                        Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='D'),
+                        Event(line_index=2, start_time=2.0, duration=2.0, pitch_class='F'),
+                    ],
+                    3.0,
+                    4.0
+                ),
             ]
         ),
     ]

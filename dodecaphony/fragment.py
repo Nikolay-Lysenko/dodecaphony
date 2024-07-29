@@ -37,6 +37,15 @@ class Event:
 
 
 @dataclass
+class Sonority:
+    """Simultaneously sounding events."""
+    events: list[Event]
+    non_pause_events: list[Event]
+    start_time: float
+    end_time: float
+
+
+@dataclass
 class ToneRowInstance:
     """An instance of a tone row (i.e., single repetition of a series)."""
     pitch_classes: list[str]
@@ -84,7 +93,7 @@ class Fragment:
     # Calculated attributes.
     sonic_content: Optional[list[list[str]]] = None
     melodic_lines: Optional[list[list[Event]]] = None
-    sonorities: Optional[list[list[Event]]] = None
+    sonorities: Optional[list[Sonority]] = None
 
     def __eq__(self, other: Any):
         if not isinstance(other, Fragment):
@@ -632,28 +641,31 @@ def set_melodic_lines_and_their_pitch_classes(fragment: Fragment) -> None:
 
 def set_sonorities(fragment: Fragment) -> None:
     """
-    Find lists of simultaneously sounding events and store them to the corresponding attribute.
+    Find simultaneously sounding events and store them to the corresponding attribute.
 
     :param fragment:
         fragment with `melodic_lines` attribute
     :return:
         None
     """
+    sonorities = []
     melodic_lines = fragment.melodic_lines
     timeline = [event for melodic_line in melodic_lines for event in melodic_line]
     timeline = sorted(timeline, key=lambda event: (event.start_time, event.line_index))
     indices = [-1 for _ in melodic_lines]
     current_times = [0 for _ in melodic_lines]
     previous_passed_time = 0
-    sonorities = []
     for event in timeline:
         indices[event.line_index] += 1
         current_times[event.line_index] += event.duration
         passed_time = min(current_times)
         if passed_time > previous_passed_time:
-            sonorities.append([
-                melodic_line[index] for melodic_line, index in zip(melodic_lines, indices)
-            ])
+            events = [melodic_line[index] for melodic_line, index in zip(melodic_lines, indices)]
+            non_pause_events = [event for event in events if event.pitch_class != "pause"]
+            sonority_start = max(event.start_time for event in events)
+            sonority_end = min(event.start_time + event.duration for event in events)
+            sonority = Sonority(events, non_pause_events, sonority_start, sonority_end)
+            sonorities.append(sonority)
         previous_passed_time = passed_time
     fragment.sonorities = sonorities
 
@@ -741,15 +753,14 @@ def set_pitches_of_lower_lines(
     previous_positions = [threshold] + [None for _ in range(len(fragment.melodic_lines) - 1)]
     previous_pitch_classes = [None for _ in range(len(fragment.melodic_lines))]
     for sonority in fragment.sonorities:
-        sonority_start = max(event.start_time for event in sonority)
-        threshold = sonority[0].position_in_semitones or previous_positions[0]
+        threshold = sonority.events[0].position_in_semitones or previous_positions[0]
         previous_positions[0] = threshold
         threshold -= 1  # It is inclusive, so subtraction prevents lines from overlapping.
-        for event in sonority[1:]:
+        for event in sonority.events[1:]:
             if event.pitch_class == 'pause':
                 threshold -= default_shift
                 continue
-            if event.start_time < sonority_start:
+            if event.start_time < sonority.start_time:
                 threshold = event.position_in_semitones - 1
                 continue
             previous_pitch_class = previous_pitch_classes[event.line_index]

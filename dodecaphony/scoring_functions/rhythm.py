@@ -34,7 +34,8 @@ def evaluate_cadence_duration(
     :return:
         minus one multiplied by missing in last sonority and last notes fraction of `max_duration`
     """
-    clipped_durations = [min(event.duration, max_duration) for event in fragment.sonorities[-1]]
+    last_sonority_events = fragment.sonorities[-1].events
+    clipped_durations = [min(event.duration, max_duration) for event in last_sonority_events]
     last_sonority_duration = min(clipped_durations)
     avg_last_note_duration = sum(clipped_durations) / len(clipped_durations)
     total_weight = last_sonority_weight + last_notes_weight
