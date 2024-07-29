@@ -106,6 +106,39 @@ def test_evaluate_absence_of_doubled_pitch_classes(fragment: Fragment, expected:
             # `expected`
             -2 / 15
         ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[1.0, 1.0, 1.0, 0.5, 0.5]],
+                    [[1.0, 1.0, 1.0, 0.5, 0.5]],
+                    [[1.0, 1.0, 1.0, 1.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['C', 'C#', 'D', 'B', 'D#', 'F', 'A', 'F#', 'E', 'G#', 'A#', 'G'])],
+                ],
+                grouped_mutable_pauses_indices=[[4, 6]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=4,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1, 2, 3],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0, 1, 2]},
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `min_skip_in_semitones`
+            7,
+            # `max_skips_share`
+            0.1,
+            # `expected`
+            0.0
+        ),
     ]
 )
 def test_evaluate_absence_of_simultaneous_skips(
@@ -986,6 +1019,35 @@ def test_evaluate_local_diatonicity_at_all_lines_level(
             ),
             # `expected`
             -1 / 7
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[1.0, 1.0, 1.0, 0.5, 0.5]],
+                    [[1.0, 2.0, 0.5, 0.5]],
+                    [[1.0, 1.0, 1.0, 0.5, 0.5]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['A#', 'B', 'C#', 'D', 'G', 'C', 'D#', 'E', 'F', 'F#', 'G#', 'A'])],
+                ],
+                grouped_mutable_pauses_indices=[[5, 6]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=4,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1, 2, 3],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0, 1, 2]},
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `expected`
+            -0.25
         ),
     ]
 )
