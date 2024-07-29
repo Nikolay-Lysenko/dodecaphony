@@ -1416,7 +1416,7 @@ def test_evaluate_sonic_intensity_by_positions(
 
 
 @pytest.mark.parametrize(
-    "sonority_events, sonority_start_time, meter_numerator, expected",
+    "sonority_events, sonority_start_time, n_melodic_lines, meter_numerator, expected",
     [
         (
             # `sonority_events`
@@ -1427,6 +1427,8 @@ def test_evaluate_sonic_intensity_by_positions(
             ],
             # `sonority_start_time`
             4.0,
+            # `n_melodic_lines`
+            3,
             # `meter_numerator`
             4,
             # `expected`
@@ -1441,6 +1443,8 @@ def test_evaluate_sonic_intensity_by_positions(
             ],
             # `sonority_start_time`
             4.0,
+            # `n_melodic_lines`
+            3,
             # `meter_numerator`
             4,
             # `expected`
@@ -1455,6 +1459,8 @@ def test_evaluate_sonic_intensity_by_positions(
             ],
             # `sonority_start_time`
             3.0,
+            # `n_melodic_lines`
+            3,
             # `meter_numerator`
             4,
             # `expected`
@@ -1469,6 +1475,8 @@ def test_evaluate_sonic_intensity_by_positions(
             ],
             # `sonority_start_time`
             4.0,
+            # `n_melodic_lines`
+            3,
             # `meter_numerator`
             4,
             # `expected`
@@ -1482,6 +1490,8 @@ def test_evaluate_sonic_intensity_by_positions(
             ],
             # `sonority_start_time`
             3.0,
+            # `n_melodic_lines`
+            3,
             # `meter_numerator`
             4,
             # `expected`
@@ -1496,20 +1506,38 @@ def test_evaluate_sonic_intensity_by_positions(
             ],
             # `sonority_start_time`
             3.0,
+            # `n_melodic_lines`
+            3,
             # `meter_numerator`
             4,
             # `expected`
             ({0}, set())
         ),
+        (
+            # `sonority_events`
+            [
+                Event(line_index=0, start_time=3.0, duration=1.0, pitch_class='E#', position_in_semitones=68),
+                Event(line_index=1, start_time=2.0, duration=2.0, pitch_class='D', position_in_semitones=65),
+                Event(line_index=2, start_time=2.0, duration=2.0, pitch_class='C', position_in_semitones=63),
+            ],
+            # `sonority_start_time`
+            3.0,
+            # `n_melodic_lines`
+            4,
+            # `meter_numerator`
+            4,
+            # `expected`
+            (set(), set())
+        ),
     ]
 )
 def test_find_indices_of_dissonating_events(
-        sonority_events: list[Event], sonority_start_time: float, meter_numerator: int,
-        expected: tuple[set[int], set[int]]
+        sonority_events: list[Event], sonority_start_time: float,
+        n_melodic_lines: int, meter_numerator: int, expected: tuple[set[int], set[int]]
 ) -> None:
     """Test `find_indices_of_dissonating_events` function."""
     result = find_indices_of_dissonating_events(
-        sonority_events, sonority_start_time, meter_numerator
+        sonority_events, sonority_start_time, n_melodic_lines, meter_numerator
     )
     assert result == expected
 

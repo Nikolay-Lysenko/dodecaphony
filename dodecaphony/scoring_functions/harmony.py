@@ -104,7 +104,8 @@ def evaluate_absence_of_voice_crossing(
 
 
 def find_indices_of_dissonating_events(
-        sonority_events: list[Event], sonority_start_time: float, meter_numerator: int
+        sonority_events: list[Event], sonority_start_time: float,
+        n_melodic_lines: int, meter_numerator: int
 ) -> tuple[set[int], set[int]]:
     """
     Find indices of dissonating (i.e., dependent, non-free in terms of strict counterpoint) events.
@@ -113,6 +114,8 @@ def find_indices_of_dissonating_events(
         simultaneously sounding events (without pauses)
     :param sonority_start_time:
         start time of the sonority
+    :param n_melodic_lines:
+        total number of melodic lines in the fragment
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
     :return:
@@ -120,10 +123,9 @@ def find_indices_of_dissonating_events(
     """
     passing_tones_and_neighbors = set()
     suspensions = set()
-    pairs = itertools.combinations(sonority_events, 2)
-    for first_event, second_event in pairs:
+    for first_event, second_event in itertools.combinations(sonority_events, 2):
         n_semitones = first_event.position_in_semitones - second_event.position_in_semitones
-        is_perfect_fourth_consonant = second_event.line_index != len(sonority_events) - 1
+        is_perfect_fourth_consonant = second_event.line_index != n_melodic_lines - 1
         interval_type = get_type_of_interval(n_semitones, is_perfect_fourth_consonant)
         if interval_type != IntervalTypes.DISSONANCE:
             continue
@@ -208,7 +210,8 @@ def evaluate_dissonances_preparation_and_resolution(
             if event != melodic_line[event_index]:
                 event_indices[event.line_index] += 1
         pt_and_ngh_line_indices, suspension_line_indices = find_indices_of_dissonating_events(
-            sonority.non_pause_events, sonority.start_time, fragment.meter_numerator
+            sonority.non_pause_events, sonority.start_time,
+            len(fragment.melodic_lines), fragment.meter_numerator
         )
         for line_index in pt_and_ngh_line_indices:
             event_index = event_indices[line_index]
