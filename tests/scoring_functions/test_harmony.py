@@ -1049,6 +1049,35 @@ def test_evaluate_local_diatonicity_at_all_lines_level(
             # `expected`
             -0.25
         ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[2.0, 1.0, 0.5, 0.5]],
+                    [[2.0, 1.0, 0.5, 0.5]],
+                    [[1.0, 1.0, 1.0, 1.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['G', 'C', 'C#', 'D', 'D#', 'B', 'F', 'F#', 'E', 'A', 'A#', 'A'])],
+                ],
+                grouped_mutable_pauses_indices=[[]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=4,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1, 2, 3],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0, 1, 2]},
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `expected`
+            -0.5
+        ),
     ]
 )
 def test_evaluate_motion_to_perfect_consonances(fragment: Fragment, expected: float) -> None:

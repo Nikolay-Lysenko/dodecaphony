@@ -81,7 +81,8 @@ def evaluate_absence_of_voice_crossing(
     """
     Evaluate absence of voice crossing.
 
-    Voice crossing may result in wrong perception of tone row and in incoherence of the fragment.
+    Voice crossing may result in wrong perception of the tone row
+    (especially, if voices are played with the same timbre).
 
     :param fragment:
         a fragment to be evaluated
@@ -161,8 +162,8 @@ def find_melodic_interval(
     :param melodic_line:
         melodic line containing the event
     :param shift:
-        -1 if interval of arrival in the event is needed or
-        1 if interval of departure from the event is needed
+        -1 if interval of arrival in the event is needed
+        or 1 if interval of departure from the event is needed
     :return:
         size of melodic interval (in semitones)
     """
@@ -188,13 +189,13 @@ def evaluate_dissonances_preparation_and_resolution(
     :param fragment:
         a fragment to be evaluated
     :param n_semitones_to_pt_and_ngh_preparation_penalty:
-        mapping from melodic interval size in semitones to a penalty for moving by this interval
+        mapping from melodic interval size (in semitones) to a penalty for moving by this interval
         to a dissonance considered to be an analogue of passing tone or neighbor dissonance
     :param n_semitones_to_pt_and_ngh_resolution_penalty:
-        mapping from melodic interval size in semitones to a penalty for moving by this interval
+        mapping from melodic interval size (in semitones) to a penalty for moving by this interval
         from a dissonance considered to be an analogue of passing tone or neighbor dissonance
     :param n_semitones_to_suspension_resolution_penalty:
-        mapping from melodic interval size in semitones to a penalty for moving by this interval
+        mapping from melodic interval size (in semitones) to a penalty for moving by this interval
         from a dissonance considered to be an analogue of suspended dissonance
     :return:
         average over all vertical intervals penalty for their preparation and resolution
@@ -278,8 +279,8 @@ def find_sonority_type(
     :param regular_positions:
         parameters of regular positions (for example, downbeats or relatively strong beats)
     :param ad_hoc_positions:
-        parameters of ad hoc positions which appear just once (for example, the beginning of
-        the fragment or the 11th reference beat)
+        parameters of ad hoc positions which appear just once
+        (for example, the beginning of the fragment or the 11th reference beat)
     :param n_beats:
         total duration of a fragment (in reference beats)
     :return:
@@ -316,8 +317,8 @@ def evaluate_harmony_dynamic_by_positions(
     :param regular_positions:
         parameters of regular positions (for example, downbeats or relatively strong beats)
     :param ad_hoc_positions:
-        parameters of ad hoc positions which appear just once (for example, the beginning of
-        the fragment or the 11th reference beat)
+        parameters of ad hoc positions which appear just once
+        (for example, the beginning of the fragment or the 11th reference beat)
     :param ranges:
         mapping from position type to minimum and maximum desired levels of harmonic stability
     :param n_semitones_to_stability:
@@ -441,7 +442,7 @@ def evaluate_motion_to_perfect_consonances(fragment: Fragment) -> float:
     :param fragment:
         a fragment to be evaluated
     :return:
-        minus one multiplied by fraction of sonorities with wrong motion to perfect consonances
+        minus one multiplied by average over sonorities number of violations
     """
     score = 0
     previous_events = [None for _ in fragment.melodic_lines]
@@ -450,6 +451,7 @@ def evaluate_motion_to_perfect_consonances(fragment: Fragment) -> float:
         for line_index, (previous_event, current_event) in enumerate(zipped):
             if previous_event != current_event:
                 previous_events[line_index] = previous_event
+
         pairs = itertools.combinations(sonority.non_pause_events, 2)
         for first_event, second_event in pairs:
             n_semitones = first_event.position_in_semitones - second_event.position_in_semitones
@@ -458,29 +460,19 @@ def evaluate_motion_to_perfect_consonances(fragment: Fragment) -> float:
             if interval_type != IntervalTypes.PERFECT_CONSONANCE:
                 continue
 
-            first_previous_event = previous_events[first_event.line_index]
-            first_event_continues = (
-                first_previous_event is None
-                or (
-                    first_previous_event.start_time + first_previous_event.duration
-                    < sonority.start_time
-                )
-            )
-            second_previous_event = previous_events[second_event.line_index]
-            second_event_continues = (
-                second_previous_event is None
-                or (
-                    second_previous_event.start_time + second_previous_event.duration
-                    < sonority.start_time
-                )
-            )
+            first_event_continues = first_event.start_time < sonority.start_time
+            second_event_continues = second_event.start_time < sonority.start_time
             if first_event_continues and second_event_continues:
                 continue
 
             if first_event_continues:
                 first_previous_event = first_event
-            elif second_event_continues:
+            else:
+                first_previous_event = previous_events[first_event.line_index]
+            if second_event_continues:
                 second_previous_event = second_event
+            else:
+                second_previous_event = previous_events[second_event.line_index]
 
             any_previous_pauses = (
                 first_previous_event.pitch_class == 'pause'
@@ -576,8 +568,8 @@ def evaluate_pitch_class_distribution_among_lines(
     """
     Evaluate that pitch classes are distributed among lines according to user specifications.
 
-    For example, it is possible to use some pitch classes only in melody and the remaining
-    pitch classes only in accompaniment.
+    For example, it is possible to use some pitch classes only in the melody
+    and the remaining pitch classes only in the accompaniment.
 
     :param fragment:
         a fragment to be evaluated
@@ -612,12 +604,12 @@ def evaluate_presence_of_vertical_intervals(
     :param intervals:
         intervals (in semitones) from top to bottom
     :param min_n_weighted_occurrences:
-        minimal sum of weights of intervallic sonorities occurrences
+        minimum sum of weights of intervallic sonorities occurrences
     :param regular_positions:
         parameters of regular positions (for example, downbeats or relatively strong beats)
     :param ad_hoc_positions:
-        parameters of ad hoc positions which appear just once (for example, the beginning of
-        the fragment or the 11th reference beat)
+        parameters of ad hoc positions which appear just once
+        (for example, the beginning of the fragment or the 11th reference beat)
     :param position_weights:
         mapping from position name to its weight
     :return:
