@@ -2,7 +2,7 @@
 Transform a fragment in progress.
 
 Note that intermediate functions from this module modify only `temporal_content` and
-`tone_row_instances` attributes, but `sonic_content`, `melodic_lines` and `sonorities` attributes
+`tone_row_instances` attributes, but `sonic_content`, `melodic_lines`, and `sonorities` attributes
 are left unchanged.
 This is done for the sake of performance. It is cheaper to update all dependent attributes
 just once after all transformations are applied. So, use `transform` function to get

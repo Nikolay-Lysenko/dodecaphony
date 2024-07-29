@@ -35,9 +35,7 @@ def evaluate_absence_of_doubled_pitch_classes(fragment: Fragment) -> float:
     """
     score = 0
     for sonority in fragment.sonorities:
-        for first, second in itertools.combinations(sonority, 2):
-            if first.pitch_class == 'pause' or second.pitch_class == 'pause':
-                continue
+        for first, second in itertools.combinations(sonority.non_pause_events, 2):
             interval = first.position_in_semitones - second.position_in_semitones
             if interval != 0 and interval % N_SEMITONES_PER_OCTAVE == 0:
                 score -= 1
@@ -65,7 +63,7 @@ def evaluate_absence_of_simultaneous_skips(
     for first_sonority, second_sonority in zip(fragment.sonorities, fragment.sonorities[1:]):
         n_melodic_intervals = 0
         n_skips = 0
-        for first, second in zip(first_sonority, second_sonority):
+        for first, second in zip(first_sonority.events, second_sonority.events):
             if first.pitch_class == 'pause' or second.pitch_class == 'pause':
                 continue
             n_melodic_intervals += 1
@@ -96,9 +94,7 @@ def evaluate_absence_of_voice_crossing(
     numerator = 0
     denominator = 0
     for sonority in fragment.sonorities:
-        for first, second in itertools.combinations(sonority, 2):
-            if first.pitch_class == 'pause' or second.pitch_class == 'pause':
-                continue
+        for first, second in itertools.combinations(sonority.non_pause_events, 2):
             interval = first.position_in_semitones - second.position_in_semitones
             if interval <= 0:
                 numerator -= n_semitones_to_penalty.get(interval, 1)
@@ -108,13 +104,15 @@ def evaluate_absence_of_voice_crossing(
 
 
 def find_indices_of_dissonating_events(
-        sonority: list[Event], meter_numerator: int
+        sonority_events: list[Event], sonority_start_time: float, meter_numerator: int
 ) -> tuple[set[int], set[int]]:
     """
     Find indices of dissonating (i.e., dependent, non-free in terms of strict counterpoint) events.
 
-    :param sonority:
-        simultaneously sounding events
+    :param sonority_events:
+        simultaneously sounding events (without pauses)
+    :param sonority_start_time:
+        start time of the sonority
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
     :return:
@@ -122,13 +120,10 @@ def find_indices_of_dissonating_events(
     """
     passing_tones_and_neighbors = set()
     suspensions = set()
-    sonority_start_time = max(event.start_time for event in sonority)
-    pairs = itertools.combinations(sonority, 2)
+    pairs = itertools.combinations(sonority_events, 2)
     for first_event, second_event in pairs:
-        if first_event.pitch_class == 'pause' or second_event.pitch_class == 'pause':
-            continue
         n_semitones = first_event.position_in_semitones - second_event.position_in_semitones
-        is_perfect_fourth_consonant = second_event.line_index != len(sonority) - 1
+        is_perfect_fourth_consonant = second_event.line_index != len(sonority_events) - 1
         interval_type = get_type_of_interval(n_semitones, is_perfect_fourth_consonant)
         if interval_type != IntervalTypes.DISSONANCE:
             continue
@@ -208,12 +203,12 @@ def evaluate_dissonances_preparation_and_resolution(
     n_semitones_to_suspension_resolution_penalty[None] = 0
     event_indices = [0 for _ in fragment.melodic_lines]
     for sonority in fragment.sonorities:
-        zipped = zip(sonority, fragment.melodic_lines, event_indices)
+        zipped = zip(sonority.events, fragment.melodic_lines, event_indices)
         for event, melodic_line, event_index in zipped:
             if event != melodic_line[event_index]:
                 event_indices[event.line_index] += 1
         pt_and_ngh_line_indices, suspension_line_indices = find_indices_of_dissonating_events(
-            sonority, fragment.meter_numerator
+            sonority.non_pause_events, sonority.start_time, fragment.meter_numerator
         )
         for line_index in pt_and_ngh_line_indices:
             event_index = event_indices[line_index]
@@ -237,27 +232,26 @@ def evaluate_dissonances_preparation_and_resolution(
 
 
 def compute_harmonic_stability_of_sonority(
-        sonority: list[Event], n_semitones_to_stability: dict[int, float]
+        sonority_events: list[Event], n_semitones_to_stability: dict[int, float]
 ) -> float:
     """
     Compute stability of sonority as average stability of intervals forming it.
 
-    :param sonority:
-        simultaneously sounding events
+    :param sonority_events:
+        simultaneously sounding events (without pauses)
     :param n_semitones_to_stability:
         mapping from interval size in semitones to its harmonic stability
     :return:
         average stability of intervals forming the sonority
     """
-    stability = 0
-    sound_events = [event for event in sonority if event.pitch_class != 'pause']
-    if len(sound_events) <= 1:
+    if len(sonority_events) <= 1:
         return 1.0
-    for first, second in itertools.combinations(sound_events, 2):
+    stability = 0
+    for first, second in itertools.combinations(sonority_events, 2):
         interval_in_semitones = abs(first.position_in_semitones - second.position_in_semitones)
         interval_in_semitones %= N_SEMITONES_PER_OCTAVE
         stability += n_semitones_to_stability[interval_in_semitones]
-    n_pairs = len(sound_events) * (len(sound_events) - 1) / 2
+    n_pairs = len(sonority_events) * (len(sonority_events) - 1) / 2
     stability /= n_pairs
     return stability
 
@@ -330,13 +324,12 @@ def evaluate_harmony_dynamic_by_positions(
     """
     score = 0
     for sonority in fragment.sonorities:
-        sonority_start = max(event.start_time for event in sonority)
-        sonority_end = min(event.start_time + event.duration for event in sonority)
         stability_of_current_sonority = compute_harmonic_stability_of_sonority(
-            sonority, n_semitones_to_stability
+            sonority.non_pause_events, n_semitones_to_stability
         )
         sonority_type = find_sonority_type(
-            sonority_start, sonority_end, regular_positions, ad_hoc_positions, fragment.n_beats
+            sonority.start_time, sonority.end_time, regular_positions, ad_hoc_positions,
+            fragment.n_beats
         )
         min_allowed_value = ranges[sonority_type][0]
         score += min(stability_of_current_sonority - min_allowed_value, 0)
@@ -372,17 +365,15 @@ def evaluate_harmony_dynamic_by_time_intervals(
     for (interval_start, interval_end), (min_allowed_value, max_allowed_value) in zipped:
         while True:
             sonority = fragment.sonorities[sonority_index]
-            sonority_start = max(event.start_time for event in sonority)
-            sonority_end = min(event.start_time + event.duration for event in sonority)
-            if sonority_end <= interval_start:
+            if sonority.end_time <= interval_start:
                 sonority_index += 1
                 continue
-            intersection_start = max(sonority_start, interval_start)
-            intersection_end = min(sonority_end, interval_end)
+            intersection_start = max(sonority.start_time, interval_start)
+            intersection_end = min(sonority.end_time, interval_end)
             intersection_duration = intersection_end - intersection_start
 
             stability_of_current_sonority = compute_harmonic_stability_of_sonority(
-                sonority, n_semitones_to_stability
+                sonority.non_pause_events, n_semitones_to_stability
             )
             deviation = 0
             deviation += min(stability_of_current_sonority - min_allowed_value, 0)
@@ -390,7 +381,7 @@ def evaluate_harmony_dynamic_by_time_intervals(
             numerator += intersection_duration * deviation
             denominator += intersection_duration
 
-            if sonority_end >= interval_end:
+            if sonority.end_time >= interval_end:
                 break
             sonority_index += 1
     score = numerator / denominator
@@ -425,10 +416,10 @@ def evaluate_local_diatonicity_at_all_lines_level(
     pitch_class_to_diatonic_scales = get_mapping_from_pitch_class_to_diatonic_scales(scale_types)
     nested_pitch_classes = []
     for sonority in fragment.sonorities[:depth - 1]:
-        nested_pitch_classes.append([event.pitch_class for event in sonority])
+        nested_pitch_classes.append([event.pitch_class for event in sonority.non_pause_events])
     for sonority in fragment.sonorities[depth - 1:]:
-        nested_pitch_classes.append([event.pitch_class for event in sonority])
-        pitch_classes = [x for y in nested_pitch_classes for x in y if x != 'pause']
+        nested_pitch_classes.append([event.pitch_class for event in sonority.non_pause_events])
+        pitch_classes = [x for y in nested_pitch_classes for x in y]
         counter = Counter()
         for pitch_class in pitch_classes:
             counter.update(pitch_class_to_diatonic_scales[pitch_class])
@@ -452,17 +443,14 @@ def evaluate_motion_to_perfect_consonances(fragment: Fragment) -> float:
     score = 0
     previous_events = [None for _ in fragment.melodic_lines]
     for previous_sonority, sonority in zip(fragment.sonorities, fragment.sonorities[1:]):
-        zipped = zip(previous_sonority, sonority)
+        zipped = zip(previous_sonority.events, sonority.events)
         for line_index, (previous_event, current_event) in enumerate(zipped):
             if previous_event != current_event:
                 previous_events[line_index] = previous_event
-        sonority_start_time = max(event.start_time for event in sonority)
-        pairs = itertools.combinations(sonority, 2)
+        pairs = itertools.combinations(sonority.non_pause_events, 2)
         for first_event, second_event in pairs:
-            if first_event.pitch_class == 'pause' or second_event.pitch_class == 'pause':
-                continue
             n_semitones = first_event.position_in_semitones - second_event.position_in_semitones
-            is_perfect_fourth_consonant = second_event.line_index != len(sonority) - 1
+            is_perfect_fourth_consonant = second_event.line_index != len(sonority.events) - 1
             interval_type = get_type_of_interval(n_semitones, is_perfect_fourth_consonant)
             if interval_type != IntervalTypes.PERFECT_CONSONANCE:
                 continue
@@ -472,7 +460,7 @@ def evaluate_motion_to_perfect_consonances(fragment: Fragment) -> float:
                 first_previous_event is None
                 or (
                     first_previous_event.start_time + first_previous_event.duration
-                    < sonority_start_time
+                    < sonority.start_time
                 )
             )
             second_previous_event = previous_events[second_event.line_index]
@@ -480,7 +468,7 @@ def evaluate_motion_to_perfect_consonances(fragment: Fragment) -> float:
                 second_previous_event is None
                 or (
                     second_previous_event.start_time + second_previous_event.duration
-                    < sonority_start_time
+                    < sonority.start_time
                 )
             )
             if first_event_continues and second_event_continues:
@@ -635,17 +623,15 @@ def evaluate_presence_of_vertical_intervals(
     weighted_n_occurrences = 0
     for sonority in fragment.sonorities:
         actual_intervals = []
-        for upper_event, lower_event in zip(sonority, sonority[1:]):
-            if upper_event.pitch_class == "pause" or lower_event.pitch_class == "pause":
-                break
+        non_pause_events = sonority.non_pause_events
+        for upper_event, lower_event in zip(non_pause_events, non_pause_events[1:]):
             interval = upper_event.position_in_semitones - lower_event.position_in_semitones
             actual_intervals.append(interval)
         if actual_intervals != intervals:
             continue
-        sonority_start = max(event.start_time for event in sonority)
-        sonority_end = min(event.start_time + event.duration for event in sonority)
         position_type = find_sonority_type(
-            sonority_start, sonority_end, regular_positions, ad_hoc_positions, fragment.n_beats
+            sonority.start_time, sonority.end_time, regular_positions, ad_hoc_positions,
+            fragment.n_beats
         )
         weighted_n_occurrences += position_weights[position_type]
     score = min(weighted_n_occurrences - min_n_weighted_occurrences, 0)
@@ -669,14 +655,13 @@ def evaluate_sonic_intensity_by_positions(
         average over positions deviation of sonic intensity from its ranges
     """
     score = 0
-    sonority_index = -1
-    sonority_end = -1
+    sonority_index = 0
+    sonority = fragment.sonorities[sonority_index]
     for position, (min_n_non_pause_events, max_n_non_pause_events) in zip(positions, ranges):
-        while sonority_end <= position:
+        while sonority.end_time <= position:
             sonority_index += 1
             sonority = fragment.sonorities[sonority_index]
-            sonority_end = min(event.start_time + event.duration for event in sonority)
-        n_non_pause_events = len([event for event in sonority if event.pitch_class != 'pause'])
+        n_non_pause_events = len(sonority.non_pause_events)
         score -= max(0, min_n_non_pause_events - n_non_pause_events)
         score -= max(0, n_non_pause_events - max_n_non_pause_events)
     score /= len(positions)
