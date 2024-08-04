@@ -10,6 +10,7 @@ from typing import Any, Callable
 from dodecaphony.fragment import Fragment
 from dodecaphony.scoring_functions.harmony import (
     evaluate_absence_of_doubled_pitch_classes,
+    evaluate_absence_of_false_octaves,
     evaluate_absence_of_simultaneous_skips,
     evaluate_absence_of_voice_crossing,
     evaluate_dissonances_preparation_and_resolution,
@@ -57,6 +58,7 @@ def get_scoring_functions_registry() -> dict[str, Callable]:
     registry = {
         'absence_of_aimless_fluctuations': evaluate_absence_of_aimless_fluctuations,
         'absence_of_doubled_pitch_classes': evaluate_absence_of_doubled_pitch_classes,
+        'absence_of_false_octaves': evaluate_absence_of_false_octaves,
         'absence_of_simultaneous_skips': evaluate_absence_of_simultaneous_skips,
         'absence_of_voice_crossing': evaluate_absence_of_voice_crossing,
         'cadence_duration': evaluate_cadence_duration,

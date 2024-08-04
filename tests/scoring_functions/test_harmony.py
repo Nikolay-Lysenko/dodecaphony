@@ -11,6 +11,7 @@ import pytest
 
 from dodecaphony.scoring_functions.harmony import (
     evaluate_absence_of_doubled_pitch_classes,
+    evaluate_absence_of_false_octaves,
     evaluate_absence_of_simultaneous_skips,
     evaluate_absence_of_voice_crossing,
     evaluate_dissonances_preparation_and_resolution,
@@ -67,6 +68,76 @@ def test_evaluate_absence_of_doubled_pitch_classes(fragment: Fragment, expected:
     """Test `evaluate_absence_of_doubled_pitch_classes` function."""
     override_calculated_attributes(fragment)
     result = evaluate_absence_of_doubled_pitch_classes(fragment)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "fragment, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[1.0, 2.0, 0.5, 0.5]],
+                    [[1.0, 1.0, 1.0, 1.0]],
+                    [[1.0, 1.0, 1.0, 1.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['C', 'C#', 'D', 'C#', 'D#', 'C', 'C#', 'E', 'F', 'F', 'F#', 'G'])],
+                ],
+                grouped_mutable_pauses_indices=[[]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=4,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1, 2, 3],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0, 1, 2]},
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (0, 1), (0, 2)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `expected`
+            -0.5
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[1.0, 2.0, 0.5, 0.5]],
+                    [[1.0, 1.0, 1.0, 1.0]],
+                    [[1.0, 1.0, 1.0, 1.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['C', 'C#', 'D', 'C#', 'D#', 'A', 'C#', 'E', 'F', 'F', 'F#', 'G'])],
+                ],
+                grouped_mutable_pauses_indices=[[]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=4,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1, 2, 3],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0, 1, 2]},
+                mutable_temporal_content_indices=[0, 1, 2],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (0, 1), (0, 2)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `expected`
+            -0.25
+        ),
+    ]
+)
+def test_evaluate_absence_of_false_octaves(fragment: Fragment, expected: float) -> None:
+    """Test `evaluate_absence_of_false_octaves` function."""
+    override_calculated_attributes(fragment)
+    result = evaluate_absence_of_false_octaves(fragment)
     assert result == expected
 
 

@@ -7,7 +7,7 @@ Author: Nikolay Lysenko
 
 import itertools
 import math
-from collections import Counter
+from collections import Counter, defaultdict
 from typing import Any, Optional
 
 from dodecaphony.fragment import Event, Fragment
@@ -40,6 +40,40 @@ def evaluate_absence_of_doubled_pitch_classes(fragment: Fragment) -> float:
             if interval != 0 and interval % N_SEMITONES_PER_OCTAVE == 0:
                 score -= 1
     score /= len(fragment.sonorities)
+    return score
+
+
+def evaluate_absence_of_false_octaves(fragment: Fragment) -> float:
+    """
+    Evaluate absence of false octaves.
+
+    False octave is a situation when a note starts in a melodic line immediately after
+    a note of the same pitch class ends in another melodic lines.
+    False octaves should be avoided in atonal music, because they interrupt
+    continuous recirculation of all 12 pitch classes. There is so-called 'note fatigue',
+    i.e., a pitch class must be absent for some time before it may sound again.
+
+    :param fragment:
+        a fragment to be evaluated
+    :return:
+        minus one multiplied by number of false octaves and divided by total number
+        of sonorities minus one (i.e., the first sonority is not counted)
+    """
+    score = 0
+    for previous_sonority, sonority in zip(fragment.sonorities, fragment.sonorities[1:]):
+        boundary_events_info = defaultdict(set)
+        for event in previous_sonority.non_pause_events:
+            if event.start_time + event.duration == previous_sonority.end_time:
+                boundary_events_info[event.pitch_class].add((event.line_index, "ended"))
+        for event in sonority.non_pause_events:
+            if event.start_time == sonority.start_time:
+                boundary_events_info[event.pitch_class].add((event.line_index, "started"))
+        for pitch_class, position_info in boundary_events_info.items():
+            for first, second in itertools.combinations(position_info, 2):
+                if first[0] != second[0] and first[1] != second[1]:
+                    score -= 1
+                    break
+    score /= len(fragment.sonorities) - 1
     return score
 
 

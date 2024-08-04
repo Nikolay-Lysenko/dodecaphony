@@ -221,6 +221,9 @@ scoring_sets:
       - name: absence_of_doubled_pitch_classes
         weights:
           0.0: 1.0
+      - name: absence_of_false_octaves
+        weights:
+          0.0: 1.0
       - name: absence_of_simultaneous_skips
         weights:
           0.0: 1.0
