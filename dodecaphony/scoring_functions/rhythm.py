@@ -13,7 +13,7 @@ from dodecaphony.fragment import Fragment
 
 def evaluate_cadence_duration(
         fragment: Fragment,
-        max_duration: float,
+        min_desired_duration: float,
         last_sonority_weight: float,
         last_notes_weight: float
 ) -> float:
@@ -22,8 +22,9 @@ def evaluate_cadence_duration(
 
     :param fragment:
         a fragment to be evaluated
-    :param max_duration:
-        maximum enough duration (in reference beats); higher durations do not increase score
+    :param min_desired_duration:
+        minimum desired duration (in reference beats) of the last sonority;
+        higher durations do not increase the score
     :param last_sonority_weight:
         weight that determines contribution of last sonority duration to final score
     :param last_notes_weight:
@@ -35,14 +36,14 @@ def evaluate_cadence_duration(
         minus one multiplied by missing in last sonority and last notes fraction of `max_duration`
     """
     last_sonority_events = fragment.sonorities[-1].events
-    clipped_durations = [min(event.duration, max_duration) for event in last_sonority_events]
+    clipped_durations = [min(event.duration, min_desired_duration) for event in last_sonority_events]
     last_sonority_duration = min(clipped_durations)
     avg_last_note_duration = sum(clipped_durations) / len(clipped_durations)
     total_weight = last_sonority_weight + last_notes_weight
     last_sonority_weight /= total_weight
     last_notes_weight /= total_weight
-    last_sonority_term = last_sonority_weight * (last_sonority_duration / max_duration - 1)
-    last_notes_term = last_notes_weight * (avg_last_note_duration / max_duration - 1)
+    last_sonority_term = last_sonority_weight * (last_sonority_duration / min_desired_duration - 1)
+    last_notes_term = last_notes_weight * (avg_last_note_duration / min_desired_duration - 1)
     score = last_sonority_term + last_notes_term
     return score
 
@@ -91,7 +92,7 @@ def evaluate_rhythmic_homogeneity(fragment: Fragment) -> float:
     :param fragment:
         a fragment to be evaluated
     :return:
-        a score between minis one and zero depending on rhythmic variation
+        a score between minus one and zero depending on rhythmic variation
     """
     score = 0
     for durations_of_measures_for_one_line in fragment.temporal_content:

@@ -38,16 +38,16 @@ def evaluate_absence_of_aimless_fluctuations(
         mapping from range (in semitones) covered within a window to penalty applicable to ranges
         of not greater size; it is recommended to set maximum penalty to 1
     :param window_size:
-        size of rolling window (in events)
+        size of rolling window (in non-pause events)
     :return:
-        multiplied by -1 penalty for narrowness averaged over all windows (including those that
-        are not penalized)
+        multiplied by -1 penalty for narrowness averaged over all windows
     """
     numerator = 0
     denominator = 0
     for melodic_line in fragment.melodic_lines:
-        pitches = [event.position_in_semitones for event in melodic_line]
-        pitches = [x for x in pitches if x is not None]
+        pitches = [
+            event.position_in_semitones for event in melodic_line if event.pitch_class != 'pause'
+        ]
         rolling_mins = compute_rolling_aggregate(pitches, min, window_size)[window_size-1:]
         rolling_maxs = compute_rolling_aggregate(pitches, max, window_size)[window_size-1:]
         borders = zip(rolling_mins, rolling_maxs)
@@ -72,19 +72,19 @@ def evaluate_climax_explicity(
     :param fragment:
         a fragment to be evaluated
     :param height_penalties:
-        mapping from interval size (in semitones) between average pitch of a line and climax of
-        this line to penalty for such interval; values for missing keys are forward-propagated
+        mapping from interval size (in semitones) between average pitch of a line and its climax
+        to penalty for such interval; values for missing keys are forward-propagated
     :param duplication_penalty:
-        penalty for each non-first occurrence of line's highest pitch within this line
+        penalty for each non-first occurrence of the line's highest pitch within this line
     :return:
-        summed over melodic lines penalty for not so high climax points and for duplications
-        of climax points within the same line
+        summed over melodic lines penalty for not so high climax points
+        and for duplications of climax points within the same line
     """
     score = 0
     for melodic_line in fragment.melodic_lines:
-        pitches = [event.position_in_semitones for event in melodic_line]
-        pitches = [x for x in pitches if x is not None]
-
+        pitches = [
+            event.position_in_semitones for event in melodic_line if event.pitch_class != 'pause'
+        ]
         climax_pitch = max(pitches)
         average_pitch = sum(pitches) / len(pitches)
         interval_size = climax_pitch - average_pitch
@@ -204,8 +204,8 @@ def find_event_type(
     :param regular_positions:
         parameters of regular positions (for example, downbeats or relatively strong beats)
     :param ad_hoc_positions:
-        parameters of ad hoc positions which appear just once (for example, the beginning of
-        the fragment or the 11th reference beat)
+        parameters of ad hoc positions which appear just once
+        (for example, the beginning of the fragment or the 11th reference beat)
     :param n_beats:
         total duration of a fragment (in reference beats)
     :return:
@@ -240,8 +240,8 @@ def evaluate_pitch_class_prominence(
     :param regular_positions:
         parameters of regular positions (for example, downbeats or relatively strong beats)
     :param ad_hoc_positions:
-        parameters of ad hoc positions which appear just once (for example, the beginning of
-        the fragment or the 11th reference beat)
+        parameters of ad hoc positions which appear just once
+        (for example, the beginning of the fragment or the 11th reference beat)
     :param event_type_to_weight:
         mapping from type of event start time to multiplicative weight for its prominence
     :param default_weight:
@@ -300,7 +300,7 @@ def encode_interval(interval: Optional[int]) -> str:
 
 def encode_line_intervals(melodic_lines: list[list[Event]]) -> list[str]:
     """
-    Encode intervals from all melodic lines
+    Encode intervals from all melodic lines.
 
     :param melodic_lines:
         melodic lines

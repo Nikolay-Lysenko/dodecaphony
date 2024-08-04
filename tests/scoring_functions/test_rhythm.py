@@ -13,12 +13,12 @@ from dodecaphony.scoring_functions.rhythm import (
     evaluate_rhythmic_homogeneity,
     evaluate_rhythmic_intensity_by_positions,
 )
-from dodecaphony.fragment import Event, Fragment, ToneRowInstance, override_calculated_attributes
+from dodecaphony.fragment import Fragment, ToneRowInstance, override_calculated_attributes
 from tests.conftest import MEASURE_DURATIONS_BY_N_EVENTS
 
 
 @pytest.mark.parametrize(
-    "fragment, max_duration, last_sonority_weight, last_notes_weight, expected",
+    "fragment, min_desired_duration, last_sonority_weight, last_notes_weight, expected",
     [
         (
             # `fragment`
@@ -46,7 +46,7 @@ from tests.conftest import MEASURE_DURATIONS_BY_N_EVENTS
                 mutable_independent_tone_row_instances_indices=[(0, 0), (1, 0)],
                 mutable_dependent_tone_row_instances_indices=[]
             ),
-            # `max_duration`
+            # `min_desired_duration`
             4,
             # `last_sonority_weight`
             0.9,
@@ -58,13 +58,13 @@ from tests.conftest import MEASURE_DURATIONS_BY_N_EVENTS
     ]
 )
 def test_evaluate_cadence_duration(
-        fragment: Fragment, max_duration: float,
+        fragment: Fragment, min_desired_duration: float,
         last_sonority_weight: float, last_notes_weight: float, expected: float
 ) -> None:
     """Test `evaluate_cadence_duration` function."""
     override_calculated_attributes(fragment)
     result = evaluate_cadence_duration(
-        fragment, max_duration, last_sonority_weight, last_notes_weight
+        fragment, min_desired_duration, last_sonority_weight, last_notes_weight
     )
     assert result == expected
 
