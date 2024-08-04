@@ -213,7 +213,40 @@ def test_evaluate_direction_change_after_large_skip(
             # `scale_types`
             None,
             # `expected`
-            -17 / 91
+            -97 / 546
+        ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[1.0, 1.0, 1.0, 1.0], [2.0, 2.0], [1.0, 1.0, 1.0, 1.0], [2.0, 1.0, 1.0]],
+                    [[2.0, 4.0], [2.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A', 'G', 'C#', 'D#', 'C', 'D', 'A#', 'F#', 'E', 'G#', 'F'])],
+                    [ToneRowInstance(['A#', 'A', 'F#', 'C', 'D', 'B', 'C#', 'G#', 'F', 'D#', 'G', 'E'])],
+                ],
+                grouped_mutable_pauses_indices=[[2], []],
+                grouped_immutable_pauses_indices=[[], []],
+                n_beats=16,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0], 1: [1]},
+                mutable_temporal_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0), (1, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `depth`
+            7,
+            # `scale_types`
+            None,
+            # `expected`
+            -2 / 13
         ),
     ]
 )

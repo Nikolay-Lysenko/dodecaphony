@@ -30,10 +30,11 @@ def evaluate_cadence_duration(
     :param last_notes_weight:
         weight that determines contribution of duration of last note of each melodic line
         to final score; this term is rather a mean than a goal, because it rewards intermediate
-        steps when last sonority duration is unchanged, but one of the last notes extends its
+        steps when last sonority duration is unchanged, but one of the last notes gets longer
         duration
     :return:
-        minus one multiplied by missing in last sonority and last notes fraction of `max_duration`
+        minus one multiplied by missing in last sonority and last notes fraction of
+        `min_desired_duration`
     """
     last_sonority_events = fragment.sonorities[-1].events
     clipped_durations = [min(event.duration, min_desired_duration) for event in last_sonority_events]

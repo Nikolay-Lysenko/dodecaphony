@@ -172,12 +172,13 @@ def evaluate_local_diatonicity_at_line_level(
     for melodic_line in fragment.melodic_lines:
         pitch_classes = []
         for event in melodic_line[:depth - 1]:
-            pitch_classes.append(event.pitch_class)
+            if event.pitch_class != 'pause':
+                pitch_classes.append(event.pitch_class)
         for event in melodic_line[depth - 1:]:
-            pitch_classes.append(event.pitch_class)
-            non_pause_pitch_classes = [x for x in pitch_classes if x != 'pause']
+            if event.pitch_class != 'pause':
+                pitch_classes.append(event.pitch_class)
             counter = Counter()
-            for pitch_class in non_pause_pitch_classes:
+            for pitch_class in pitch_classes:
                 counter.update(pitch_class_to_diatonic_scales[pitch_class])
             n_pitch_classes_from_best_scale = counter.most_common(1)[0][1]
             numerator -= 1 - n_pitch_classes_from_best_scale / len(pitch_classes)
@@ -214,7 +215,7 @@ def find_event_type(
     for ad_hoc_position in ad_hoc_positions:
         if ad_hoc_position['time'] < 0:
             ad_hoc_position['time'] += n_beats
-        if event.start_time <= ad_hoc_position['time'] <= event.start_time + event.duration:
+        if event.start_time <= ad_hoc_position['time'] < event.start_time + event.duration:
             return ad_hoc_position['name']
     for regular_position in regular_positions:
         denominator = regular_position['denominator']
@@ -305,7 +306,7 @@ def encode_line_intervals(melodic_lines: list[list[Event]]) -> list[str]:
     :param melodic_lines:
         melodic lines
     :return:
-        strings with encoded intervals for each melodic line
+        strings of encoded intervals for each melodic line
     """
     encoded_lines = []
     for melodic_line in melodic_lines:
@@ -450,7 +451,7 @@ def evaluate_smoothness_of_voice_leading(
         n_semitones_to_penalty: dict[int, float]
 ) -> float:
     """
-    Evaluate presence of coherent melodic lines that move without large leaps.
+    Evaluate presence of coherent melodic lines that are not interrupted by large leaps too often.
 
     :param fragment:
         a fragment to be evaluated
