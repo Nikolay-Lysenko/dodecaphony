@@ -339,14 +339,14 @@ def generate_elision_patterns(
     patterns = []
     if not run:
         return patterns
-    not_first = f'[^{original_pattern[0]}]'
+    not_first = f'(^|[^{original_pattern[0]}])'
     first_omission_pattern = not_first + original_pattern[1:]
     patterns.append(first_omission_pattern)
     for i in range(len(motif) - 1):
         motif_with_omission = motif[:i] + (motif[i] + motif[i + 1],) + motif[i + 2:]
         omission_pattern = ''.join([encode_interval(x) for x in motif_with_omission])
         patterns.append(omission_pattern)
-    not_last = f'[^{original_pattern[-1]}]'
+    not_last = f'([^{original_pattern[-1]}]|$)'
     last_omission_pattern = original_pattern[:-1] + not_last
     patterns.append(last_omission_pattern)
     return patterns

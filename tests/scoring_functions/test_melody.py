@@ -19,6 +19,7 @@ from dodecaphony.scoring_functions.melody import (
     evaluate_smoothness_of_voice_leading,
     evaluate_stackability,
     evaluate_transitions,
+    generate_elision_patterns,
 )
 from dodecaphony.fragment import Fragment, ToneRowInstance, override_calculated_attributes
 from tests.conftest import MEASURE_DURATIONS_BY_N_EVENTS
@@ -714,3 +715,17 @@ def test_evaluate_transitions(
         fragment, n_semitones_to_penalty, left_end_notes, right_end_notes
     )
     assert round(result, 8) == round(expected, 8)
+
+
+@pytest.mark.parametrize(
+    "motif, original_pattern, run, expected",
+    [
+        ((1, 3, 2), 'npo', True, ['(^|[^n])po', 'qo', 'nr', 'np([^o]|$)']),
+    ]
+)
+def test_generate_elision_patterns(
+        motif: tuple[int], original_pattern: str, run: bool, expected: list[str]
+) -> None:
+    """Test `generate_elision_patterns` function."""
+    result = generate_elision_patterns(motif, original_pattern, run)
+    assert result == expected
