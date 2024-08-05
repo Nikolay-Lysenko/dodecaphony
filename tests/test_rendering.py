@@ -74,6 +74,53 @@ from .conftest import MEASURE_DURATIONS_BY_N_EVENTS
                 ">>"
             )
         ),
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[1.0, 6.0], [5.0], [1.0, 2.0]],
+                    [[2.0, 1.0], [1.5, 0.75, 0.75], [1.0, 1.0, 0.5, 0.5]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'])],
+                ],
+                grouped_mutable_pauses_indices=[[]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=9,
+                meter_numerator=3,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,  # It affects nothing.
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0, 1]},
+                mutable_temporal_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `expected`
+            (
+                "\\version \"2.22.1\"\n"
+                "\\layout {\n"
+                "    indent = #0\n"
+                "}\n"
+                "\\new StaffGroup <<\n"
+                "    \\new Staff <<\n"
+                "        \\clef treble\n"
+                "        \\time 3/4\n"
+                "        \\key c \\major\n"
+                "        {b'4 g'2~ g'2.~ g'4 fis'2}\n"
+                "    >>\n"
+                "    \\new Staff <<\n"
+                "        \\clef bass\n"
+                "        \\time 3/4\n"
+                "        \\key c \\major\n"
+                "        {ais'2 cis'4 dis'4. c'8. d'8. a4 e4 gis8 f8}\n"
+                "    >>\n"
+                ">>"
+            )
+        ),
     ]
 )
 def test_create_lilypond_file_from_fragment(

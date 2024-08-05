@@ -126,7 +126,7 @@ def test_evaluate_absence_of_doubled_pitch_classes(fragment: Fragment, expected:
                 tone_row_len=12,
                 group_index_to_line_indices={0: [0, 1, 2]},
                 mutable_temporal_content_indices=[0, 1, 2],
-                mutable_independent_tone_row_instances_indices=[(0, 0), (0, 1), (0, 2)],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
                 mutable_dependent_tone_row_instances_indices=[]
             ),
             # `expected`

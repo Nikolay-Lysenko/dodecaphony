@@ -67,7 +67,9 @@ fragment:
   upper_line_lowest_note: E4
   # The output piece has 5 measures (bars).
   n_measures: 5
-  # The piece should be written in the standard 4/4 meter.
+  # The piece is going to be written in the standard 4/4 meter.
+  # Sheet music is rendered only if the meter signature is one of 2/4, 3/4, and 4/4.
+  # MIDI and WAV files should be rendered for any meter signature.
   meter_numerator: 4
   meter_denominator: 4
   # This is the list of allowed options for splitting a measure span into spans of separate notes.

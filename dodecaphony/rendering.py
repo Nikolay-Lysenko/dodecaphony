@@ -9,6 +9,7 @@ import datetime
 import os
 import subprocess
 import traceback
+import warnings
 from math import ceil, floor
 from pkg_resources import resource_filename
 from typing import Any
@@ -24,6 +25,7 @@ from sinethesizer.io import (
 from sinethesizer.synth.core import Instrument
 from sinethesizer.utils.music_theory import get_list_of_notes, get_note_to_position_mapping
 
+from .constants import LILYPOND_RECIPROCAL_DURATIONS_BY_METER_SIGNATURE
 from .fragment import Event, Fragment
 
 
@@ -348,7 +350,8 @@ def get_lilypond_order_of_voices(n_voices: int) -> list[int]:
 def find_lilypond_duration(
         duration: float,
         time_in_measure: float,
-        meter_numerator: int
+        meter_numerator: int,
+        meter_denominator: int
 ) -> list[str]:
     """
     Find duration of a note in Lilypond reciprocal format.
@@ -359,41 +362,17 @@ def find_lilypond_duration(
         number of previous beats passed from the start of the current measure
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
+    :param meter_denominator:
+        denominator in meter signature, i.e., ratio of reference beat duration to the whole note
     :return:
         strings representing Lilypond durations of notes (a note can be split to multiple notes
         if it crosses bar or if its duration is compound and requires ties)
     """
     if time_in_measure + duration <= meter_numerator:
+        meter_signature = f"{meter_numerator}/{meter_denominator}"
+        lilypond_mapping = LILYPOND_RECIPROCAL_DURATIONS_BY_METER_SIGNATURE[meter_signature]
         reciprocal_duration = meter_numerator / duration
-        supported_reciprocal_durations = {
-            16: ['16'],
-            32 / 3: ['16.'],
-            8: ['8'],
-            16 / 3: ['8.'],
-            4: ['4'],
-            3.2: ['4~', '16'],
-            1 / 0.34375: ['4~', '16.'],
-            8 / 3: ['4.'],
-            1 / 0.4375: ['4.~', '16'],
-            1 / 0.46875: ['4.~', '16.'],
-            2: ['2'],
-            1 / 0.5625: ['2~', '16'],
-            1 / 0.59375: ['2~', '16.'],
-            1.6: ['2~', '8'],
-            1 / 0.6875: ['2~', '8.'],
-            4 / 3: ['2.'],
-            1 / 0.8125: ['2.~', '16'],
-            1 / 0.84375: ['2.~', '16.'],
-            8 / 7: ['2.~', '8'],
-            1 / 0.9375: ['2.~', '8.'],
-            1: ['1'],
-            2 / 3: ['1.'],
-            0.5: ['\\breve'],
-            1 / 3: ['\\breve.'],
-            0.25: ['\\longa'],
-            1 / 6: ['\\longa.'],
-        }
-        lilypond_duration = supported_reciprocal_durations.get(reciprocal_duration)
+        lilypond_duration = lilypond_mapping.get(reciprocal_duration)
         if lilypond_duration is None:
             raise RuntimeError(f"Reciprocal duration {reciprocal_duration} is not supported yet.")
         return lilypond_duration
@@ -402,19 +381,21 @@ def find_lilypond_duration(
         remaining_results = find_lilypond_duration(
             remaining_duration,
             time_in_measure,
-            meter_numerator
+            meter_numerator,
+            meter_denominator
         )
-        remaining_results[-1] = remaining_results[-1] + '~'
+        remaining_results = remaining_results[:-1] + [remaining_results[-1] + '~']
         left_over_bar_duration = duration - meter_numerator + time_in_measure
         left_over_bar_results = find_lilypond_duration(
             left_over_bar_duration,
             0,
-            meter_numerator
+            meter_numerator,
+            meter_denominator
         )
         return remaining_results + left_over_bar_results
 
 
-def convert_to_lilypond_note(event: Event, meter_numerator: int) -> str:
+def convert_to_lilypond_note(event: Event, meter_numerator: int, meter_denominator: int) -> str:
     """
     Convert `Event` instance to note in Lilypond absolute notation.
 
@@ -422,6 +403,8 @@ def convert_to_lilypond_note(event: Event, meter_numerator: int) -> str:
         event
     :param meter_numerator:
         numerator in meter signature, i.e., number of reference beats per measure
+    :param meter_denominator:
+        denominator in meter signature, i.e., ratio of reference beat duration to the whole note
     :return:
         note in Lilypond absolute notation
     """
@@ -442,7 +425,9 @@ def convert_to_lilypond_note(event: Event, meter_numerator: int) -> str:
 
     start_time = event.start_time
     time_in_measure = start_time % meter_numerator
-    durations = find_lilypond_duration(event.duration, time_in_measure, meter_numerator)
+    durations = find_lilypond_duration(
+        event.duration, time_in_measure, meter_numerator, meter_denominator
+    )
     note = [f"{note_without_duration}{duration}" for duration in durations]
     note = " ".join(note)
     if event.pitch_class in ['pause', 'skip']:
@@ -477,7 +462,9 @@ def create_lilypond_file_from_fragment(fragment: Fragment, output_path: str) -> 
         melodic_line = fragment.melodic_lines[index]
         lilypond_voice = []
         for event in melodic_line:
-            note = convert_to_lilypond_note(event, fragment.meter_numerator)
+            note = convert_to_lilypond_note(
+                event, fragment.meter_numerator, fragment.meter_denominator
+            )
             lilypond_voice.append(note)
         lilypond_voice = " ".join(lilypond_voice)
         lilypond_voices.append(lilypond_voice)
@@ -550,6 +537,13 @@ def render(fragment: Fragment, rendering_params: dict[str, Any]) -> None:  # pra
     with open(meta_information_path, 'w') as in_file:
         in_file.write(rendering_params['meta_information'] + '\n')
 
+    meter_signature = f"{fragment.meter_numerator}/{fragment.meter_denominator}"
+    if meter_signature not in LILYPOND_RECIPROCAL_DURATIONS_BY_METER_SIGNATURE:
+        warnings.warn(
+            f"Meter signature {meter_signature} is not supported in sheet music rendering. "
+            "Only MIDI and WAV outputs are saved."
+        )
+        return
     lilypond_path = os.path.join(nested_dir, 'sheet_music.ly')
     create_lilypond_file_from_fragment(fragment, lilypond_path)
     create_pdf_sheet_music_with_lilypond(lilypond_path)
