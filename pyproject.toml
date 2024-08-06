@@ -28,7 +28,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["dodecaphony"]
+packages = ["dodecaphony", "dodecaphony.scoring_functions"]
 
 [tool.setuptools.package-data]
 "dodecaphony.configs" = ["default_config.yml", "sinethesizer_presets.yml"]
