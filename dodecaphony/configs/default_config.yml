@@ -418,6 +418,7 @@ optimization:
       line_durations_change: 1.0
   max_rotation: 2
   max_transposition_in_semitones: 3
+  shuffle_section_sizes: [0]
   paralleling_params:
     n_processes: null
 

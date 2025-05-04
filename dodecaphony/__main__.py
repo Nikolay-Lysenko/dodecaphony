@@ -52,7 +52,8 @@ def main() -> None:
     scoring_sets = settings['evaluation']['scoring_sets']
     transformations_registry = create_transformations_registry(
         settings['optimization'].pop('max_rotation'),
-        settings['optimization'].pop('max_transposition_in_semitones')
+        settings['optimization'].pop('max_transposition_in_semitones'),
+        settings['optimization'].pop('shuffle_section_sizes')
     )
     fragments = optimize_with_variable_neighborhood_search(
         initial_fragment,

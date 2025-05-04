@@ -99,6 +99,31 @@ def apply_transposition(fragment: Fragment, max_transposition: int) -> Fragment:
     return fragment
 
 
+def apply_shuffle(fragment: Fragment, section_sizes: list[int]) -> Fragment:
+    """
+    Shuffle sections of one random series (transformed tone row instance).
+
+    :param fragment:
+        a fragment to be modified
+    :param section_sizes:
+        sizes of sections to be shuffled independently
+    :return:
+        modified fragment
+    """
+    tone_row_instance = draw_tone_row_instance(fragment)
+    original_pitch_classes = tone_row_instance.pitch_classes
+    shuffled_pitch_classes = []
+    start_index = 0
+    for size in section_sizes:
+        section = original_pitch_classes[start_index:start_index+size]
+        random.shuffle(section)
+        shuffled_pitch_classes.extend(section)
+        start_index += size
+    shuffled_pitch_classes.extend(original_pitch_classes[start_index:])
+    tone_row_instance.pitch_classes = shuffled_pitch_classes
+    return fragment
+
+
 def apply_measure_durations_change(fragment: Fragment) -> Fragment:
     """
     Change durations of events from a random measure of a single melodic line.
@@ -200,7 +225,7 @@ def apply_pause_shift(fragment: Fragment) -> Fragment:
 
 
 def create_transformations_registry(
-        max_rotation: int, max_transposition: int
+        max_rotation: int, max_transposition: int, shuffle_section_sizes: list[int]
 ) -> TRANSFORMATION_REGISTRY_TYPE:
     """
     Get mapping from names to corresponding transformations and their arguments.
@@ -209,6 +234,8 @@ def create_transformations_registry(
         maximum size of rotation (in elements)
     :param max_transposition:
         maximum interval of transposition (in semitones)
+    :param shuffle_section_sizes:
+        sizes of sections to be shuffled independently
     :return:
         registry of transformations
     """
@@ -217,6 +244,7 @@ def create_transformations_registry(
         'inversion': (apply_inversion, []),
         'reversion': (apply_reversion, []),
         'rotation': (apply_rotation, [max_rotation]),
+        'shuffle': (apply_shuffle, [shuffle_section_sizes]),
         'transposition': (apply_transposition, [max_transposition]),
         # Rhythm transformations.
         'crossmeasure_event_transfer': (apply_crossmeasure_event_transfer, []),

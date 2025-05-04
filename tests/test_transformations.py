@@ -17,6 +17,7 @@ from dodecaphony.transformations import (
     apply_pause_shift,
     apply_reversion,
     apply_rotation,
+    apply_shuffle,
     apply_transposition,
     create_transformations_registry,
     transform,
@@ -737,6 +738,58 @@ def test_apply_rotation(
 
 
 @pytest.mark.parametrize(
+    "fragment, section_sizes, expected_options",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[2.0, 2.0], [2.0, 2.0], [2.0, 2.0], [2.0, 2.0], [2.0, 2.0], [2.0, 2.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [
+                        ToneRowInstance(['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F'])
+                    ],
+                ],
+                grouped_mutable_pauses_indices=[[]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=24,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0]},
+                mutable_temporal_content_indices=[0],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `section_sizes`
+            [3],
+            # `expected_options`
+            [
+                [['B', 'A#', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']],
+                [['B', 'G', 'A#', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']],
+                [['A#', 'G', 'B', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']],
+                [['A#', 'B', 'G', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']],
+                [['G', 'B', 'A#', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']],
+                [['G', 'A#', 'B', 'C#', 'D#', 'C', 'D', 'A', 'F#', 'E', 'G#', 'F']],
+            ]
+        ),
+    ]
+)
+def test_apply_shuffle(
+        fragment: Fragment, section_sizes: list[int], expected_options: list[list[list[str]]]
+) -> None:
+    """Test `apply_shuffle` function."""
+    fragment = apply_shuffle(fragment, section_sizes)
+    override_calculated_attributes(fragment)
+    assert fragment.sonic_content in expected_options
+
+
+@pytest.mark.parametrize(
     "fragment, max_transposition, expected_options",
     [
         (
@@ -851,7 +904,8 @@ def test_apply_transposition(
 
 
 @pytest.mark.parametrize(
-    "fragment, n_transformations, transformation_names, max_rotation, max_transposition, "
+    "fragment, n_transformations, transformation_names, "
+    "max_rotation, max_transposition, shuffle_section_sizes, "
     "expected_options",
     [
         (
@@ -886,6 +940,8 @@ def test_apply_transposition(
             1,
             # `max_transposition`
             1,
+            # `shuffle_section_sizes`
+            [0],
             # `expected_options`
             [
                 [
@@ -926,10 +982,13 @@ def test_apply_transposition(
 )
 def test_transform(
         fragment: Fragment, n_transformations: int, transformation_names: list[str],
-        max_rotation: int, max_transposition: int, expected_options: list[list[list[Event]]]
+        max_rotation: int, max_transposition: int, shuffle_section_sizes: list[int],
+        expected_options: list[list[list[Event]]]
 ) -> None:
     """Test `transform` function."""
-    registry = create_transformations_registry(max_rotation, max_transposition)
+    registry = create_transformations_registry(
+        max_rotation, max_transposition, shuffle_section_sizes
+    )
     transformation_probabilities = [1 / len(transformation_names) for _ in transformation_names]
     fragment = transform(
         fragment, n_transformations, registry, transformation_names, transformation_probabilities

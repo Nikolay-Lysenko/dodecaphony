@@ -481,6 +481,7 @@ optimization:
   # Parameters of `create_transformations_registry` function from `transformations.py` module.
   max_rotation: 2
   max_transposition_in_semitones: 3
+  shuffle_section_sizes: [0]
   # Parameters of parallel execution.
   paralleling_params:
     n_processes: null

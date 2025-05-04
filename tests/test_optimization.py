@@ -74,7 +74,7 @@ def test_create_tasks(
 
 @pytest.mark.parametrize(
     "fragment, n_iterations, n_trials_per_iteration, beam_width, neighborhoods, perturbation, "
-    "max_rotation, max_transposition, scoring_sets, scoring_sets_params",
+    "max_rotation, max_transposition, shuffle_section_sizes, scoring_sets, scoring_sets_params",
     [
         (
             # `fragment`
@@ -145,6 +145,8 @@ def test_create_tasks(
             1,
             # `max_transposition`
             1,
+            # `shuffle_section_sizes`
+            [4, 4, 100],
             # `scoring_sets`
             ['default'],
             # `scoring_sets_params`
@@ -181,11 +183,13 @@ def test_create_tasks(
 def test_optimize_with_variable_neighborhood_search(
         fragment: Fragment, n_iterations: int, n_trials_per_iteration: int,
         beam_width: int, neighborhoods: list[dict[str, Any]], perturbation: dict[str, Any],
-        max_rotation: int, max_transposition: int,
+        max_rotation: int, max_transposition: int, shuffle_section_sizes: list[int],
         scoring_sets: list[str], scoring_sets_params: list[dict[str, Any]]
 ) -> None:
     """Test `optimize_with_variable_neighborhood_search` function."""
-    transformations_registry = create_transformations_registry(max_rotation, max_transposition)
+    transformations_registry = create_transformations_registry(
+        max_rotation, max_transposition, shuffle_section_sizes
+    )
     scoring_sets_registry = parse_scoring_sets_registry(scoring_sets_params)
     override_calculated_attributes(fragment)
     optimize_with_variable_neighborhood_search(
