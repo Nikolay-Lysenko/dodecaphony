@@ -757,7 +757,8 @@ def test_evaluate_dissonances_preparation_and_resolution(
 
 
 @pytest.mark.parametrize(
-    "fragment, regular_positions, ad_hoc_positions, ranges, n_semitones_to_stability, expected",
+    "fragment, regular_positions, ad_hoc_positions, ranges, "
+    "n_semitones_to_stability, min_stability_weight, expected",
     [
         (
             # `fragment`
@@ -816,6 +817,8 @@ def test_evaluate_dissonances_preparation_and_resolution(
                 10: 0.2,
                 11: 0.2,
             },
+            # `min_stability_weight`
+            0,
             # `expected`
             -0.1766666667
         ),
@@ -878,6 +881,8 @@ def test_evaluate_dissonances_preparation_and_resolution(
                 10: 0.2,
                 11: 0.2,
             },
+            # `min_stability_weight`
+            0,
             # `expected`
             -0.3366666667
         ),
@@ -886,18 +891,19 @@ def test_evaluate_dissonances_preparation_and_resolution(
 def test_evaluate_harmony_dynamic_by_positions(
         fragment: Fragment, regular_positions: list[dict[str, Any]],
         ad_hoc_positions: list[dict[str, Any]], ranges: dict[str, tuple[float, float]],
-        n_semitones_to_stability: dict[int, float], expected: float
+        n_semitones_to_stability: dict[int, float], min_stability_weight: float, expected: float
 ) -> None:
     """Test `evaluate_harmony_dynamic_by_positions` function."""
     override_calculated_attributes(fragment)
     result = evaluate_harmony_dynamic_by_positions(
-        fragment, regular_positions, ad_hoc_positions, ranges, n_semitones_to_stability
+        fragment, regular_positions, ad_hoc_positions, ranges,
+        n_semitones_to_stability, min_stability_weight
     )
     assert round(result, 10) == expected
 
 
 @pytest.mark.parametrize(
-    "fragment, intervals, ranges, n_semitones_to_stability, expected",
+    "fragment, intervals, ranges, n_semitones_to_stability, min_stability_weight, expected",
     [
         (
             # `fragment`
@@ -944,6 +950,8 @@ def test_evaluate_harmony_dynamic_by_positions(
                 10: 0.2,
                 11: 0.2,
             },
+            # `min_stability_weight`
+            0,
             # `expected`
             -(0.75 * 0.5 + 0.3) / 1.75
         ),
@@ -992,6 +1000,8 @@ def test_evaluate_harmony_dynamic_by_positions(
                 10: 0.2,
                 11: 0.2,
             },
+            # `min_stability_weight`
+            0,
             # `expected`
             -0.8 / 2.25
         ),
@@ -1000,12 +1010,12 @@ def test_evaluate_harmony_dynamic_by_positions(
 def test_evaluate_harmony_dynamic_by_time_intervals(
         fragment: Fragment, intervals: list[tuple[float, float]],
         ranges: list[tuple[float, float]], n_semitones_to_stability: dict[int, float],
-        expected: float
+        min_stability_weight: float, expected: float
 ) -> None:
     """Test `evaluate_harmony_dynamic_by_time_intervals` function."""
     override_calculated_attributes(fragment)
     result = evaluate_harmony_dynamic_by_time_intervals(
-        fragment, intervals, ranges, n_semitones_to_stability
+        fragment, intervals, ranges, n_semitones_to_stability, min_stability_weight
     )
     assert round(result, 10) == round(expected, 10)
 

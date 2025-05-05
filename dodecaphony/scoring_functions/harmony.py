@@ -270,27 +270,32 @@ def evaluate_dissonances_preparation_and_resolution(
 
 
 def compute_harmonic_stability_of_sonority(
-        sonority_events: list[Event], n_semitones_to_stability: dict[int, float]
+        sonority_events: list[Event], n_semitones_to_stability: dict[int, float],
+        min_stability_weight: float = 0.0
 ) -> float:
     """
-    Compute stability of sonority as average stability of intervals forming it.
+    Compute stability of sonority as aggregated stability levels of intervals forming it.
 
     :param sonority_events:
         simultaneously sounding events (without pauses)
     :param n_semitones_to_stability:
         mapping from interval size in semitones to its harmonic stability
+    :param min_stability_weight:
+        weight of minimum interval stability in the total value; a float between 0 and 1;
+        the remaining weight is distributed to average stability
     :return:
-        average stability of intervals forming the sonority
+        weighted sum of average and minimum stability of intervals forming the sonority
     """
     if len(sonority_events) <= 1:
         return 1.0
-    stability = 0
+    stabilities = []
     for first, second in itertools.combinations(sonority_events, 2):
         interval_in_semitones = abs(first.position_in_semitones - second.position_in_semitones)
         interval_in_semitones %= N_SEMITONES_PER_OCTAVE
-        stability += n_semitones_to_stability[interval_in_semitones]
-    n_pairs = len(sonority_events) * (len(sonority_events) - 1) / 2
-    stability /= n_pairs
+        stabilities.append(n_semitones_to_stability[interval_in_semitones])
+    avg_stability = sum(stabilities) / len(stabilities)
+    min_stability = min(stabilities)
+    stability = (1 - min_stability_weight) * avg_stability + min_stability_weight * min_stability
     return stability
 
 
@@ -341,7 +346,7 @@ def find_sonority_type(
 def evaluate_harmony_dynamic_by_positions(
         fragment: Fragment, regular_positions: list[dict[str, Any]],
         ad_hoc_positions: list[dict[str, Any]], ranges: dict[str, tuple[float, float]],
-        n_semitones_to_stability: dict[int, float]
+        n_semitones_to_stability: dict[int, float], min_stability_weight: float = 0.0
 ) -> float:
     """
     Evaluate values of harmonic stability/tension at particular positions.
@@ -357,13 +362,16 @@ def evaluate_harmony_dynamic_by_positions(
         mapping from position type to minimum and maximum desired levels of harmonic stability
     :param n_semitones_to_stability:
         mapping from interval size in semitones to its harmonic stability
+    :param min_stability_weight:
+        weight of minimum interval stability in the total value; a float between 0 and 1;
+        the remaining weight is distributed to average stability
     :return:
         average over all sonorities deviation of harmonic stability from its ranges
     """
     score = 0
     for sonority in fragment.sonorities:
         stability_of_current_sonority = compute_harmonic_stability_of_sonority(
-            sonority.non_pause_events, n_semitones_to_stability
+            sonority.non_pause_events, n_semitones_to_stability, min_stability_weight
         )
         sonority_type = find_sonority_type(
             sonority.start_time, sonority.end_time, regular_positions, ad_hoc_positions,
@@ -379,7 +387,8 @@ def evaluate_harmony_dynamic_by_positions(
 
 def evaluate_harmony_dynamic_by_time_intervals(
         fragment: Fragment, intervals: list[tuple[float, float]],
-        ranges: list[tuple[float, float]], n_semitones_to_stability: dict[int, float]
+        ranges: list[tuple[float, float]], n_semitones_to_stability: dict[int, float],
+        min_stability_weight: float = 0.0
 ) -> float:
     """
     Evaluate values of harmonic stability/tension during particular time intervals.
@@ -392,6 +401,9 @@ def evaluate_harmony_dynamic_by_time_intervals(
         list of minimum and maximum desired levels of harmonic stability during each time interval
     :param n_semitones_to_stability:
         mapping from interval size in semitones to its harmonic stability
+    :param min_stability_weight:
+        weight of minimum interval stability in the total value; a float between 0 and 1;
+        the remaining weight is distributed to average stability
     :return:
         weighted (based on duration) average over all sonorities deviation of harmonic stability
         from its ranges
@@ -411,7 +423,7 @@ def evaluate_harmony_dynamic_by_time_intervals(
             intersection_duration = intersection_end - intersection_start
 
             stability_of_current_sonority = compute_harmonic_stability_of_sonority(
-                sonority.non_pause_events, n_semitones_to_stability
+                sonority.non_pause_events, n_semitones_to_stability, min_stability_weight
             )
             deviation = 0
             deviation += min(stability_of_current_sonority - min_allowed_value, 0)
