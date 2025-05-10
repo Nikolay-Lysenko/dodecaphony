@@ -534,8 +534,8 @@ def render(fragment: Fragment, rendering_params: dict[str, Any]) -> None:  # pra
     create_yaml_from_fragment(fragment, yaml_path)
 
     meta_information_path = os.path.join(nested_dir, 'meta_information.txt')
-    with open(meta_information_path, 'w') as in_file:
-        in_file.write(rendering_params['meta_information'] + '\n')
+    with open(meta_information_path, 'w') as output_file:
+        output_file.write(rendering_params['meta_information'] + '\n')
 
     meter_signature = f"{fragment.meter_numerator}/{fragment.meter_denominator}"
     if meter_signature not in LILYPOND_RECIPROCAL_DURATIONS_BY_METER_SIGNATURE:
