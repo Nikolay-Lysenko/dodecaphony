@@ -270,6 +270,53 @@ def evaluate_pitch_class_prominence(
     return score
 
 
+def convert_ranges_to_positions_in_semitones(
+        ranges: list[tuple[str, str]]
+) -> list[tuple[float, float]]:
+    """
+    Convert ranges from pairs of notes to pairs pf positions in semitones.
+
+    :param ranges:
+        pairs of the lowest note and the highest note for each melodic line
+        starting from the topmost one
+    :return:
+        pairs of the lowest position in semitones and the highest position in semitones
+        for each melodic line starting from the topmost one
+    """
+    results = []
+    for lowest_note, highest_note in ranges:
+        result = (NOTE_TO_POSITION_MAPPING[lowest_note], NOTE_TO_POSITION_MAPPING[highest_note])
+        results.append(result)
+    return results
+
+
+def evaluate_pitch_ranges(fragment: Fragment, ranges: list[tuple[str, str]]) -> float:
+    """
+    Evaluate fitness of melodic lines to their prescribed ranges.
+
+    :param fragment:
+        a fragment to be evaluated
+    :param ranges:
+        pairs of the lowest note and the highest note for each melodic line
+        starting from the topmost one
+    :return:
+        minus one multiplied by share of out-of-range events
+    """
+    numerator = 0
+    denominator = 0
+    converted_ranges = convert_ranges_to_positions_in_semitones(ranges)
+    zipped = zip(fragment.melodic_lines, converted_ranges)
+    for melodic_line, (lowest_position, highest_position) in zipped:
+        for event in melodic_line:
+            if event.pitch_class == 'pause':
+                continue
+            if not lowest_position <= event.position_in_semitones <= highest_position:
+                numerator -= 1
+            denominator += 1
+    score = numerator / denominator
+    return score
+
+
 @cache
 def get_mapping_from_interval_size_to_character() -> dict[Optional[int], str]:
     """

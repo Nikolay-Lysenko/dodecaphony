@@ -15,6 +15,7 @@ from dodecaphony.scoring_functions.melody import (
     evaluate_direction_change_after_large_skip,
     evaluate_local_diatonicity_at_line_level,
     evaluate_pitch_class_prominence,
+    evaluate_pitch_ranges,
     evaluate_presence_of_intervallic_motif,
     evaluate_smoothness_of_voice_leading,
     evaluate_stackability,
@@ -322,6 +323,50 @@ def test_evaluate_pitch_class_prominence(
         event_type_to_weight, default_weight
     )
     assert round(result, 10) == round(expected, 10)
+
+
+@pytest.mark.parametrize(
+    "fragment, ranges, expected",
+    [
+        (
+            # `fragment`
+            Fragment(
+                temporal_content=[
+                    [[2.0, 2.0], [2.0, 2.0], [2.0, 2.0]],
+                    [[2.0, 1.0, 1.0], [2.0, 2.0], [2.0, 2.0]],
+                ],
+                grouped_tone_row_instances=[
+                    [ToneRowInstance(['C#', 'D#', 'C', 'E', 'B', 'D', 'F#', 'G#', 'F', 'A', 'G', 'A#'])],
+                ],
+                grouped_mutable_pauses_indices=[[4]],
+                grouped_immutable_pauses_indices=[[]],
+                n_beats=12,
+                meter_numerator=4,
+                meter_denominator=4,
+                measure_durations_by_n_events=MEASURE_DURATIONS_BY_N_EVENTS,
+                line_ids=[1, 2],
+                upper_line_highest_position=55,
+                upper_line_lowest_position=41,
+                tone_row_len=12,
+                group_index_to_line_indices={0: [0, 1]},
+                mutable_temporal_content_indices=[0, 1],
+                mutable_independent_tone_row_instances_indices=[(0, 0)],
+                mutable_dependent_tone_row_instances_indices=[]
+            ),
+            # `ranges`
+            [('C7', 'C8'), ('C1', 'C8')],
+            # `expected`
+            -0.5
+        ),
+    ]
+)
+def test_evaluate_pitch_ranges(
+        fragment: Fragment, ranges: list[tuple[str, str]], expected: float
+) -> None:
+    """Test `evaluate_pitch_ranges` function."""
+    override_calculated_attributes(fragment)
+    result = evaluate_pitch_ranges(fragment, ranges)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
