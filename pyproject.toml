@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dodecaphony"
-version = "0.2.1"
+version = "0.2.2"
 description = "Algorithmic composition of modern classical music in the twelve-tone technique"
 readme = "README.md"
 keywords = [
