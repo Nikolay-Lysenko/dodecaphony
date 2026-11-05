@@ -10,8 +10,8 @@ import os
 import subprocess
 import traceback
 import warnings
+from importlib.resources import files
 from math import ceil, floor
-from pkg_resources import resource_filename
 from typing import Any
 
 import pretty_midi
@@ -179,7 +179,7 @@ def create_sinethesizer_instruments() -> dict[str, Instrument]:
     :return:
         mapping from instrument names to instruments itself
     """
-    presets_path = resource_filename('dodecaphony', 'configs/sinethesizer_presets.yml')
+    presets_path = str(files('dodecaphony').joinpath('configs/sinethesizer_presets.yml'))
     instruments_registry = create_instruments_registry(presets_path)
     return instruments_registry
 
