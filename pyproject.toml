@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dodecaphony"
-version = "0.2.2"
+version = "0.2.3"
 description = "Algorithmic composition of modern classical music in the twelve-tone technique"
 readme = "README.md"
 keywords = [
@@ -42,7 +42,10 @@ test = [
 packages = ["dodecaphony", "dodecaphony.scoring_functions"]
 
 [tool.setuptools.package-data]
-"dodecaphony.configs" = ["default_config.yml", "sinethesizer_presets.yml"]
+"dodecaphony" = [
+    "configs/default_config.yml",
+    "configs/sinethesizer_presets.yml"
+]
 
 [tool.coverage.run]
 branch = true
